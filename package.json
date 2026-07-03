@@ -1,5 +1,6 @@
 {
   "name": "harry-potter-games",
+  "version": "1.3.0",
   "private": true,
   "scripts": {
     "test": "playwright test",
