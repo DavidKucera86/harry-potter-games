@@ -7,6 +7,7 @@ const baseURL = isProduction
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: '**/unit/**',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,

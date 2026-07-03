@@ -1,10 +1,15 @@
-class GuessHouseGame extends BaseGame {
+import { GAME_CONFIG } from '../shared/config.js';
+import { STRINGS } from '../shared/strings.js';
+import { getCharacters } from '../shared/dataProvider.js';
+import { BaseGame } from '../shared/BaseGame.js';
+
+export class GuessHouseGame extends BaseGame {
   static HOUSES = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff'];
   static HOUSE_CLASSES = {
     Gryffindor: 'house-gryffindor',
     Slytherin: 'house-slytherin',
     Ravenclaw: 'house-ravenclaw',
-    Hufflepuff: 'house-hufflepuff'
+    Hufflepuff: 'house-hufflepuff',
   };
 
   constructor() {
@@ -35,7 +40,9 @@ class GuessHouseGame extends BaseGame {
       this.startNewGame();
     } else {
       this.setMessage(STRINGS.errors.loadCharacters, 'error');
-      this.newGameBtn.disabled = false;
+      if (this.newGameBtn) {
+        this.newGameBtn.disabled = false;
+      }
     }
   }
 
@@ -54,14 +61,20 @@ class GuessHouseGame extends BaseGame {
   }
 
   setControlsEnabled(enabled) {
-    this.newGameBtn.disabled = !enabled;
-    this.choicesEl.querySelectorAll('button').forEach(btn => {
-      btn.disabled = !enabled;
-    });
+    if (this.newGameBtn) {
+      this.newGameBtn.disabled = !enabled;
+    }
+    if (this.choicesEl) {
+      this.choicesEl.querySelectorAll('button').forEach(btn => {
+        btn.disabled = !enabled;
+      });
+    }
   }
 
   renderRound() {
     this.currentCharacter = this.pickFromDeck();
+    if (!this.currentCharacter || !this.characterNameEl) return;
+
     this.characterNameEl.textContent = this.currentCharacter.name;
 
     const wrongHouses = GuessHouseGame.HOUSES.filter(
@@ -69,8 +82,10 @@ class GuessHouseGame extends BaseGame {
     );
     const options = this.shuffle([
       this.currentCharacter.house,
-      ...this.shuffle(wrongHouses).slice(0, 3)
+      ...this.shuffle(wrongHouses).slice(0, 3),
     ]);
+
+    if (!this.choicesEl) return;
 
     this.choicesEl.replaceChildren();
     for (const house of options) {
@@ -83,13 +98,13 @@ class GuessHouseGame extends BaseGame {
   }
 
   guessHouse(house, btn) {
-    if (this.gameOver || !this.isReady) return;
+    if (this.gameOver || !this.isReady || !this.currentCharacter) return;
 
     this.setControlsEnabled(false);
     const correct = house === this.currentCharacter.house;
     this.lastAnswer = {
       name: this.currentCharacter.name,
-      house: this.currentCharacter.house
+      house: this.currentCharacter.house,
     };
 
     if (correct) {
@@ -100,7 +115,7 @@ class GuessHouseGame extends BaseGame {
         STRINGS.quiz.houseCorrect(this.currentCharacter.name, house),
         'success'
       );
-      setTimeout(() => this.nextRound(), 1200);
+      this.scheduleRoundTimeout(() => this.nextRound());
     } else {
       btn.classList.add('wrong');
       this.lives--;
@@ -111,9 +126,9 @@ class GuessHouseGame extends BaseGame {
       );
 
       if (this.lives <= 0) {
-        setTimeout(() => this.endGame(), 1200);
+        this.scheduleRoundTimeout(() => this.endGame());
       } else {
-        setTimeout(() => this.nextRound(), 1200);
+        this.scheduleRoundTimeout(() => this.nextRound());
       }
     }
   }
@@ -126,23 +141,28 @@ class GuessHouseGame extends BaseGame {
   }
 
   showModal() {
+    if (!this.modalIcon || !this.modalTitle || !this.lastAnswer) return;
+
     this.modalIcon.textContent = '💀';
     this.modalTitle.textContent = STRINGS.quiz.loseTitle;
     this.fillModalLines([
       { label: STRINGS.quiz.scoreLabel, value: this.score },
       { label: STRINGS.quiz.lastCharacterLabel, value: this.lastAnswer.name, gap: true },
-      { label: STRINGS.quiz.correctHouseLabel, value: this.lastAnswer.house }
+      { label: STRINGS.quiz.correctHouseLabel, value: this.lastAnswer.house },
     ]);
     this.openModal();
   }
 
   endGame() {
     this.gameOver = true;
+    this.clearRoundTimeout();
     this.setControlsEnabled(false);
     this.showModal();
   }
 
   async startNewGame() {
+    this.clearRoundTimeout();
+
     if (!this.isReady) {
       this.setControlsEnabled(false);
       this.showLoading(true, STRINGS.loading.characters);
@@ -152,7 +172,9 @@ class GuessHouseGame extends BaseGame {
 
       if (!loaded) {
         this.setMessage(STRINGS.errors.loadCharacters, 'error');
-        this.newGameBtn.disabled = false;
+        if (this.newGameBtn) {
+          this.newGameBtn.disabled = false;
+        }
         return;
       }
     }

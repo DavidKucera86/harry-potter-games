@@ -1,4 +1,8 @@
-class BaseGame {
+import { GAME_CONFIG } from './config.js';
+import { pickFromRemaining, shuffle } from './deckUtils.js';
+import { STRINGS } from './strings.js';
+
+export class BaseGame {
   constructor() {
     this.isReady = false;
     this.lives = GAME_CONFIG.MAX_LIVES;
@@ -6,6 +10,7 @@ class BaseGame {
     this.score = 0;
     this.remainingItems = [];
     this.deckSource = [];
+    this.roundTimeoutId = null;
     this.bindCommonElements();
   }
 
@@ -20,11 +25,28 @@ class BaseGame {
     this.modalBtn = document.getElementById('modalBtn');
     this.scoreEl = document.getElementById('score');
     this.loadingOverlay = document.getElementById('loadingOverlay');
+    this.gameContainer = document.querySelector('.game-container');
   }
 
   bindCommonEvents(onNewGame) {
-    this.newGameBtn.addEventListener('click', onNewGame);
-    this.modalBtn.addEventListener('click', onNewGame);
+    if (this.newGameBtn) {
+      this.newGameBtn.addEventListener('click', onNewGame);
+    }
+    if (this.modalBtn) {
+      this.modalBtn.addEventListener('click', onNewGame);
+    }
+  }
+
+  clearRoundTimeout() {
+    if (this.roundTimeoutId !== null) {
+      clearTimeout(this.roundTimeoutId);
+      this.roundTimeoutId = null;
+    }
+  }
+
+  scheduleRoundTimeout(callback, delayMs = 1200) {
+    this.clearRoundTimeout();
+    this.roundTimeoutId = setTimeout(callback, delayMs);
   }
 
   createHeartSvg() {
@@ -40,10 +62,15 @@ class BaseGame {
   }
 
   renderHearts() {
+    if (!this.heartsEl) return;
+
     this.heartsEl.replaceChildren();
+    this.heartsEl.setAttribute('aria-label', `${STRINGS.a11y.livesLabel}: ${this.lives}`);
+
     for (let i = 0; i < GAME_CONFIG.MAX_LIVES; i++) {
       const heart = document.createElement('div');
       heart.className = 'heart' + (i >= this.lives ? ' lost' : '');
+      heart.setAttribute('aria-hidden', 'true');
       heart.appendChild(this.createHeartSvg());
       this.heartsEl.appendChild(heart);
     }
@@ -56,6 +83,8 @@ class BaseGame {
   }
 
   setMessage(text, type) {
+    if (!this.messageEl) return;
+
     this.messageEl.textContent = text;
     this.messageEl.className = 'message ' + type;
   }
@@ -64,6 +93,9 @@ class BaseGame {
     if (!this.loadingOverlay) return;
 
     this.loadingOverlay.hidden = !show;
+    if (this.gameContainer) {
+      this.gameContainer.setAttribute('aria-busy', show ? 'true' : 'false');
+    }
     if (text) {
       const label = this.loadingOverlay.querySelector('p');
       if (label) label.textContent = text;
@@ -71,14 +103,27 @@ class BaseGame {
   }
 
   openModal() {
+    if (!this.overlay) return;
+
+    this.overlay.removeAttribute('inert');
     this.overlay.classList.add('visible');
+    this.overlay.setAttribute('aria-hidden', 'false');
+    if (this.modalBtn) {
+      this.modalBtn.focus();
+    }
   }
 
   closeModal() {
+    if (!this.overlay) return;
+
     this.overlay.classList.remove('visible');
+    this.overlay.setAttribute('aria-hidden', 'true');
+    this.overlay.setAttribute('inert', '');
   }
 
   fillModalLines(lines) {
+    if (!this.modalText) return;
+
     this.modalText.replaceChildren();
 
     lines.forEach((line, index) => {
@@ -102,26 +147,26 @@ class BaseGame {
   }
 
   shuffle(array) {
-    const copy = [...array];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
+    return shuffle(array);
   }
 
   resetDeck(items) {
     this.deckSource = items;
-    this.remainingItems = this.shuffle([...items]);
+    this.remainingItems = shuffle([...items]);
   }
 
-  pickFromDeck() {
+  pickFromDeck(filterFn) {
     if (this.remainingItems.length === 0) {
       this.resetDeck(this.deckSource);
     }
 
-    const index = Math.floor(Math.random() * this.remainingItems.length);
-    return this.remainingItems.splice(index, 1)[0];
+    const { item, index } = pickFromRemaining(this.remainingItems, filterFn);
+    if (!item || index === -1) {
+      return null;
+    }
+
+    this.remainingItems.splice(index, 1);
+    return item;
   }
 
   returnToDeck(item) {

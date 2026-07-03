@@ -1,4 +1,4 @@
-const STRINGS = {
+export const STRINGS = {
   loading: {
     characters: 'Načítám postavy…',
     spells: 'Načítám kouzla…',
@@ -11,6 +11,12 @@ const STRINGS = {
     emptySpells: 'Prázdný seznam kouzel',
     notEnoughCharacters: 'Nedostatek postav',
     notEnoughPhotoCharacters: 'Nedostatek postav s fotkou',
+    allPhotosBroken: 'Nepodařilo se načíst fotky postav. Zkus to znovu tlačítkem Nová hra.',
+  },
+  a11y: {
+    livesLabel: 'Zbývající životy',
+    photoAlt: 'Fotka postavy',
+    loadingBusy: 'Načítám data hry',
   },
   hangman: {
     guessCharacter: 'Hádej písmeno ve jménu postavy…',
