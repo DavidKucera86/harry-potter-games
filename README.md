@@ -24,5 +24,14 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 ## Tech stack
 
 - HTML, CSS, vanilla JavaScript (OOP třídy)
+- Sdílené moduly v `shared/`:
+  - `config.js` — globální konfigurace (životy, API URL)
+  - `dataProvider.js` — načítání dat s cache v `sessionStorage`
+  - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
+  - `hangmanUtils.js` — utility pro hangman hry
 - Sdílené styly v `shared/common.css`
 - Bez build stepu a bez externích knihoven
+
+## Sdílená cache dat
+
+`dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu.

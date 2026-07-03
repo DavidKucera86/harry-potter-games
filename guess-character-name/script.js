@@ -1,48 +1,23 @@
-class HangmanGame {
-  static API_URL = 'https://hp-api.onrender.com/api/characters';
-  static MAX_LIVES = 10;
-
-  static normalizeLetter(char) {
-    const map = {
-      'á': 'a', 'č': 'c', 'ď': 'd', 'é': 'e', 'ě': 'e',
-      'í': 'i', 'ň': 'n', 'ó': 'o', 'ř': 'r', 'š': 's',
-      'ť': 't', 'ú': 'u', 'ů': 'u', 'ý': 'y', 'ž': 'z'
-    };
-    const lower = char.toLowerCase();
-    return map[lower] || lower;
-  }
-
-  static getWordLetters(word) {
-    return word.split('').filter(ch => ch !== ' ');
-  }
-
+class HangmanGame extends BaseGame {
   constructor() {
+    super();
     this.characters = [];
-    this.isReady = false;
     this.currentWord = '';
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
-    this.lives = HangmanGame.MAX_LIVES;
-    this.gameOver = false;
 
-    this.heartsEl = document.getElementById('hearts');
     this.wordDisplayEl = document.getElementById('wordDisplay');
     this.wrongLettersEl = document.getElementById('wrongLetters');
-    this.messageEl = document.getElementById('message');
     this.letterInput = document.getElementById('letterInput');
     this.guessBtn = document.getElementById('guessBtn');
-    this.newGameBtn = document.getElementById('newGameBtn');
-    this.overlay = document.getElementById('overlay');
-    this.modalIcon = document.getElementById('modalIcon');
-    this.modalTitle = document.getElementById('modalTitle');
-    this.modalText = document.getElementById('modalText');
-    this.modalBtn = document.getElementById('modalBtn');
 
     this.bindEvents();
     this.init();
   }
 
   bindEvents() {
+    this.bindCommonEvents(() => this.startNewGame());
+
     this.guessBtn.addEventListener('click', () => {
       this.guessLetter(this.letterInput.value);
     });
@@ -56,17 +31,15 @@ class HangmanGame {
     this.letterInput.addEventListener('input', () => {
       this.letterInput.value = this.letterInput.value.slice(-1);
     });
-
-    this.newGameBtn.addEventListener('click', () => this.startNewGame());
-    this.modalBtn.addEventListener('click', () => this.startNewGame());
   }
 
   async init() {
     this.setControlsEnabled(false);
-    this.setMessage('Načítám postavy z API…', 'info');
-    this.wordDisplayEl.innerHTML = '';
+    this.showLoading(true, 'Načítám postavy…');
+    this.wordDisplayEl.replaceChildren();
 
     const loaded = await this.loadCharacters();
+    this.showLoading(false);
 
     if (loaded) {
       this.startNewGame();
@@ -78,13 +51,7 @@ class HangmanGame {
 
   async loadCharacters() {
     try {
-      const response = await fetch(HangmanGame.API_URL);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await getCharacters();
       this.characters = data
         .map(character => character.name?.trim())
         .filter(name => name);
@@ -110,14 +77,14 @@ class HangmanGame {
   }
 
   isLetterInWord(letter) {
-    return HangmanGame.getWordLetters(this.currentWord).some(
-      ch => HangmanGame.normalizeLetter(ch) === letter
+    return getWordLetters(this.currentWord).some(
+      ch => normalizeLetter(ch) === letter
     );
   }
 
   isWordComplete() {
-    return HangmanGame.getWordLetters(this.currentWord).every(
-      ch => this.guessedLetters.has(HangmanGame.normalizeLetter(ch))
+    return getWordLetters(this.currentWord).every(
+      ch => this.guessedLetters.has(normalizeLetter(ch))
     );
   }
 
@@ -125,24 +92,14 @@ class HangmanGame {
     return this.characters[Math.floor(Math.random() * this.characters.length)];
   }
 
-  renderHearts() {
-    this.heartsEl.innerHTML = '';
-    for (let i = 0; i < HangmanGame.MAX_LIVES; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart' + (i >= this.lives ? ' lost' : '');
-      heart.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
-      this.heartsEl.appendChild(heart);
-    }
-  }
-
   renderWord() {
-    this.wordDisplayEl.innerHTML = '';
+    this.wordDisplayEl.replaceChildren();
     for (const ch of this.currentWord) {
       const slot = document.createElement('div');
       if (ch === ' ') {
         slot.className = 'letter-slot space';
       } else {
-        const normalized = HangmanGame.normalizeLetter(ch);
+        const normalized = normalizeLetter(ch);
         const isRevealed = this.guessedLetters.has(normalized);
         slot.className = 'letter-slot' + (isRevealed ? ' revealed' : '');
         slot.textContent = isRevealed ? ch.toUpperCase() : '';
@@ -159,30 +116,27 @@ class HangmanGame {
     }
   }
 
-  setMessage(text, type) {
-    this.messageEl.textContent = text;
-    this.messageEl.className = 'message ' + type;
-  }
-
   showModal(won) {
     if (won) {
       this.modalIcon.textContent = '🎉';
       this.modalTitle.textContent = 'Gratulujeme!';
-      this.modalText.innerHTML = `Uhodl/a jsi postavu:<br><span class="highlight">${this.currentWord}</span>`;
+      this.fillModalLines([
+        { label: 'Uhodl/a jsi postavu:', value: this.currentWord }
+      ]);
     } else {
       this.modalIcon.textContent = '💀';
       this.modalTitle.textContent = 'Došly životy!';
-      this.modalText.innerHTML = `Správná postava byla:<br><span class="highlight">${this.currentWord}</span>`;
+      this.fillModalLines([
+        { label: 'Správná postava byla:', value: this.currentWord }
+      ]);
     }
-    this.overlay.classList.add('visible');
+    this.openModal();
   }
 
   endGame(won) {
     this.gameOver = true;
     this.guessedLetters = new Set(
-      HangmanGame.getWordLetters(this.currentWord).map(
-        ch => HangmanGame.normalizeLetter(ch)
-      )
+      getWordLetters(this.currentWord).map(ch => normalizeLetter(ch))
     );
     this.renderWord();
     this.guessBtn.disabled = true;
@@ -193,10 +147,12 @@ class HangmanGame {
   async startNewGame() {
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.setMessage('Načítám postavy z API…', 'info');
-      this.wordDisplayEl.innerHTML = '';
+      this.showLoading(true, 'Načítám postavy…');
+      this.wordDisplayEl.replaceChildren();
 
       const loaded = await this.loadCharacters();
+      this.showLoading(false);
+
       if (!loaded) {
         this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
         this.newGameBtn.disabled = false;
@@ -207,7 +163,7 @@ class HangmanGame {
     this.currentWord = this.pickRandomCharacter();
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
-    this.lives = HangmanGame.MAX_LIVES;
+    this.lives = GAME_CONFIG.MAX_LIVES;
     this.gameOver = false;
 
     this.renderHearts();
@@ -218,13 +174,13 @@ class HangmanGame {
     this.setControlsEnabled(true);
     this.letterInput.value = '';
     this.letterInput.focus();
-    this.overlay.classList.remove('visible');
+    this.closeModal();
   }
 
   guessLetter(rawLetter) {
     if (this.gameOver || !this.isReady) return;
 
-    const letter = HangmanGame.normalizeLetter(rawLetter);
+    const letter = normalizeLetter(rawLetter);
     if (!letter || !/^[a-z]$/.test(letter)) {
       this.setMessage('Zadej prosím platné písmeno (A–Z).', 'error');
       return;
