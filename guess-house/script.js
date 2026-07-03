@@ -17,6 +17,7 @@ class GuessHouseGame {
     this.score = 0;
     this.gameOver = false;
     this.lastAnswer = null;
+    this.remainingCharacters = [];
 
     this.heartsEl = document.getElementById('hearts');
     this.scoreEl = document.getElementById('score');
@@ -111,12 +112,21 @@ class GuessHouseGame {
     return copy;
   }
 
-  pickRandomCharacter() {
-    return this.characters[Math.floor(Math.random() * this.characters.length)];
+  resetCharacterDeck() {
+    this.remainingCharacters = this.shuffle([...this.characters]);
+  }
+
+  pickNextCharacter() {
+    if (this.remainingCharacters.length === 0) {
+      this.resetCharacterDeck();
+    }
+
+    const index = Math.floor(Math.random() * this.remainingCharacters.length);
+    return this.remainingCharacters.splice(index, 1)[0];
   }
 
   renderRound() {
-    this.currentCharacter = this.pickRandomCharacter();
+    this.currentCharacter = this.pickNextCharacter();
     this.characterNameEl.textContent = this.currentCharacter.name;
 
     const wrongHouses = GuessHouseGame.HOUSES.filter(h => h !== this.currentCharacter.house);
@@ -206,6 +216,7 @@ class GuessHouseGame {
     this.lives = GuessHouseGame.MAX_LIVES;
     this.score = 0;
     this.gameOver = false;
+    this.resetCharacterDeck();
     this.renderHearts();
     this.renderScore();
     this.renderRound();
