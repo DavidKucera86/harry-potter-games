@@ -1,48 +1,23 @@
-class SpellHangmanGame {
-  static API_URL = 'https://hp-api.onrender.com/api/spells';
-  static MAX_LIVES = 10;
-
-  static normalizeLetter(char) {
-    const map = {
-      'á': 'a', 'č': 'c', 'ď': 'd', 'é': 'e', 'ě': 'e',
-      'í': 'i', 'ň': 'n', 'ó': 'o', 'ř': 'r', 'š': 's',
-      'ť': 't', 'ú': 'u', 'ů': 'u', 'ý': 'y', 'ž': 'z'
-    };
-    const lower = char.toLowerCase();
-    return map[lower] || lower;
-  }
-
-  static getWordLetters(word) {
-    return word.split('').filter(ch => ch !== ' ');
-  }
-
+class SpellHangmanGame extends BaseGame {
   constructor() {
+    super();
     this.spells = [];
-    this.isReady = false;
     this.currentWord = '';
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
-    this.lives = SpellHangmanGame.MAX_LIVES;
-    this.gameOver = false;
 
-    this.heartsEl = document.getElementById('hearts');
     this.wordDisplayEl = document.getElementById('wordDisplay');
     this.wrongLettersEl = document.getElementById('wrongLetters');
-    this.messageEl = document.getElementById('message');
     this.letterInput = document.getElementById('letterInput');
     this.guessBtn = document.getElementById('guessBtn');
-    this.newGameBtn = document.getElementById('newGameBtn');
-    this.overlay = document.getElementById('overlay');
-    this.modalIcon = document.getElementById('modalIcon');
-    this.modalTitle = document.getElementById('modalTitle');
-    this.modalText = document.getElementById('modalText');
-    this.modalBtn = document.getElementById('modalBtn');
 
     this.bindEvents();
     this.init();
   }
 
   bindEvents() {
+    this.bindCommonEvents(() => this.startNewGame());
+
     this.guessBtn.addEventListener('click', () => {
       this.guessLetter(this.letterInput.value);
     });
@@ -56,17 +31,16 @@ class SpellHangmanGame {
     this.letterInput.addEventListener('input', () => {
       this.letterInput.value = this.letterInput.value.slice(-1);
     });
-
-    this.newGameBtn.addEventListener('click', () => this.startNewGame());
-    this.modalBtn.addEventListener('click', () => this.startNewGame());
   }
 
   async init() {
     this.setControlsEnabled(false);
-    this.setMessage('Načítám kouzla z API…', 'info');
-    this.wordDisplayEl.innerHTML = '';
+    this.showLoading(true, 'Načítám kouzla…');
+    this.wordDisplayEl.replaceChildren();
 
     const loaded = await this.loadSpells();
+    this.showLoading(false);
+
     if (loaded) {
       this.startNewGame();
     } else {
@@ -77,10 +51,7 @@ class SpellHangmanGame {
 
   async loadSpells() {
     try {
-      const response = await fetch(SpellHangmanGame.API_URL);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const data = await response.json();
+      const data = await getSpells();
       this.spells = data
         .map(spell => spell.name?.trim())
         .filter(name => name);
@@ -106,14 +77,14 @@ class SpellHangmanGame {
   }
 
   isLetterInWord(letter) {
-    return SpellHangmanGame.getWordLetters(this.currentWord).some(
-      ch => SpellHangmanGame.normalizeLetter(ch) === letter
+    return getWordLetters(this.currentWord).some(
+      ch => normalizeLetter(ch) === letter
     );
   }
 
   isWordComplete() {
-    return SpellHangmanGame.getWordLetters(this.currentWord).every(
-      ch => this.guessedLetters.has(SpellHangmanGame.normalizeLetter(ch))
+    return getWordLetters(this.currentWord).every(
+      ch => this.guessedLetters.has(normalizeLetter(ch))
     );
   }
 
@@ -121,24 +92,14 @@ class SpellHangmanGame {
     return this.spells[Math.floor(Math.random() * this.spells.length)];
   }
 
-  renderHearts() {
-    this.heartsEl.innerHTML = '';
-    for (let i = 0; i < SpellHangmanGame.MAX_LIVES; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart' + (i >= this.lives ? ' lost' : '');
-      heart.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
-      this.heartsEl.appendChild(heart);
-    }
-  }
-
   renderWord() {
-    this.wordDisplayEl.innerHTML = '';
+    this.wordDisplayEl.replaceChildren();
     for (const ch of this.currentWord) {
       const slot = document.createElement('div');
       if (ch === ' ') {
         slot.className = 'letter-slot space';
       } else {
-        const normalized = SpellHangmanGame.normalizeLetter(ch);
+        const normalized = normalizeLetter(ch);
         const isRevealed = this.guessedLetters.has(normalized);
         slot.className = 'letter-slot' + (isRevealed ? ' revealed' : '');
         slot.textContent = isRevealed ? ch.toUpperCase() : '';
@@ -155,30 +116,27 @@ class SpellHangmanGame {
     }
   }
 
-  setMessage(text, type) {
-    this.messageEl.textContent = text;
-    this.messageEl.className = 'message ' + type;
-  }
-
   showModal(won) {
     if (won) {
       this.modalIcon.textContent = '🎉';
       this.modalTitle.textContent = 'Gratulujeme!';
-      this.modalText.innerHTML = `Uhodl/a jsi zaklínadlo:<br><span class="highlight">${this.currentWord}</span>`;
+      this.fillModalLines([
+        { label: 'Uhodl/a jsi zaklínadlo:', value: this.currentWord }
+      ]);
     } else {
       this.modalIcon.textContent = '💀';
       this.modalTitle.textContent = 'Došly životy!';
-      this.modalText.innerHTML = `Správné zaklínadlo bylo:<br><span class="highlight">${this.currentWord}</span>`;
+      this.fillModalLines([
+        { label: 'Správné zaklínadlo bylo:', value: this.currentWord }
+      ]);
     }
-    this.overlay.classList.add('visible');
+    this.openModal();
   }
 
   endGame(won) {
     this.gameOver = true;
     this.guessedLetters = new Set(
-      SpellHangmanGame.getWordLetters(this.currentWord).map(
-        ch => SpellHangmanGame.normalizeLetter(ch)
-      )
+      getWordLetters(this.currentWord).map(ch => normalizeLetter(ch))
     );
     this.renderWord();
     this.guessBtn.disabled = true;
@@ -189,10 +147,12 @@ class SpellHangmanGame {
   async startNewGame() {
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.setMessage('Načítám kouzla z API…', 'info');
-      this.wordDisplayEl.innerHTML = '';
+      this.showLoading(true, 'Načítám kouzla…');
+      this.wordDisplayEl.replaceChildren();
 
       const loaded = await this.loadSpells();
+      this.showLoading(false);
+
       if (!loaded) {
         this.setMessage('Nepodařilo se načíst kouzla. Zkus to znovu tlačítkem Nová hra.', 'error');
         this.newGameBtn.disabled = false;
@@ -203,7 +163,7 @@ class SpellHangmanGame {
     this.currentWord = this.pickRandomSpell();
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
-    this.lives = SpellHangmanGame.MAX_LIVES;
+    this.lives = GAME_CONFIG.MAX_LIVES;
     this.gameOver = false;
 
     this.renderHearts();
@@ -214,13 +174,13 @@ class SpellHangmanGame {
     this.setControlsEnabled(true);
     this.letterInput.value = '';
     this.letterInput.focus();
-    this.overlay.classList.remove('visible');
+    this.closeModal();
   }
 
   guessLetter(rawLetter) {
     if (this.gameOver || !this.isReady) return;
 
-    const letter = SpellHangmanGame.normalizeLetter(rawLetter);
+    const letter = normalizeLetter(rawLetter);
     if (!letter || !/^[a-z]$/.test(letter)) {
       this.setMessage('Zadej prosím platné písmeno (A–Z).', 'error');
       return;
