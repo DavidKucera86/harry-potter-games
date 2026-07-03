@@ -10,6 +10,7 @@ class WhoIsOnPhotoGame {
     this.score = 0;
     this.gameOver = false;
     this.lastAnswer = null;
+    this.remainingCharacters = [];
 
     this.heartsEl = document.getElementById('hearts');
     this.scoreEl = document.getElementById('score');
@@ -103,15 +104,21 @@ class WhoIsOnPhotoGame {
     return copy;
   }
 
-  pickRandomCharacter(exclude = null) {
-    const pool = exclude
-      ? this.characters.filter(c => c.id !== exclude.id)
-      : this.characters;
-    return pool[Math.floor(Math.random() * pool.length)];
+  resetCharacterDeck() {
+    this.remainingCharacters = this.shuffle([...this.characters]);
+  }
+
+  pickNextCharacter() {
+    if (this.remainingCharacters.length === 0) {
+      this.resetCharacterDeck();
+    }
+
+    const index = Math.floor(Math.random() * this.remainingCharacters.length);
+    return this.remainingCharacters.splice(index, 1)[0];
   }
 
   renderRound() {
-    this.currentCharacter = this.pickRandomCharacter();
+    this.currentCharacter = this.pickNextCharacter();
     this.photoEl.src = this.currentCharacter.image;
     this.photoEl.alt = '';
 
@@ -133,6 +140,11 @@ class WhoIsOnPhotoGame {
 
   handleImageError() {
     if (this.gameOver || !this.isReady) return;
+
+    if (this.currentCharacter) {
+      this.remainingCharacters.push(this.currentCharacter);
+    }
+
     this.renderRound();
     this.setMessage('Kdo je na fotce?', 'info');
   }
@@ -207,6 +219,7 @@ class WhoIsOnPhotoGame {
     this.lives = WhoIsOnPhotoGame.MAX_LIVES;
     this.score = 0;
     this.gameOver = false;
+    this.resetCharacterDeck();
     this.renderHearts();
     this.renderScore();
     this.renderRound();
