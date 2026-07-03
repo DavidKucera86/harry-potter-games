@@ -18,6 +18,12 @@
   min-height: 60px;
 }
 
+.word-group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.6rem;
+}
+
 .letter-slot {
   width: 36px;
   height: 48px;
