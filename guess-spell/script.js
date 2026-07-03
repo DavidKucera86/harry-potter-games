@@ -35,39 +35,33 @@ class SpellHangmanGame extends BaseGame {
 
   async init() {
     this.setControlsEnabled(false);
-    this.showLoading(true, 'Načítám kouzla…');
+    this.showLoading(true, STRINGS.loading.spells);
     this.wordDisplayEl.replaceChildren();
 
     const loaded = await this.loadSpells();
     this.showLoading(false);
 
     if (loaded) {
+      this.resetDeck(this.spells);
       this.startNewGame();
     } else {
-      this.setMessage('Nepodařilo se načíst kouzla. Zkus to znovu tlačítkem Nová hra.', 'error');
+      this.setMessage(STRINGS.errors.loadSpells, 'error');
       this.newGameBtn.disabled = false;
     }
   }
 
-  async loadSpells() {
-    try {
-      const data = await getSpells();
-      this.spells = data
+  loadSpells() {
+    return this.loadGameData({
+      fetchFn: getSpells,
+      transform: data => data
         .map(spell => spell.name?.trim())
-        .filter(name => name);
-
-      if (this.spells.length === 0) {
-        throw new Error('Prázdný seznam kouzel');
-      }
-
-      this.isReady = true;
-      return true;
-    } catch (error) {
-      console.error('Chyba při načítání kouzel:', error);
-      this.isReady = false;
-      this.spells = [];
-      return false;
-    }
+        .filter(name => name),
+      minCount: 1,
+      emptyError: STRINGS.errors.emptySpells,
+      logLabel: 'kouzel',
+      assign: items => { this.spells = items; },
+      onError: () => { this.spells = []; },
+    });
   }
 
   setControlsEnabled(enabled) {
@@ -86,10 +80,6 @@ class SpellHangmanGame extends BaseGame {
     return getWordLetters(this.currentWord).every(
       ch => this.guessedLetters.has(normalizeLetter(ch))
     );
-  }
-
-  pickRandomSpell() {
-    return this.spells[Math.floor(Math.random() * this.spells.length)];
   }
 
   renderWord() {
@@ -125,7 +115,7 @@ class SpellHangmanGame extends BaseGame {
 
   renderWrongLetters() {
     if (this.wrongLetters.size === 0) {
-      this.wrongLettersEl.textContent = '—';
+      this.wrongLettersEl.textContent = STRINGS.hangman.noWrongLetters;
     } else {
       this.wrongLettersEl.textContent = [...this.wrongLetters].join(' ').toUpperCase();
     }
@@ -134,15 +124,15 @@ class SpellHangmanGame extends BaseGame {
   showModal(won) {
     if (won) {
       this.modalIcon.textContent = '🎉';
-      this.modalTitle.textContent = 'Gratulujeme!';
+      this.modalTitle.textContent = STRINGS.hangman.winTitle;
       this.fillModalLines([
-        { label: 'Uhodl/a jsi zaklínadlo:', value: this.currentWord }
+        { label: STRINGS.hangman.winSpell, value: this.currentWord }
       ]);
     } else {
       this.modalIcon.textContent = '💀';
-      this.modalTitle.textContent = 'Došly životy!';
+      this.modalTitle.textContent = STRINGS.hangman.loseTitle;
       this.fillModalLines([
-        { label: 'Správné zaklínadlo bylo:', value: this.currentWord }
+        { label: STRINGS.hangman.loseSpell, value: this.currentWord }
       ]);
     }
     this.openModal();
@@ -162,20 +152,22 @@ class SpellHangmanGame extends BaseGame {
   async startNewGame() {
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.showLoading(true, 'Načítám kouzla…');
+      this.showLoading(true, STRINGS.loading.spells);
       this.wordDisplayEl.replaceChildren();
 
       const loaded = await this.loadSpells();
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage('Nepodařilo se načíst kouzla. Zkus to znovu tlačítkem Nová hra.', 'error');
+        this.setMessage(STRINGS.errors.loadSpells, 'error');
         this.newGameBtn.disabled = false;
         return;
       }
+
+      this.resetDeck(this.spells);
     }
 
-    this.currentWord = this.pickRandomSpell();
+    this.currentWord = this.pickFromDeck();
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
     this.lives = GAME_CONFIG.MAX_LIVES;
@@ -184,7 +176,7 @@ class SpellHangmanGame extends BaseGame {
     this.renderHearts();
     this.renderWord();
     this.renderWrongLetters();
-    this.setMessage('Hádej písmeno v zaklínadle…', 'info');
+    this.setMessage(STRINGS.hangman.guessSpell, 'info');
 
     this.setControlsEnabled(true);
     this.letterInput.value = '';
@@ -197,12 +189,12 @@ class SpellHangmanGame extends BaseGame {
 
     const letter = normalizeLetter(rawLetter);
     if (!letter || !/^[a-z]$/.test(letter)) {
-      this.setMessage('Zadej prosím platné písmeno (A–Z).', 'error');
+      this.setMessage(STRINGS.hangman.invalidLetter, 'error');
       return;
     }
 
     if (this.guessedLetters.has(letter) || this.wrongLetters.has(letter)) {
-      this.setMessage(`Písmeno „${letter.toUpperCase()}" už jsi hádal/a.`, 'error');
+      this.setMessage(STRINGS.hangman.letterAlreadyGuessed(letter), 'error');
       this.letterInput.value = '';
       return;
     }
@@ -212,7 +204,7 @@ class SpellHangmanGame extends BaseGame {
     if (this.isLetterInWord(letter)) {
       this.guessedLetters.add(letter);
       this.renderWord();
-      this.setMessage(`Správně! Písmeno „${letter.toUpperCase()}" je v zaklínadle.`, 'success');
+      this.setMessage(STRINGS.hangman.correctInSpell(letter), 'success');
 
       if (this.isWordComplete()) {
         this.endGame(true);
@@ -222,7 +214,7 @@ class SpellHangmanGame extends BaseGame {
       this.lives--;
       this.renderHearts();
       this.renderWrongLetters();
-      this.setMessage(`Špatně! Písmeno „${letter.toUpperCase()}" v zaklínadle není.`, 'error');
+      this.setMessage(STRINGS.hangman.wrongInSpell(letter), 'error');
 
       if (this.lives <= 0) {
         this.endGame(false);

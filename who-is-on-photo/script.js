@@ -19,7 +19,7 @@ class WhoIsOnPhotoGame extends BaseGame {
 
   async init() {
     this.setControlsEnabled(false);
-    this.showLoading(true, 'Načítám postavy…');
+    this.showLoading(true, STRINGS.loading.characters);
 
     const loaded = await this.loadCharacters();
     this.showLoading(false);
@@ -27,28 +27,21 @@ class WhoIsOnPhotoGame extends BaseGame {
     if (loaded) {
       this.startNewGame();
     } else {
-      this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
+      this.setMessage(STRINGS.errors.loadCharacters, 'error');
       this.newGameBtn.disabled = false;
     }
   }
 
-  async loadCharacters() {
-    try {
-      const data = await getCharacters();
-      this.characters = data.filter(c => c.name && c.image);
-
-      if (this.characters.length < 4) {
-        throw new Error('Nedostatek postav s fotkou');
-      }
-
-      this.isReady = true;
-      return true;
-    } catch (error) {
-      console.error('Chyba při načítání postav:', error);
-      this.isReady = false;
-      this.characters = [];
-      return false;
-    }
+  loadCharacters() {
+    return this.loadGameData({
+      fetchFn: getCharacters,
+      transform: data => data.filter(c => c.name && c.image),
+      minCount: 4,
+      emptyError: STRINGS.errors.notEnoughPhotoCharacters,
+      logLabel: 'postav',
+      assign: items => { this.characters = items; },
+      onError: () => { this.characters = []; },
+    });
   }
 
   setControlsEnabled(enabled) {
@@ -87,7 +80,7 @@ class WhoIsOnPhotoGame extends BaseGame {
     }
 
     this.renderRound();
-    this.setMessage('Kdo je na fotce?', 'info');
+    this.setMessage(STRINGS.quiz.photoPrompt, 'info');
   }
 
   guessName(name, btn) {
@@ -103,16 +96,13 @@ class WhoIsOnPhotoGame extends BaseGame {
       btn.classList.add('correct');
       this.score++;
       this.renderScore();
-      this.setMessage(`Správně! Je to ${this.currentCharacter.name}.`, 'success');
+      this.setMessage(STRINGS.quiz.photoCorrect(this.currentCharacter.name), 'success');
       setTimeout(() => this.nextRound(), 1200);
     } else {
       btn.classList.add('wrong');
       this.lives--;
       this.renderHearts();
-      this.setMessage(
-        `Špatně! Na fotce je ${this.currentCharacter.name}.`,
-        'error'
-      );
+      this.setMessage(STRINGS.quiz.photoWrong(this.currentCharacter.name), 'error');
 
       if (this.lives <= 0) {
         setTimeout(() => this.endGame(), 1200);
@@ -126,15 +116,15 @@ class WhoIsOnPhotoGame extends BaseGame {
     if (this.gameOver) return;
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage('Kdo je na fotce?', 'info');
+    this.setMessage(STRINGS.quiz.photoPrompt, 'info');
   }
 
   showModal() {
     this.modalIcon.textContent = '💀';
-    this.modalTitle.textContent = 'Došly životy!';
+    this.modalTitle.textContent = STRINGS.quiz.loseTitle;
     this.fillModalLines([
-      { label: 'Tvé skóre:', value: this.score },
-      { label: 'Poslední postava:', value: this.lastAnswer.name, gap: true }
+      { label: STRINGS.quiz.scoreLabel, value: this.score },
+      { label: STRINGS.quiz.lastCharacterLabel, value: this.lastAnswer.name, gap: true }
     ]);
     this.openModal();
   }
@@ -148,13 +138,13 @@ class WhoIsOnPhotoGame extends BaseGame {
   async startNewGame() {
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.showLoading(true, 'Načítám postavy…');
+      this.showLoading(true, STRINGS.loading.characters);
 
       const loaded = await this.loadCharacters();
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
+        this.setMessage(STRINGS.errors.loadCharacters, 'error');
         this.newGameBtn.disabled = false;
         return;
       }
@@ -168,7 +158,7 @@ class WhoIsOnPhotoGame extends BaseGame {
     this.renderScore();
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage('Kdo je na fotce?', 'info');
+    this.setMessage(STRINGS.quiz.photoPrompt, 'info');
     this.closeModal();
   }
 }
