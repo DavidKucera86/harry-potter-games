@@ -20,6 +20,10 @@
   --text: #e8e4dc;
   --text-muted: #8a8494;
   --border: rgba(212, 168, 67, 0.2);
+  --gryffindor: #740001;
+  --slytherin: #1a472a;
+  --ravenclaw: #0e1a40;
+  --hufflepuff: #ecb939;
 }
 
 body {
@@ -39,6 +43,8 @@ body {
 header {
   text-align: center;
   margin-bottom: 2.5rem;
+  width: 100%;
+  max-width: 640px;
 }
 
 header h1 {
@@ -55,6 +61,19 @@ header p {
   color: var(--text-muted);
   margin-top: 0.5rem;
   font-size: 0.95rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--purple-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: var(--gold-light);
 }
 
 .game-container {
@@ -84,11 +103,18 @@ header p {
   gap: 0.5rem;
 }
 
-.lives-label {
+.lives-label,
+.score-label {
   font-size: 0.85rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-light);
 }
 
 .hearts {
@@ -112,86 +138,6 @@ header p {
   height: 100%;
   fill: var(--red-light);
   filter: drop-shadow(0 0 4px rgba(231, 76, 60, 0.4));
-}
-
-.wrong-letters {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.wrong-letters span {
-  color: var(--red-light);
-  font-weight: 600;
-  letter-spacing: 0.15em;
-}
-
-.word-display {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.6rem;
-  margin-bottom: 2rem;
-  min-height: 60px;
-}
-
-.letter-slot {
-  width: 36px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--gold-light);
-  border-bottom: 3px solid var(--gold);
-  text-transform: uppercase;
-  transition: color 0.3s, transform 0.2s;
-}
-
-.letter-slot.space {
-  width: 20px;
-  border-bottom: none;
-}
-
-.letter-slot.revealed {
-  animation: reveal 0.4s ease;
-}
-
-@keyframes reveal {
-  0% { transform: translateY(-10px); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-
-.input-area {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 0.85rem 1.2rem;
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  text-align: center;
-  letter-spacing: 0.3em;
-  background: var(--bg-deep);
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.input-area input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px var(--gold-glow);
-}
-
-.input-area input::placeholder {
-  letter-spacing: normal;
-  text-transform: none;
-  color: var(--text-muted);
 }
 
 .btn {
@@ -323,7 +269,7 @@ header p {
   line-height: 1.5;
 }
 
-.modal .character-name {
+.modal .highlight {
   color: var(--gold);
   font-weight: 700;
   font-size: 1.2rem;
@@ -334,4 +280,125 @@ header p {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 1rem;
+}
+
+.quiz-prompt {
+  text-align: center;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 1.5rem;
+  min-height: 2.5rem;
+}
+
+.choices-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.choice-btn {
+  padding: 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-deep);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+
+.choice-btn:hover:not(:disabled) {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+
+.choice-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.choice-btn.correct {
+  border-color: var(--green-light);
+  background: rgba(39, 174, 96, 0.2);
+}
+
+.choice-btn.wrong {
+  border-color: var(--red-light);
+  background: rgba(192, 57, 43, 0.2);
+}
+
+.house-gryffindor { background: var(--gryffindor); border-color: #ae0001; color: #fff; }
+.house-slytherin { background: var(--slytherin); border-color: #2a623d; color: #fff; }
+.house-ravenclaw { background: var(--ravenclaw); border-color: #222f5b; color: #fff; }
+.house-hufflepuff { background: var(--hufflepuff); border-color: #f0c75e; color: #372e29; }
+
+.house-gryffindor:hover:not(:disabled),
+.house-slytherin:hover:not(:disabled),
+.house-ravenclaw:hover:not(:disabled),
+.house-hufflepuff:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.photo-frame {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.photo-frame img {
+  max-width: 220px;
+  max-height: 280px;
+  border-radius: 16px;
+  border: 3px solid var(--gold);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.game-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 8px 32px var(--gold-glow);
+}
+
+.game-card h2 {
+  font-size: 1.25rem;
+  color: var(--gold-light);
+}
+
+.game-card p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.game-card span {
+  color: var(--purple-light);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
