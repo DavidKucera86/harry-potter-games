@@ -7,12 +7,18 @@ export const STRINGS = {
   errors: {
     loadCharacters: 'Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.',
     loadSpells: 'Nepodařilo se načíst kouzla. Zkus to znovu tlačítkem Nová hra.',
-    fetchTimeout: 'Načítání dat trvalo příliš dlouho. Zkus to znovu tlačítkem Nová hra.',
+    fetchTimeoutCharacters: 'Načítání postav trvá příliš dlouho. Zkus to znovu tlačítkem Nová hra.',
+    fetchTimeoutSpells: 'Načítání kouzel trvá příliš dlouho. Zkus to znovu tlačítkem Nová hra.',
     emptyCharacters: 'Prázdný seznam postav',
     emptySpells: 'Prázdný seznam kouzel',
     notEnoughCharacters: 'Nedostatek postav',
     notEnoughPhotoCharacters: 'Nedostatek postav s fotkou',
-    imageErrorsExhausted: 'Příliš mnoho nefunkčních fotek. Zkus to znovu později.',
+    allPhotosBroken: 'Nepodařilo se načíst fotky postav. Zkus to znovu tlačítkem Nová hra.',
+  },
+  a11y: {
+    livesLabel: 'Zbývající životy',
+    photoAlt: 'Fotografie postavy — hádej jméno',
+    loadingBusy: 'Načítám data hry',
   },
   hangman: {
     guessCharacter: 'Hádej písmeno ve jménu postavy…',
@@ -44,7 +50,6 @@ export const STRINGS = {
   quiz: {
     housePrompt: 'Vyber kolej, do které postava patří…',
     photoPrompt: 'Kdo je na fotce?',
-    photoAlt: 'Fotografie postavy — hádej jméno',
     houseCorrect(name, house) {
       return `Správně! ${name} patří do ${house}.`;
     },
@@ -56,12 +61,6 @@ export const STRINGS = {
     },
     photoWrong(name) {
       return `Špatně! Na fotce je ${name}.`;
-    },
-    choiceCorrect(label) {
-      return `${label} — správně`;
-    },
-    choiceWrong(label) {
-      return `${label} — špatně`;
     },
     loseTitle: 'Došly životy!',
     scoreLabel: 'Tvé skóre:',
