@@ -127,4 +127,26 @@ class BaseGame {
   returnToDeck(item) {
     this.remainingItems.push(item);
   }
+
+  async loadGameData({ fetchFn, transform, minCount = 1, emptyError, logLabel, assign, onError }) {
+    try {
+      const data = await fetchFn();
+      const items = transform(data);
+
+      if (items.length < minCount) {
+        throw new Error(emptyError);
+      }
+
+      assign(items);
+      this.isReady = true;
+      return true;
+    } catch (error) {
+      console.error(`Chyba při načítání ${logLabel}:`, error);
+      this.isReady = false;
+      if (onError) {
+        onError();
+      }
+      return false;
+    }
+  }
 }

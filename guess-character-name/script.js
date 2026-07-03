@@ -35,39 +35,33 @@ class HangmanGame extends BaseGame {
 
   async init() {
     this.setControlsEnabled(false);
-    this.showLoading(true, 'Načítám postavy…');
+    this.showLoading(true, STRINGS.loading.characters);
     this.wordDisplayEl.replaceChildren();
 
     const loaded = await this.loadCharacters();
     this.showLoading(false);
 
     if (loaded) {
+      this.resetDeck(this.characters);
       this.startNewGame();
     } else {
-      this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
+      this.setMessage(STRINGS.errors.loadCharacters, 'error');
       this.newGameBtn.disabled = false;
     }
   }
 
-  async loadCharacters() {
-    try {
-      const data = await getCharacters();
-      this.characters = data
+  loadCharacters() {
+    return this.loadGameData({
+      fetchFn: getCharacters,
+      transform: data => data
         .map(character => character.name?.trim())
-        .filter(name => name);
-
-      if (this.characters.length === 0) {
-        throw new Error('Prázdný seznam postav');
-      }
-
-      this.isReady = true;
-      return true;
-    } catch (error) {
-      console.error('Chyba při načítání postav:', error);
-      this.isReady = false;
-      this.characters = [];
-      return false;
-    }
+        .filter(name => name),
+      minCount: 1,
+      emptyError: STRINGS.errors.emptyCharacters,
+      logLabel: 'postav',
+      assign: items => { this.characters = items; },
+      onError: () => { this.characters = []; },
+    });
   }
 
   setControlsEnabled(enabled) {
@@ -86,10 +80,6 @@ class HangmanGame extends BaseGame {
     return getWordLetters(this.currentWord).every(
       ch => this.guessedLetters.has(normalizeLetter(ch))
     );
-  }
-
-  pickRandomCharacter() {
-    return this.characters[Math.floor(Math.random() * this.characters.length)];
   }
 
   renderWord() {
@@ -125,7 +115,7 @@ class HangmanGame extends BaseGame {
 
   renderWrongLetters() {
     if (this.wrongLetters.size === 0) {
-      this.wrongLettersEl.textContent = '—';
+      this.wrongLettersEl.textContent = STRINGS.hangman.noWrongLetters;
     } else {
       this.wrongLettersEl.textContent = [...this.wrongLetters].join(' ').toUpperCase();
     }
@@ -134,15 +124,15 @@ class HangmanGame extends BaseGame {
   showModal(won) {
     if (won) {
       this.modalIcon.textContent = '🎉';
-      this.modalTitle.textContent = 'Gratulujeme!';
+      this.modalTitle.textContent = STRINGS.hangman.winTitle;
       this.fillModalLines([
-        { label: 'Uhodl/a jsi postavu:', value: this.currentWord }
+        { label: STRINGS.hangman.winCharacter, value: this.currentWord }
       ]);
     } else {
       this.modalIcon.textContent = '💀';
-      this.modalTitle.textContent = 'Došly životy!';
+      this.modalTitle.textContent = STRINGS.hangman.loseTitle;
       this.fillModalLines([
-        { label: 'Správná postava byla:', value: this.currentWord }
+        { label: STRINGS.hangman.loseCharacter, value: this.currentWord }
       ]);
     }
     this.openModal();
@@ -162,20 +152,22 @@ class HangmanGame extends BaseGame {
   async startNewGame() {
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.showLoading(true, 'Načítám postavy…');
+      this.showLoading(true, STRINGS.loading.characters);
       this.wordDisplayEl.replaceChildren();
 
       const loaded = await this.loadCharacters();
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
+        this.setMessage(STRINGS.errors.loadCharacters, 'error');
         this.newGameBtn.disabled = false;
         return;
       }
+
+      this.resetDeck(this.characters);
     }
 
-    this.currentWord = this.pickRandomCharacter();
+    this.currentWord = this.pickFromDeck();
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
     this.lives = GAME_CONFIG.MAX_LIVES;
@@ -184,7 +176,7 @@ class HangmanGame extends BaseGame {
     this.renderHearts();
     this.renderWord();
     this.renderWrongLetters();
-    this.setMessage('Hádej písmeno ve jménu postavy…', 'info');
+    this.setMessage(STRINGS.hangman.guessCharacter, 'info');
 
     this.setControlsEnabled(true);
     this.letterInput.value = '';
@@ -197,12 +189,12 @@ class HangmanGame extends BaseGame {
 
     const letter = normalizeLetter(rawLetter);
     if (!letter || !/^[a-z]$/.test(letter)) {
-      this.setMessage('Zadej prosím platné písmeno (A–Z).', 'error');
+      this.setMessage(STRINGS.hangman.invalidLetter, 'error');
       return;
     }
 
     if (this.guessedLetters.has(letter) || this.wrongLetters.has(letter)) {
-      this.setMessage(`Písmeno „${letter.toUpperCase()}" už jsi hádal/a.`, 'error');
+      this.setMessage(STRINGS.hangman.letterAlreadyGuessed(letter), 'error');
       this.letterInput.value = '';
       return;
     }
@@ -212,7 +204,7 @@ class HangmanGame extends BaseGame {
     if (this.isLetterInWord(letter)) {
       this.guessedLetters.add(letter);
       this.renderWord();
-      this.setMessage(`Správně! Písmeno „${letter.toUpperCase()}" je ve jménu.`, 'success');
+      this.setMessage(STRINGS.hangman.correctInName(letter), 'success');
 
       if (this.isWordComplete()) {
         this.endGame(true);
@@ -222,7 +214,7 @@ class HangmanGame extends BaseGame {
       this.lives--;
       this.renderHearts();
       this.renderWrongLetters();
-      this.setMessage(`Špatně! Písmeno „${letter.toUpperCase()}" ve jménu není.`, 'error');
+      this.setMessage(STRINGS.hangman.wrongInName(letter), 'error');
 
       if (this.lives <= 0) {
         this.endGame(false);
