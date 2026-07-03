@@ -26,7 +26,7 @@ class GuessHouseGame extends BaseGame {
 
   async init() {
     this.setControlsEnabled(false);
-    this.showLoading(true, 'Načítám postavy…');
+    this.showLoading(true, STRINGS.loading.characters);
 
     const loaded = await this.loadCharacters();
     this.showLoading(false);
@@ -34,30 +34,23 @@ class GuessHouseGame extends BaseGame {
     if (loaded) {
       this.startNewGame();
     } else {
-      this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
+      this.setMessage(STRINGS.errors.loadCharacters, 'error');
       this.newGameBtn.disabled = false;
     }
   }
 
-  async loadCharacters() {
-    try {
-      const data = await getCharacters();
-      this.characters = data.filter(
+  loadCharacters() {
+    return this.loadGameData({
+      fetchFn: getCharacters,
+      transform: data => data.filter(
         c => c.name && GuessHouseGame.HOUSES.includes(c.house)
-      );
-
-      if (this.characters.length < 4) {
-        throw new Error('Nedostatek postav');
-      }
-
-      this.isReady = true;
-      return true;
-    } catch (error) {
-      console.error('Chyba při načítání postav:', error);
-      this.isReady = false;
-      this.characters = [];
-      return false;
-    }
+      ),
+      minCount: 4,
+      emptyError: STRINGS.errors.notEnoughCharacters,
+      logLabel: 'postav',
+      assign: items => { this.characters = items; },
+      onError: () => { this.characters = []; },
+    });
   }
 
   setControlsEnabled(enabled) {
@@ -103,14 +96,17 @@ class GuessHouseGame extends BaseGame {
       btn.classList.add('correct');
       this.score++;
       this.renderScore();
-      this.setMessage(`Správně! ${this.currentCharacter.name} patří do ${house}.`, 'success');
+      this.setMessage(
+        STRINGS.quiz.houseCorrect(this.currentCharacter.name, house),
+        'success'
+      );
       setTimeout(() => this.nextRound(), 1200);
     } else {
       btn.classList.add('wrong');
       this.lives--;
       this.renderHearts();
       this.setMessage(
-        `Špatně! ${this.currentCharacter.name} patří do ${this.currentCharacter.house}.`,
+        STRINGS.quiz.houseWrong(this.currentCharacter.name, this.currentCharacter.house),
         'error'
       );
 
@@ -126,16 +122,16 @@ class GuessHouseGame extends BaseGame {
     if (this.gameOver) return;
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage('Vyber kolej, do které postava patří…', 'info');
+    this.setMessage(STRINGS.quiz.housePrompt, 'info');
   }
 
   showModal() {
     this.modalIcon.textContent = '💀';
-    this.modalTitle.textContent = 'Došly životy!';
+    this.modalTitle.textContent = STRINGS.quiz.loseTitle;
     this.fillModalLines([
-      { label: 'Tvé skóre:', value: this.score },
-      { label: 'Poslední postava:', value: this.lastAnswer.name, gap: true },
-      { label: 'Správná kolej:', value: this.lastAnswer.house }
+      { label: STRINGS.quiz.scoreLabel, value: this.score },
+      { label: STRINGS.quiz.lastCharacterLabel, value: this.lastAnswer.name, gap: true },
+      { label: STRINGS.quiz.correctHouseLabel, value: this.lastAnswer.house }
     ]);
     this.openModal();
   }
@@ -149,13 +145,13 @@ class GuessHouseGame extends BaseGame {
   async startNewGame() {
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.showLoading(true, 'Načítám postavy…');
+      this.showLoading(true, STRINGS.loading.characters);
 
       const loaded = await this.loadCharacters();
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage('Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.', 'error');
+        this.setMessage(STRINGS.errors.loadCharacters, 'error');
         this.newGameBtn.disabled = false;
         return;
       }
@@ -169,7 +165,7 @@ class GuessHouseGame extends BaseGame {
     this.renderScore();
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage('Vyber kolej, do které postava patří…', 'info');
+    this.setMessage(STRINGS.quiz.housePrompt, 'info');
     this.closeModal();
   }
 }
