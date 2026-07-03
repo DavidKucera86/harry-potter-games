@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hádej dům — Harry Potter Games</title>
+  <link rel="stylesheet" href="../shared/common.css">
+</head>
+<body>
+  <header>
+    <a class="back-link" href="../index.html">← Zpět na menu</a>
+    <h1>Hádej dům postavy</h1>
+    <p>Ke jménu postavy vyber správný Bradavický dům. Máš 10 životů.</p>
+  </header>
+
+  <div class="game-container">
+    <div class="status-bar">
+      <div class="lives">
+        <span class="lives-label">Životy</span>
+        <div class="hearts" id="hearts"></div>
+      </div>
+      <div>
+        <span class="score-label">Skóre </span>
+        <span class="score" id="score">0</span>
+      </div>
+    </div>
+
+    <div class="quiz-prompt" id="characterName"></div>
+
+    <div class="message info" id="message">Vyber dům, do kterého postava patří…</div>
+
+    <div class="choices-grid" id="choices"></div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" id="newGameBtn">Nová hra</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="modal-icon" id="modalIcon"></div>
+      <h2 id="modalTitle"></h2>
+      <p id="modalText"></p>
+      <button class="btn btn-primary" id="modalBtn">Hrát znovu</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

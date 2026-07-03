@@ -1,20 +1,28 @@
 # Harry Potter Games
 
-Hangman-style browser game — guess Harry Potter characters letter by letter.
+Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https://hp-api.onrender.com/).
 
-## Play locally
+## Hry
 
-Open `index.html` in your browser, or serve the folder with any static file server.
+| Hra | Popis |
+|---|---|
+| [Hádej jméno postavy](guess-character-name/) | Hangman — uhodni jméno postavy písmeno po písmenu |
+| [Hádej dům postavy](guess-house/) | Vyber správný Bradavický dům ke jménu postavy |
+| [Hádej kouzlo](guess-spell/) | Hangman — uhodni incantaci kouzla |
+| [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
 
-## Deploy on Netlify
+## Spuštění lokálně
 
-1. Push this repository to GitHub.
-2. Sign in at [netlify.com](https://www.netlify.com/) with your GitHub account.
-3. **Add new site → Import an existing project** and select `harry-potter-games`.
-4. Use the default settings (publish directory is already set in `netlify.toml`).
-5. Deploy — Netlify will provide a public URL.
+Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný statický server v kořeni repozitáře.
 
-## Tech
+## Deploy na Netlify
 
-- HTML, CSS, vanilla JavaScript
-- Character data from [HP API](https://hp-api.onrender.com/)
+1. Repozitář je propojen s Netlify (publish directory: `.`, viz `netlify.toml`).
+2. Kořenová URL zobrazí menu her.
+3. Jednotlivé hry jsou na `/guess-character-name/`, `/guess-house/` atd.
+
+## Tech stack
+
+- HTML, CSS, vanilla JavaScript (OOP třídy)
+- Sdílené styly v `shared/common.css`
+- Bez build stepu a bez externích knihoven

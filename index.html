@@ -3,58 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hádej postavu z Harryho Pottera</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Harry Potter Games</title>
+  <link rel="stylesheet" href="shared/common.css">
 </head>
 <body>
   <header>
-    <h1>Hádej postavu z Harryho Pottera</h1>
-    <p>Uhodni jméno postavy písmeno po písmenu. Máš 10 životů.</p>
+    <h1>Harry Potter Games</h1>
+    <p>Vyber si hru ze světa Harryho Pottera. Data z HP API.</p>
   </header>
 
-  <div class="game-container">
-    <div class="status-bar">
-      <div class="lives">
-        <span class="lives-label">Životy</span>
-        <div class="hearts" id="hearts"></div>
-      </div>
-      <div class="wrong-letters">
-        Špatně: <span id="wrongLetters">—</span>
-      </div>
-    </div>
+  <div class="game-grid">
+    <a class="game-card" href="guess-character-name/">
+      <h2>Hádej jméno postavy</h2>
+      <p>Hangman styl — uhodni jméno postavy písmeno po písmenu. Máš 10 životů.</p>
+      <span>Hrát →</span>
+    </a>
 
-    <div class="word-display" id="wordDisplay"></div>
+    <a class="game-card" href="guess-house/">
+      <h2>Hádej dům postavy</h2>
+      <p>Ukaž znalost Bradavic — ke jménu postavy vyber správný dům ze čtyř možností.</p>
+      <span>Hrát →</span>
+    </a>
 
-    <div class="message info" id="message">Hádej písmeno ve jménu postavy…</div>
+    <a class="game-card" href="guess-spell/">
+      <h2>Hádej kouzlo</h2>
+      <p>Hangman pro kouzla — uhodni incantaci kouzla z HP světa písmeno po písmenu.</p>
+      <span>Hrát →</span>
+    </a>
 
-    <div class="input-area">
-      <input
-        type="text"
-        id="letterInput"
-        maxlength="1"
-        placeholder="Zadej písmeno"
-        autocomplete="off"
-        autofocus
-      >
-      <button class="btn btn-primary" id="guessBtn">Hádat</button>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-secondary" id="newGameBtn">Nová hra</button>
-    </div>
-
-    <p class="keyboard-hint">Tip: můžeš psát přímo na klávesnici a potvrdit Enterem</p>
+    <a class="game-card" href="who-is-on-photo/">
+      <h2>Kdo je na fotce?</h2>
+      <p>Podívej se na fotku postavy a vyber správné jméno ze čtyř možností.</p>
+      <span>Hrát →</span>
+    </a>
   </div>
-
-  <div class="overlay" id="overlay">
-    <div class="modal">
-      <div class="modal-icon" id="modalIcon"></div>
-      <h2 id="modalTitle"></h2>
-      <p id="modalText"></p>
-      <button class="btn btn-primary" id="modalBtn">Hrát znovu</button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
