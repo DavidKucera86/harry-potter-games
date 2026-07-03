@@ -1,4 +1,6 @@
-class BaseGame {
+import { GAME_CONFIG } from './config.js';
+
+export class BaseGame {
   constructor() {
     this.isReady = false;
     this.lives = GAME_CONFIG.MAX_LIVES;
@@ -6,6 +8,8 @@ class BaseGame {
     this.score = 0;
     this.remainingItems = [];
     this.deckSource = [];
+    this._modalKeydownHandler = this._handleModalKeydown.bind(this);
+    this._previousFocus = null;
     this.bindCommonElements();
   }
 
@@ -14,17 +18,20 @@ class BaseGame {
     this.messageEl = document.getElementById('message');
     this.newGameBtn = document.getElementById('newGameBtn');
     this.overlay = document.getElementById('overlay');
+    this.modalDialog = document.getElementById('modal');
     this.modalIcon = document.getElementById('modalIcon');
     this.modalTitle = document.getElementById('modalTitle');
     this.modalText = document.getElementById('modalText');
     this.modalBtn = document.getElementById('modalBtn');
     this.scoreEl = document.getElementById('score');
     this.loadingOverlay = document.getElementById('loadingOverlay');
+    this.gameContainer = document.querySelector('.game-container');
   }
 
   bindCommonEvents(onNewGame) {
-    this.newGameBtn.addEventListener('click', onNewGame);
-    this.modalBtn.addEventListener('click', onNewGame);
+    this._onNewGame = onNewGame;
+    this.newGameBtn?.addEventListener('click', onNewGame);
+    this.modalBtn?.addEventListener('click', onNewGame);
   }
 
   createHeartSvg() {
@@ -40,6 +47,8 @@ class BaseGame {
   }
 
   renderHearts() {
+    if (!this.heartsEl) return;
+
     this.heartsEl.replaceChildren();
     for (let i = 0; i < GAME_CONFIG.MAX_LIVES; i++) {
       const heart = document.createElement('div');
@@ -56,6 +65,8 @@ class BaseGame {
   }
 
   setMessage(text, type) {
+    if (!this.messageEl) return;
+
     this.messageEl.textContent = text;
     this.messageEl.className = 'message ' + type;
   }
@@ -71,14 +82,66 @@ class BaseGame {
   }
 
   openModal() {
+    if (!this.overlay) return;
+
+    this._previousFocus = document.activeElement;
     this.overlay.classList.add('visible');
+    this.modalDialog?.setAttribute('aria-hidden', 'false');
+    this.gameContainer?.setAttribute('aria-hidden', 'true');
+    document.addEventListener('keydown', this._modalKeydownHandler);
+    this.modalBtn?.focus();
   }
 
   closeModal() {
+    if (!this.overlay) return;
+
     this.overlay.classList.remove('visible');
+    this.modalDialog?.setAttribute('aria-hidden', 'true');
+    this.gameContainer?.setAttribute('aria-hidden', 'false');
+    document.removeEventListener('keydown', this._modalKeydownHandler);
+
+    if (this._previousFocus?.focus) {
+      this._previousFocus.focus();
+    }
+  }
+
+  _getModalFocusables() {
+    if (!this.modalDialog) return [];
+
+    return [...this.modalDialog.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )].filter(el => !el.hasAttribute('disabled'));
+  }
+
+  _handleModalKeydown(event) {
+    if (!this.overlay?.classList.contains('visible')) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this._onNewGame?.();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    const focusables = this._getModalFocusables();
+    if (focusables.length === 0) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   fillModalLines(lines) {
+    if (!this.modalText) return;
+
     this.modalText.replaceChildren();
 
     lines.forEach((line, index) => {
@@ -128,6 +191,11 @@ class BaseGame {
     this.remainingItems.push(item);
   }
 
+  removeFromDeck(item, compareFn = (a, b) => a === b) {
+    this.deckSource = this.deckSource.filter(entry => !compareFn(entry, item));
+    this.remainingItems = this.remainingItems.filter(entry => !compareFn(entry, item));
+  }
+
   async loadGameData({ fetchFn, transform, minCount = 1, emptyError, logLabel, assign, onError }) {
     try {
       const data = await fetchFn();
@@ -144,7 +212,7 @@ class BaseGame {
       console.error(`Chyba při načítání ${logLabel}:`, error);
       this.isReady = false;
       if (onError) {
-        onError();
+        onError(error);
       }
       return false;
     }

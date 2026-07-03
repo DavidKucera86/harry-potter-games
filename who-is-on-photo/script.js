@@ -1,165 +1,93 @@
-class WhoIsOnPhotoGame extends BaseGame {
+import { QuizGame } from '../shared/QuizGame.js';
+import { getCharacters } from '../shared/dataProvider.js';
+import { STRINGS } from '../shared/strings.js';
+import { GAME_CONFIG } from '../shared/config.js';
+
+class WhoIsOnPhotoGame extends QuizGame {
   constructor() {
-    super();
-    this.characters = [];
-    this.currentCharacter = null;
-    this.lastAnswer = null;
-
-    this.photoEl = document.getElementById('characterPhoto');
-    this.choicesEl = document.getElementById('choices');
-
-    this.bindEvents();
-    this.init();
-  }
-
-  bindEvents() {
-    this.bindCommonEvents(() => this.startNewGame());
-    this.photoEl.addEventListener('error', () => this.handleImageError());
-  }
-
-  async init() {
-    this.setControlsEnabled(false);
-    this.showLoading(true, STRINGS.loading.characters);
-
-    const loaded = await this.loadCharacters();
-    this.showLoading(false);
-
-    if (loaded) {
-      this.startNewGame();
-    } else {
-      this.setMessage(STRINGS.errors.loadCharacters, 'error');
-      this.newGameBtn.disabled = false;
-    }
-  }
-
-  loadCharacters() {
-    return this.loadGameData({
+    super({
       fetchFn: getCharacters,
       transform: data => data.filter(c => c.name && c.image),
-      minCount: 4,
+      minCount: GAME_CONFIG.MIN_PHOTO_CHARACTERS,
       emptyError: STRINGS.errors.notEnoughPhotoCharacters,
+      loadError: STRINGS.errors.loadCharacters,
+      fetchTimeoutError: STRINGS.errors.fetchTimeout,
+      loadingText: STRINGS.loading.characters,
       logLabel: 'postav',
-      assign: items => { this.characters = items; },
-      onError: () => { this.characters = []; },
+      promptMessage: STRINGS.quiz.photoPrompt,
+      loseTitle: STRINGS.quiz.loseTitle,
+      choiceCorrect: STRINGS.quiz.choiceCorrect,
+      choiceWrong: STRINGS.quiz.choiceWrong,
+      onNewGame: WhoIsOnPhotoGame.prototype.resetImageErrors,
+
+      renderRound: WhoIsOnPhotoGame.prototype.renderRound,
+      isCorrect: (character, item) => character.id === item.id,
+      getChoiceLabel: character => character.name,
+      getCorrectMessage: item => STRINGS.quiz.photoCorrect(item.name),
+      getWrongMessage: item => STRINGS.quiz.photoWrong(item.name),
+      buildLastAnswer: item => ({ name: item.name }),
+      buildModalLines: (lastAnswer, score) => [
+        { label: STRINGS.quiz.scoreLabel, value: score },
+        { label: STRINGS.quiz.lastCharacterLabel, value: lastAnswer.name, gap: true },
+      ],
     });
+
+    this.photoEl = document.getElementById('characterPhoto');
+    this.consecutiveImageErrors = 0;
+    this.photoEl?.addEventListener('error', () => this.handleImageError());
   }
 
-  setControlsEnabled(enabled) {
-    this.newGameBtn.disabled = !enabled;
-    this.choicesEl.querySelectorAll('button').forEach(btn => {
-      btn.disabled = !enabled;
-    });
+  resetImageErrors() {
+    this.consecutiveImageErrors = 0;
   }
 
   renderRound() {
-    this.currentCharacter = this.pickFromDeck();
-    this.photoEl.src = this.currentCharacter.image;
-    this.photoEl.alt = '';
+    this.currentItem = this.pickFromDeck();
+    if (this.photoEl) {
+      this.photoEl.src = this.currentItem.image;
+      this.photoEl.alt = STRINGS.quiz.photoAlt;
+    }
 
     const others = this.shuffle(
-      this.characters.filter(c => c.id !== this.currentCharacter.id)
+      this.items.filter(c => c.id !== this.currentItem.id)
     ).slice(0, 3);
 
-    const options = this.shuffle([this.currentCharacter, ...others]);
+    const options = this.shuffle([this.currentItem, ...others]);
 
     this.choicesEl.replaceChildren();
     for (const character of options) {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
       btn.textContent = character.name;
-      btn.addEventListener('click', () => this.guessName(character.name, btn));
+      btn.addEventListener('click', () => this.handleGuess(character, btn));
       this.choicesEl.appendChild(btn);
     }
+  }
+
+  removeCharacterFromPool(character) {
+    this.removeFromDeck(character, (entry, target) => entry.id === target.id);
+    this.items = this.items.filter(entry => entry.id !== character.id);
   }
 
   handleImageError() {
     if (this.gameOver || !this.isReady) return;
 
-    if (this.currentCharacter) {
-      this.returnToDeck(this.currentCharacter);
+    if (this.currentItem) {
+      this.removeCharacterFromPool(this.currentItem);
+      this.consecutiveImageErrors++;
     }
 
-    this.renderRound();
-    this.setMessage(STRINGS.quiz.photoPrompt, 'info');
-  }
-
-  guessName(name, btn) {
-    if (this.gameOver || !this.isReady) return;
-
-    this.setControlsEnabled(false);
-    const correct = name === this.currentCharacter.name;
-    this.lastAnswer = {
-      name: this.currentCharacter.name
-    };
-
-    if (correct) {
-      btn.classList.add('correct');
-      this.score++;
-      this.renderScore();
-      this.setMessage(STRINGS.quiz.photoCorrect(this.currentCharacter.name), 'success');
-      setTimeout(() => this.nextRound(), 1200);
-    } else {
-      btn.classList.add('wrong');
-      this.lives--;
-      this.renderHearts();
-      this.setMessage(STRINGS.quiz.photoWrong(this.currentCharacter.name), 'error');
-
-      if (this.lives <= 0) {
-        setTimeout(() => this.endGame(), 1200);
-      } else {
-        setTimeout(() => this.nextRound(), 1200);
-      }
-    }
-  }
-
-  nextRound() {
-    if (this.gameOver) return;
-    this.renderRound();
-    this.setControlsEnabled(true);
-    this.setMessage(STRINGS.quiz.photoPrompt, 'info');
-  }
-
-  showModal() {
-    this.modalIcon.textContent = '💀';
-    this.modalTitle.textContent = STRINGS.quiz.loseTitle;
-    this.fillModalLines([
-      { label: STRINGS.quiz.scoreLabel, value: this.score },
-      { label: STRINGS.quiz.lastCharacterLabel, value: this.lastAnswer.name, gap: true }
-    ]);
-    this.openModal();
-  }
-
-  endGame() {
-    this.gameOver = true;
-    this.setControlsEnabled(false);
-    this.showModal();
-  }
-
-  async startNewGame() {
-    if (!this.isReady) {
+    if (
+      this.items.length < GAME_CONFIG.MIN_PHOTO_CHARACTERS ||
+      this.consecutiveImageErrors >= GAME_CONFIG.MAX_CONSECUTIVE_IMAGE_ERRORS
+    ) {
+      this.setMessage(STRINGS.errors.imageErrorsExhausted, 'error');
       this.setControlsEnabled(false);
-      this.showLoading(true, STRINGS.loading.characters);
-
-      const loaded = await this.loadCharacters();
-      this.showLoading(false);
-
-      if (!loaded) {
-        this.setMessage(STRINGS.errors.loadCharacters, 'error');
-        this.newGameBtn.disabled = false;
-        return;
-      }
+      return;
     }
 
-    this.lives = GAME_CONFIG.MAX_LIVES;
-    this.score = 0;
-    this.gameOver = false;
-    this.resetDeck(this.characters);
-    this.renderHearts();
-    this.renderScore();
     this.renderRound();
-    this.setControlsEnabled(true);
     this.setMessage(STRINGS.quiz.photoPrompt, 'info');
-    this.closeModal();
   }
 }
 

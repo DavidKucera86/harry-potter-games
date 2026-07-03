@@ -8,6 +8,7 @@ export const selectors = {
   modalTitle: '#modalTitle',
   modalText: '#modalText',
   modalBtn: '#modalBtn',
+  modalDialog: '#modal',
   modalHighlight: '#modalText .highlight',
   score: '#score',
   letterInput: '#letterInput',
