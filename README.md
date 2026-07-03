@@ -23,18 +23,27 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 
 ## Tech stack
 
-- HTML, CSS, vanilla JavaScript (OOP třídy)
+- HTML, CSS, vanilla JavaScript (OOP třídy, ES modules)
 - Sdílené moduly v `shared/`:
-  - `config.js` — globální konfigurace (životy, API URL)
-  - `dataProvider.js` — načítání dat s cache v `sessionStorage`
+  - `config.js` — globální konfigurace (životy, API URL, offline fallback cesty)
+  - `dataProvider.js` — načítání dat s cache v `sessionStorage` a offline fallback
   - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
+  - `HangmanGame.js` — sdílená hangman logika pro postavy a kouzla
+  - `QuizGame.js` — sdílená multiple-choice logika pro koleje a fotky
   - `hangmanUtils.js` — utility pro hangman hry
+  - `fixtures/` — lokální snapshot dat pro offline fallback
 - Sdílené styly v `shared/common.css`
-- Bez build stepu a bez externích knihoven
+- Bez build stepu a bez externích knihoven (kromě dev tools)
 
 ## Sdílená cache dat
 
-`dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu.
+`dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu. Pokud live API selže, aplikace automaticky načte data z lokálních souborů v `shared/fixtures/`.
+
+## Lint
+
+```bash
+npm run lint
+```
 
 ## Testování
 

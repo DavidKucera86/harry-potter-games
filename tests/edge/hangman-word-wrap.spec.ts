@@ -3,7 +3,7 @@ import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady } from '../helpers/hangman';
 
 test.describe('Hangman word wrap @edge', () => {
-  test('E3: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
+  test('E5: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         {

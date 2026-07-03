@@ -32,7 +32,7 @@
 
     <div class="word-display" id="wordDisplay"></div>
 
-    <div class="message info" id="message">Hádej písmeno v zaklínadle…</div>
+    <div class="message info" id="message" role="status" aria-live="polite">Hádej písmeno v zaklínadle…</div>
 
     <div class="input-area">
       <input
@@ -53,8 +53,8 @@
     <p class="keyboard-hint">Tip: můžeš psát přímo na klávesnici a potvrdit Enterem</p>
   </div>
 
-  <div class="overlay" id="overlay">
-    <div class="modal">
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-icon" id="modalIcon"></div>
       <h2 id="modalTitle"></h2>
       <p id="modalText"></p>
@@ -69,11 +69,6 @@
     </a>
   </footer>
 
-  <script src="../shared/config.js"></script>
-  <script src="../shared/strings.js"></script>
-  <script src="../shared/dataProvider.js"></script>
-  <script src="../shared/hangmanUtils.js"></script>
-  <script src="../shared/BaseGame.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

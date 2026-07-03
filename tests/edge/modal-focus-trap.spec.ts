@@ -3,8 +3,8 @@ import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, guessLetters, expectModalOpen } from '../helpers/hangman';
 import { selectors } from '../helpers/selectors';
 
-test.describe('Hangman lose @edge', () => {
-  test('E4: losing all lives shows defeat modal with answer', { tag: '@edge' }, async ({ page }) => {
+test.describe('Modal focus trap @edge', () => {
+  test('E19: defeat modal has dialog role and focus on action button', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [{ id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' }],
       random: 0,
@@ -14,6 +14,8 @@ test.describe('Hangman lose @edge', () => {
 
     await guessLetters(page, ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']);
     await expectModalOpen(page, 'Došly životy!');
-    await expect(page.locator(selectors.modalHighlight)).toHaveText('Al');
+
+    await expect(page.locator('.modal[role="dialog"]')).toBeVisible();
+    await expect(page.locator(selectors.modalBtn)).toBeFocused();
   });
 });
