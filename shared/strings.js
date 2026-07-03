@@ -1,4 +1,4 @@
-const STRINGS = {
+export const STRINGS = {
   loading: {
     characters: 'Načítám postavy…',
     spells: 'Načítám kouzla…',

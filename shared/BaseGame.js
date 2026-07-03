@@ -1,4 +1,6 @@
-class BaseGame {
+import { GAME_CONFIG } from './config.js';
+
+export default class BaseGame {
   constructor() {
     this.isReady = false;
     this.lives = GAME_CONFIG.MAX_LIVES;
@@ -14,12 +16,17 @@ class BaseGame {
     this.messageEl = document.getElementById('message');
     this.newGameBtn = document.getElementById('newGameBtn');
     this.overlay = document.getElementById('overlay');
+    this.modal = this.overlay?.querySelector('.modal');
     this.modalIcon = document.getElementById('modalIcon');
     this.modalTitle = document.getElementById('modalTitle');
     this.modalText = document.getElementById('modalText');
     this.modalBtn = document.getElementById('modalBtn');
     this.scoreEl = document.getElementById('score');
     this.loadingOverlay = document.getElementById('loadingOverlay');
+
+    if (this.overlay) {
+      this.overlay.setAttribute('aria-hidden', 'true');
+    }
   }
 
   bindCommonEvents(onNewGame) {
@@ -33,7 +40,7 @@ class BaseGame {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute(
       'd',
-      'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
+      'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
     );
     svg.appendChild(path);
     return svg;
@@ -70,12 +77,53 @@ class BaseGame {
     }
   }
 
+  getModalFocusables() {
+    if (!this.modal) return [this.modalBtn];
+
+    return [...this.modal.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    )].filter(el => !el.disabled);
+  }
+
+  trapFocus(event) {
+    if (event.key !== 'Tab') return;
+
+    const focusables = this.getModalFocusables();
+    if (focusables.length === 0) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   openModal() {
+    this._previousFocus = document.activeElement;
     this.overlay.classList.add('visible');
+    this.overlay.setAttribute('aria-hidden', 'false');
+    this._trapFocusHandler = (event) => this.trapFocus(event);
+    this.overlay.addEventListener('keydown', this._trapFocusHandler);
+
+    const focusables = this.getModalFocusables();
+    (focusables[0] || this.modalBtn).focus();
   }
 
   closeModal() {
     this.overlay.classList.remove('visible');
+    this.overlay.setAttribute('aria-hidden', 'true');
+    if (this._trapFocusHandler) {
+      this.overlay.removeEventListener('keydown', this._trapFocusHandler);
+      this._trapFocusHandler = null;
+    }
+    if (this._previousFocus?.focus) {
+      this._previousFocus.focus();
+    }
   }
 
   fillModalLines(lines) {

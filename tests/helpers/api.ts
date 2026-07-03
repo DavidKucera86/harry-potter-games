@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
-import charactersFixture from '../fixtures/characters.json';
-import spellsFixture from '../fixtures/spells.json';
+import charactersFixture from '../../shared/fixtures/characters.json' with { type: 'json' };
+import spellsFixture from '../../shared/fixtures/spells.json' with { type: 'json' };
 
 const PNG_1X1 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
