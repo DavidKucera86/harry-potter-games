@@ -4,6 +4,20 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export class FetchTimeoutError extends Error {
+  constructor() {
+    super('Fetch timeout');
+    this.name = 'FetchTimeoutError';
+  }
+}
+
+function getFetchTimeoutMs() {
+  if (typeof window !== 'undefined' && window.__HP_FETCH_TIMEOUT_MS) {
+    return window.__HP_FETCH_TIMEOUT_MS;
+  }
+  return GAME_CONFIG.FETCH_TIMEOUT_MS;
+}
+
 function cacheStorageKey(storageKey) {
   return `${storageKey}-v${GAME_CONFIG.CACHE_VERSION}`;
 }
@@ -12,16 +26,29 @@ async function fetchWithRetry(url) {
   let lastError;
 
   for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), getFetchTimeoutMs());
+
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
       if (response.ok) {
         return response;
       }
+
       lastError = new Error(`HTTP ${response.status}`);
       if (response.status < 500) {
         throw lastError;
       }
     } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        lastError = new FetchTimeoutError();
+        throw lastError;
+      }
+
       lastError = error instanceof Error ? error : new Error(String(error));
     }
 

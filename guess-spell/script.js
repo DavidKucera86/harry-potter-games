@@ -9,6 +9,7 @@ new HangmanGame({
     .filter(name => name),
   loadingText: STRINGS.loading.spells,
   loadError: STRINGS.errors.loadSpells,
+  fetchTimeoutError: STRINGS.errors.fetchTimeoutSpells,
   emptyError: STRINGS.errors.emptySpells,
   logLabel: 'kouzel',
   strings: {

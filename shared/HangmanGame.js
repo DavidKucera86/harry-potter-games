@@ -56,11 +56,17 @@ export class HangmanGame extends BaseGame {
       this.resetDeck(this.words);
       this.startNewGame();
     } else {
-      this.setMessage(this.config.loadError, 'error');
+      this.setMessage(this._loadError ?? this.config.loadError, 'error');
       if (this.newGameBtn) {
         this.newGameBtn.disabled = false;
       }
     }
+  }
+
+  resolveLoadError(error) {
+    return error?.name === 'FetchTimeoutError'
+      ? this.config.fetchTimeoutError ?? this.config.loadError
+      : this.config.loadError;
   }
 
   loadWords() {
@@ -71,7 +77,10 @@ export class HangmanGame extends BaseGame {
       emptyError: this.config.emptyError,
       logLabel: this.config.logLabel,
       assign: items => { this.words = items; },
-      onError: () => { this.words = []; },
+      onError: (error) => {
+        this.words = [];
+        this._loadError = this.resolveLoadError(error);
+      },
     });
   }
 
