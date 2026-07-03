@@ -182,7 +182,7 @@ class GuessHouseGame {
     if (this.gameOver) return;
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage('Vyber dům, do kterého postava patří…', 'info');
+    this.setMessage('Vyber kolej, do které postava patří…', 'info');
   }
 
   showModal() {
@@ -191,7 +191,7 @@ class GuessHouseGame {
     this.modalText.innerHTML =
       `Tvé skóre: <span class="highlight">${this.score}</span><br><br>` +
       `Poslední postava: <span class="highlight">${this.lastAnswer.name}</span><br>` +
-      `Správný dům: <span class="highlight">${this.lastAnswer.house}</span>`;
+      `Správná kolej: <span class="highlight">${this.lastAnswer.house}</span>`;
     this.overlay.classList.add('visible');
   }
 
@@ -221,7 +221,7 @@ class GuessHouseGame {
     this.renderScore();
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage('Vyber dům, do kterého postava patří…', 'info');
+    this.setMessage('Vyber kolej, do které postava patří…', 'info');
     this.overlay.classList.remove('visible');
   }
 }
