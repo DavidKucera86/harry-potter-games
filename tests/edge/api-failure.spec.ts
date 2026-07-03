@@ -3,10 +3,17 @@ import { clearSessionStorage, mockApiFailure, mockCharacters, mockImages } from 
 import { waitForHangmanReady, waitForQuizReady, clickNewGame } from '../helpers/hangman';
 import { quizCharacters } from '../helpers/quiz';
 
+async function mockFallbackFailure(page: import('@playwright/test').Page) {
+  await page.route('**/shared/fixtures/characters.json', (route) => {
+    route.fulfill({ status: 500, body: 'Fallback unavailable' });
+  });
+}
+
 test.describe('API failure @edge', () => {
-  test('E7: hangman shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
+  test('E10: hangman shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
     await clearSessionStorage(page);
     await mockApiFailure(page, 'characters');
+    await mockFallbackFailure(page);
     await mockImages(page);
     await page.goto('/guess-character-name/');
 
@@ -14,6 +21,8 @@ test.describe('API failure @edge', () => {
     await expect(page.locator('#message')).toContainText('Nepodařilo se načíst');
     await expect(page.locator('#newGameBtn')).toBeEnabled();
 
+    await page.unroute('**/api/characters');
+    await page.unroute('**/shared/fixtures/characters.json');
     await mockCharacters(page, [
       { id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' },
     ]);
@@ -22,15 +31,18 @@ test.describe('API failure @edge', () => {
     await expect(page.locator('#wordDisplay .word-group')).toHaveCount(1);
   });
 
-  test('E7: guess-house shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
+  test('E11: guess-house shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
     await clearSessionStorage(page);
     await mockApiFailure(page, 'characters');
+    await mockFallbackFailure(page);
     await mockImages(page);
     await page.goto('/guess-house/');
 
     await expect(page.locator('#message')).toHaveClass(/error/, { timeout: 10000 });
     await expect(page.locator('#newGameBtn')).toBeEnabled();
 
+    await page.unroute('**/api/characters');
+    await page.unroute('**/shared/fixtures/characters.json');
     await mockCharacters(page, quizCharacters);
     await clickNewGame(page);
     await waitForQuizReady(page);

@@ -6,6 +6,10 @@ export const GAME_CONFIG = {
     CHARACTERS: 'https://hp-api.onrender.com/api/characters',
     SPELLS: 'https://hp-api.onrender.com/api/spells',
   },
+  FALLBACK: {
+    CHARACTERS: '/shared/fixtures/characters.json',
+    SPELLS: '/shared/fixtures/spells.json',
+  },
   CACHE_TTL_MS: 60 * 60 * 1000,
   CACHE_VERSION: '2',
   API_RETRIES: 3,
