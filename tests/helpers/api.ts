@@ -56,6 +56,18 @@ export async function seedRandom(page: Page, value = 0) {
   }, value);
 }
 
+export async function setFetchTimeout(page: Page, timeoutMs: number) {
+  await page.addInitScript((timeout) => {
+    window.__HP_FETCH_TIMEOUT_MS = timeout;
+  }, timeoutMs);
+}
+
+export async function mockFetchHang(page: Page, endpoint: 'characters' | 'spells') {
+  await page.route(`**/api/${endpoint}`, async () => {
+    await new Promise(() => {});
+  });
+}
+
 export async function setupGameMocks(page: Page, options: {
   characters?: Character[];
   spells?: Spell[];

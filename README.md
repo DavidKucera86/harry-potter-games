@@ -13,7 +13,11 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 
 ## Spuštění lokálně
 
-Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný statický server v kořeni repozitáře.
+Otevři [`index.html`](index.html) v prohlížeči přes statický server (ES moduly nefungují z `file://`), např.:
+
+```bash
+npx serve . -l 4173
+```
 
 ## Deploy na Netlify
 
@@ -23,14 +27,18 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 
 ## Tech stack
 
-- HTML, CSS, vanilla JavaScript (OOP třídy)
+- HTML, CSS, vanilla JavaScript (ES moduly, OOP třídy)
 - Sdílené moduly v `shared/`:
-  - `config.js` — globální konfigurace (životy, API URL)
-  - `dataProvider.js` — načítání dat s cache v `sessionStorage`
-  - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
-  - `hangmanUtils.js` — utility pro hangman hry
-- Sdílené styly v `shared/common.css`
-- Bez build stepu a bez externích knihoven
+  - `config.js` — globální konfigurace (verze, životy, timeout, API URL)
+  - `strings.js` — lokalizované texty
+  - `dataProvider.js` — načítání dat s cache v `sessionStorage` a fetch timeoutem
+  - `BaseGame.js` — společná logika her (životy, modal, loader, deck, a11y)
+  - `HangmanGame.js` — sdílená hangman logika
+  - `QuizGame.js` — sdílená logika kvízových her
+  - `hangmanUtils.js` — normalizace diakritiky (Unicode NFD)
+- Sdílené styly v `shared/common.css` a `shared/styles/hangman.css`
+- Bez build stepu a bez externích knihoven (vyžaduje statický server kvůli ES modulům)
+- CSP hlavičky v `netlify.toml`
 
 ## Sdílená cache dat
 
