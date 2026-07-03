@@ -402,3 +402,39 @@ header p {
   font-weight: 600;
   font-size: 0.9rem;
 }
+
+.site-footer {
+  margin-top: auto;
+  width: 100%;
+  max-width: 900px;
+  padding: 2rem 1rem 0.5rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.bmc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold-light);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(212, 168, 67, 0.08);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.bmc-link:hover {
+  border-color: var(--gold);
+  background: rgba(212, 168, 67, 0.15);
+  box-shadow: 0 0 16px var(--gold-glow);
+}

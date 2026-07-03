@@ -7,7 +7,7 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | Hra | Popis |
 |---|---|
 | [Hádej jméno postavy](guess-character-name/) | Hangman — uhodni jméno postavy písmeno po písmenu |
-| [Hádej dům postavy](guess-house/) | Vyber správný Bradavický dům ke jménu postavy |
+| [Hádej kolej postavy](guess-house/) | Vyber správnou Bradavickou kolej ke jménu postavy |
 | [Hádej kouzlo](guess-spell/) | Hangman — uhodni incantaci kouzla |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
 
