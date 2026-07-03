@@ -4,7 +4,7 @@ import { waitForHangmanReady, guessLetters, expectModalOpen } from '../helpers/h
 import { selectors } from '../helpers/selectors';
 
 test.describe('XSS safe DOM @edge', () => {
-  test('E11: malicious character name is rendered as text in modal', { tag: '@edge' }, async ({ page }) => {
+  test('E17: malicious character name is rendered as text in modal', { tag: '@edge' }, async ({ page }) => {
     let dialogShown = false;
     page.on('dialog', () => {
       dialogShown = true;
@@ -26,7 +26,7 @@ test.describe('XSS safe DOM @edge', () => {
 
     await guessLetters(page, ['b', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'o']);
     await expectModalOpen(page, 'Došly životy!');
-    await expect(page.locator(selectors.modalHighlight)).toHaveText('<script>alert(1)</script>');
+    await expect(page.locator(selectors.modalHighlight).first()).toHaveText('<script>alert(1)</script>');
     expect(dialogShown).toBe(false);
   });
 });

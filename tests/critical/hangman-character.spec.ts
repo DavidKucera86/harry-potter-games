@@ -30,7 +30,7 @@ test.describe('Hangman character @critical', () => {
 
     await guessLetter(page, 'l');
     await expectModalOpen(page, 'Gratulujeme!');
-    await expect(page.locator(selectors.modalHighlight)).toHaveText('Al');
+    await expect(page.locator(selectors.modalHighlight).first()).toHaveText('Al');
   });
 
   test('G1: new game resets state', { tag: '@critical' }, async ({ page }) => {

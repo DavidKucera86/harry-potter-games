@@ -1,9 +1,17 @@
-class WhoIsOnPhotoGame extends BaseGame {
+import { GAME_CONFIG } from '../shared/config.js';
+import { STRINGS } from '../shared/strings.js';
+import { getCharacters } from '../shared/dataProvider.js';
+import { BaseGame } from '../shared/BaseGame.js';
+
+export class WhoIsOnPhotoGame extends BaseGame {
   constructor() {
     super();
     this.characters = [];
     this.currentCharacter = null;
     this.lastAnswer = null;
+    this.failedImageIds = new Set();
+    this.imageErrorCount = 0;
+    this.photoLoadTimeoutId = null;
 
     this.photoEl = document.getElementById('characterPhoto');
     this.choicesEl = document.getElementById('choices');
@@ -14,7 +22,10 @@ class WhoIsOnPhotoGame extends BaseGame {
 
   bindEvents() {
     this.bindCommonEvents(() => this.startNewGame());
-    this.photoEl.addEventListener('error', () => this.handleImageError());
+    if (this.photoEl) {
+      this.photoEl.addEventListener('error', () => this.handleImageError());
+      this.photoEl.addEventListener('load', () => this.clearPhotoLoadTimeout());
+    }
   }
 
   async init() {
@@ -28,7 +39,9 @@ class WhoIsOnPhotoGame extends BaseGame {
       this.startNewGame();
     } else {
       this.setMessage(STRINGS.errors.loadCharacters, 'error');
-      this.newGameBtn.disabled = false;
+      if (this.newGameBtn) {
+        this.newGameBtn.disabled = false;
+      }
     }
   }
 
@@ -44,21 +57,79 @@ class WhoIsOnPhotoGame extends BaseGame {
     });
   }
 
+  clearPhotoLoadTimeout() {
+    if (this.photoLoadTimeoutId !== null) {
+      clearTimeout(this.photoLoadTimeoutId);
+      this.photoLoadTimeoutId = null;
+    }
+  }
+
+  getAvailableCharacters() {
+    return this.characters.filter(c => !this.failedImageIds.has(c.id));
+  }
+
   setControlsEnabled(enabled) {
-    this.newGameBtn.disabled = !enabled;
-    this.choicesEl.querySelectorAll('button').forEach(btn => {
-      btn.disabled = !enabled;
-    });
+    if (this.newGameBtn) {
+      this.newGameBtn.disabled = !enabled;
+    }
+    if (this.choicesEl) {
+      this.choicesEl.querySelectorAll('button').forEach(btn => {
+        btn.disabled = !enabled;
+      });
+    }
   }
 
   renderRound() {
-    this.currentCharacter = this.pickFromDeck();
-    this.photoEl.src = this.currentCharacter.image;
-    this.photoEl.alt = '';
+    const photoPool = this.characters.filter(c => !this.failedImageIds.has(c.id));
+
+    if (photoPool.length === 0) {
+      if (this.choicesEl) {
+        this.choicesEl.replaceChildren();
+      }
+      this.setMessage(STRINGS.errors.allPhotosBroken, 'error');
+      this.setControlsEnabled(false);
+      if (this.newGameBtn) {
+        this.newGameBtn.disabled = false;
+      }
+      return;
+    }
+
+    this.currentCharacter = this.pickFromDeck(
+      item => !this.failedImageIds.has(item.id)
+    );
+
+    if (!this.currentCharacter || !this.photoEl || !this.choicesEl) {
+      if (this.choicesEl) {
+        this.choicesEl.replaceChildren();
+      }
+      this.setMessage(STRINGS.errors.allPhotosBroken, 'error');
+      this.setControlsEnabled(false);
+      return;
+    }
+
+    this.clearPhotoLoadTimeout();
+    const expectedSrc = this.currentCharacter.image;
+    this.photoEl.src = expectedSrc;
+    this.photoEl.alt = STRINGS.a11y.photoAlt;
+
+    this.photoLoadTimeoutId = setTimeout(() => {
+      if (this.photoEl.src === expectedSrc && this.photoEl.naturalWidth === 0) {
+        this.handleImageError();
+      }
+    }, 2000);
 
     const others = this.shuffle(
       this.characters.filter(c => c.id !== this.currentCharacter.id)
     ).slice(0, 3);
+
+    if (others.length < 3) {
+      if (this.choicesEl) {
+        this.choicesEl.replaceChildren();
+      }
+      this.setMessage(STRINGS.errors.notEnoughPhotoCharacters, 'error');
+      this.setControlsEnabled(false);
+      return;
+    }
 
     const options = this.shuffle([this.currentCharacter, ...others]);
 
@@ -75,21 +146,39 @@ class WhoIsOnPhotoGame extends BaseGame {
   handleImageError() {
     if (this.gameOver || !this.isReady) return;
 
+    this.clearPhotoLoadTimeout();
+
     if (this.currentCharacter) {
-      this.returnToDeck(this.currentCharacter);
+      this.failedImageIds.add(this.currentCharacter.id);
+    }
+
+    this.imageErrorCount++;
+    if (this.imageErrorCount >= GAME_CONFIG.MAX_IMAGE_ERRORS) {
+      if (this.choicesEl) {
+        this.choicesEl.replaceChildren();
+      }
+      this.setMessage(STRINGS.errors.allPhotosBroken, 'error');
+      this.setControlsEnabled(false);
+      if (this.newGameBtn) {
+        this.newGameBtn.disabled = false;
+      }
+      return;
     }
 
     this.renderRound();
-    this.setMessage(STRINGS.quiz.photoPrompt, 'info');
+
+    if (this.getAvailableCharacters().length > 0) {
+      this.setMessage(STRINGS.quiz.photoPrompt, 'info');
+    }
   }
 
   guessName(name, btn) {
-    if (this.gameOver || !this.isReady) return;
+    if (this.gameOver || !this.isReady || !this.currentCharacter) return;
 
     this.setControlsEnabled(false);
     const correct = name === this.currentCharacter.name;
     this.lastAnswer = {
-      name: this.currentCharacter.name
+      name: this.currentCharacter.name,
     };
 
     if (correct) {
@@ -97,7 +186,7 @@ class WhoIsOnPhotoGame extends BaseGame {
       this.score++;
       this.renderScore();
       this.setMessage(STRINGS.quiz.photoCorrect(this.currentCharacter.name), 'success');
-      setTimeout(() => this.nextRound(), 1200);
+      this.scheduleRoundTimeout(() => this.nextRound());
     } else {
       btn.classList.add('wrong');
       this.lives--;
@@ -105,9 +194,9 @@ class WhoIsOnPhotoGame extends BaseGame {
       this.setMessage(STRINGS.quiz.photoWrong(this.currentCharacter.name), 'error');
 
       if (this.lives <= 0) {
-        setTimeout(() => this.endGame(), 1200);
+        this.scheduleRoundTimeout(() => this.endGame());
       } else {
-        setTimeout(() => this.nextRound(), 1200);
+        this.scheduleRoundTimeout(() => this.nextRound());
       }
     }
   }
@@ -120,22 +209,30 @@ class WhoIsOnPhotoGame extends BaseGame {
   }
 
   showModal() {
+    if (!this.modalIcon || !this.modalTitle || !this.lastAnswer) return;
+
     this.modalIcon.textContent = '💀';
     this.modalTitle.textContent = STRINGS.quiz.loseTitle;
     this.fillModalLines([
       { label: STRINGS.quiz.scoreLabel, value: this.score },
-      { label: STRINGS.quiz.lastCharacterLabel, value: this.lastAnswer.name, gap: true }
+      { label: STRINGS.quiz.lastCharacterLabel, value: this.lastAnswer.name, gap: true },
     ]);
     this.openModal();
   }
 
   endGame() {
     this.gameOver = true;
+    this.clearRoundTimeout();
     this.setControlsEnabled(false);
     this.showModal();
   }
 
   async startNewGame() {
+    this.clearRoundTimeout();
+    this.clearPhotoLoadTimeout();
+    this.failedImageIds.clear();
+    this.imageErrorCount = 0;
+
     if (!this.isReady) {
       this.setControlsEnabled(false);
       this.showLoading(true, STRINGS.loading.characters);
@@ -145,7 +242,9 @@ class WhoIsOnPhotoGame extends BaseGame {
 
       if (!loaded) {
         this.setMessage(STRINGS.errors.loadCharacters, 'error');
-        this.newGameBtn.disabled = false;
+        if (this.newGameBtn) {
+          this.newGameBtn.disabled = false;
+        }
         return;
       }
     }
