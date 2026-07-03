@@ -35,3 +35,82 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 ## Sdílená cache dat
 
 `dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu.
+
+## Testování
+
+Playwright end-to-end testy pokrývají všechny 4 hry. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
+
+### Požadavky
+
+- Node.js 18+ (doporučeno 22)
+- npm
+- Chromium pro Playwright (instaluje se jedním příkazem níže)
+
+### První spuštění (jednorázově)
+
+V kořeni repozitáře (`harry-potter-games/`):
+
+```bash
+npm ci
+npx playwright install chromium
+```
+
+### Doporučený postup před pushem
+
+```bash
+npm test
+```
+
+Co se stane:
+
+1. Playwright spustí lokální server (`npx serve . -l 4173`)
+2. Provede celou testovací sadu (smoke + critical + edge)
+3. HP API je mockované — testy nepotřebují internet ani live API
+4. Při úspěchu můžeš pushnout
+5. Při failu viz níže „Co dělat, když test spadne“
+
+**Poznámka:** Nepotřebuješ nastavovat GitHub secrets ani Netlify tokeny — to platí jen pro volitelné CI.
+
+### Volitelné příkazy
+
+| Příkaz | Účel |
+|---|---|
+| `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
+| `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
+| `npx playwright test --grep @critical` | Jen happy-path scénáře |
+| `npx playwright test tests/critical/hangman-character.spec.ts` | Jeden testovací soubor |
+| `PLAYWRIGHT_BASE_URL=https://your-site.netlify.app npm run test:production` | Proti live URL (po deployi) |
+
+### Co dělat, když test spadne
+
+```bash
+npx playwright show-report
+```
+
+Otevře HTML report v prohlížeči. U failed testu klikni na **Trace** — otevře se Trace Viewer (timeline, screenshoty, síť). Alternativa:
+
+```bash
+npx playwright show-trace test-results/.../trace.zip
+```
+
+### Priorita testů
+
+| Tag | Popis |
+|---|---|
+| `@smoke` | Základní dostupnost stránek a her |
+| `@critical` | Hlavní happy-path scénáře |
+| `@edge` | Edge cases (validace, prohra, cache, XSS, …) |
+
+### CI pipeline (volitelné)
+
+Workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) se spouští **automaticky jen** při pushi na `main` (pokud je nasazen). Vyžaduje GitHub secrets (`NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID`, `NETLIFY_SITE_URL`) — **pro lokální testování je nepotřebuješ**.
+
+Průběh:
+
+1. **Pre-deploy** — celá testovací sada proti localhost
+2. **Deploy** — Netlify CLI
+3. **Post-deploy** — celá sada proti produkční URL
+
+Při selhání v CI se do GitHub Actions nahraje Playwright HTML report včetně trace (Artifacts → stáhnout → `npx playwright show-report playwright-report`).
+
+Pro plně automatický deploy je potřeba v Netlify vypnout paralelní auto-deploy z GitHub hooku, aby deploy probíhal jen z GHA po úspěšných pre-deploy testech.

@@ -94,17 +94,32 @@ class SpellHangmanGame extends BaseGame {
 
   renderWord() {
     this.wordDisplayEl.replaceChildren();
+    let group = null;
+
     for (const ch of this.currentWord) {
-      const slot = document.createElement('div');
       if (ch === ' ') {
-        slot.className = 'letter-slot space';
-      } else {
-        const normalized = normalizeLetter(ch);
-        const isRevealed = this.guessedLetters.has(normalized);
-        slot.className = 'letter-slot' + (isRevealed ? ' revealed' : '');
-        slot.textContent = isRevealed ? ch.toUpperCase() : '';
+        if (group) {
+          const space = document.createElement('div');
+          space.className = 'letter-slot space';
+          space.setAttribute('aria-hidden', 'true');
+          group.appendChild(space);
+        }
+        group = null;
+        continue;
       }
-      this.wordDisplayEl.appendChild(slot);
+
+      if (!group) {
+        group = document.createElement('div');
+        group.className = 'word-group';
+        this.wordDisplayEl.appendChild(group);
+      }
+
+      const normalized = normalizeLetter(ch);
+      const isRevealed = this.guessedLetters.has(normalized);
+      const slot = document.createElement('div');
+      slot.className = 'letter-slot' + (isRevealed ? ' revealed' : '');
+      slot.textContent = isRevealed ? ch.toUpperCase() : '';
+      group.appendChild(slot);
     }
   }
 
