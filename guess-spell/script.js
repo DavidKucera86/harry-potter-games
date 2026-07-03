@@ -164,11 +164,11 @@ class SpellHangmanGame {
     if (won) {
       this.modalIcon.textContent = '🎉';
       this.modalTitle.textContent = 'Gratulujeme!';
-      this.modalText.innerHTML = `Uhodl/a jsi kouzlo:<br><span class="highlight">${this.currentWord}</span>`;
+      this.modalText.innerHTML = `Uhodl/a jsi zaklínadlo:<br><span class="highlight">${this.currentWord}</span>`;
     } else {
       this.modalIcon.textContent = '💀';
       this.modalTitle.textContent = 'Došly životy!';
-      this.modalText.innerHTML = `Správné kouzlo bylo:<br><span class="highlight">${this.currentWord}</span>`;
+      this.modalText.innerHTML = `Správné zaklínadlo bylo:<br><span class="highlight">${this.currentWord}</span>`;
     }
     this.overlay.classList.add('visible');
   }
@@ -209,7 +209,7 @@ class SpellHangmanGame {
     this.renderHearts();
     this.renderWord();
     this.renderWrongLetters();
-    this.setMessage('Hádej písmeno v názvu kouzla…', 'info');
+    this.setMessage('Hádej písmeno v zaklínadle…', 'info');
 
     this.setControlsEnabled(true);
     this.letterInput.value = '';
@@ -237,7 +237,7 @@ class SpellHangmanGame {
     if (this.isLetterInWord(letter)) {
       this.guessedLetters.add(letter);
       this.renderWord();
-      this.setMessage(`Správně! Písmeno „${letter.toUpperCase()}" je v názvu.`, 'success');
+      this.setMessage(`Správně! Písmeno „${letter.toUpperCase()}" je v zaklínadle.`, 'success');
 
       if (this.isWordComplete()) {
         this.endGame(true);
@@ -247,7 +247,7 @@ class SpellHangmanGame {
       this.lives--;
       this.renderHearts();
       this.renderWrongLetters();
-      this.setMessage(`Špatně! Písmeno „${letter.toUpperCase()}" v názvu není.`, 'error');
+      this.setMessage(`Špatně! Písmeno „${letter.toUpperCase()}" v zaklínadle není.`, 'error');
 
       if (this.lives <= 0) {
         this.endGame(false);
