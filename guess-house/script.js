@@ -39,7 +39,7 @@ export class GuessHouseGame extends BaseGame {
     if (loaded) {
       this.startNewGame();
     } else {
-      this.setMessage(STRINGS.errors.loadCharacters, 'error');
+      this.setMessage(this._loadError ?? STRINGS.errors.loadCharacters, 'error');
       if (this.newGameBtn) {
         this.newGameBtn.disabled = false;
       }
@@ -56,7 +56,12 @@ export class GuessHouseGame extends BaseGame {
       emptyError: STRINGS.errors.notEnoughCharacters,
       logLabel: 'postav',
       assign: items => { this.characters = items; },
-      onError: () => { this.characters = []; },
+      onError: (error) => {
+        this.characters = [];
+        this._loadError = error?.name === 'FetchTimeoutError'
+          ? STRINGS.errors.fetchTimeoutCharacters
+          : STRINGS.errors.loadCharacters;
+      },
     });
   }
 
@@ -171,7 +176,7 @@ export class GuessHouseGame extends BaseGame {
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage(STRINGS.errors.loadCharacters, 'error');
+        this.setMessage(this._loadError ?? STRINGS.errors.loadCharacters, 'error');
         if (this.newGameBtn) {
           this.newGameBtn.disabled = false;
         }

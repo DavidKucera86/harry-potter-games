@@ -1,5 +1,7 @@
 export const GAME_CONFIG = {
   MAX_LIVES: 10,
+  ROUND_DELAY_MS: 1200,
+  FETCH_TIMEOUT_MS: 15_000,
   API: {
     CHARACTERS: 'https://hp-api.onrender.com/api/characters',
     SPELLS: 'https://hp-api.onrender.com/api/spells',

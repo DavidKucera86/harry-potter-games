@@ -38,7 +38,7 @@ export class WhoIsOnPhotoGame extends BaseGame {
     if (loaded) {
       this.startNewGame();
     } else {
-      this.setMessage(STRINGS.errors.loadCharacters, 'error');
+      this.setMessage(this._loadError ?? STRINGS.errors.loadCharacters, 'error');
       if (this.newGameBtn) {
         this.newGameBtn.disabled = false;
       }
@@ -53,7 +53,12 @@ export class WhoIsOnPhotoGame extends BaseGame {
       emptyError: STRINGS.errors.notEnoughPhotoCharacters,
       logLabel: 'postav',
       assign: items => { this.characters = items; },
-      onError: () => { this.characters = []; },
+      onError: (error) => {
+        this.characters = [];
+        this._loadError = error?.name === 'FetchTimeoutError'
+          ? STRINGS.errors.fetchTimeoutCharacters
+          : STRINGS.errors.loadCharacters;
+      },
     });
   }
 
@@ -138,7 +143,7 @@ export class WhoIsOnPhotoGame extends BaseGame {
       const btn = document.createElement('button');
       btn.className = 'choice-btn';
       btn.textContent = character.name;
-      btn.addEventListener('click', () => this.guessName(character.name, btn));
+      btn.addEventListener('click', () => this.guessName(character, btn));
       this.choicesEl.appendChild(btn);
     }
   }
@@ -172,11 +177,11 @@ export class WhoIsOnPhotoGame extends BaseGame {
     }
   }
 
-  guessName(name, btn) {
+  guessName(character, btn) {
     if (this.gameOver || !this.isReady || !this.currentCharacter) return;
 
     this.setControlsEnabled(false);
-    const correct = name === this.currentCharacter.name;
+    const correct = character.id === this.currentCharacter.id;
     this.lastAnswer = {
       name: this.currentCharacter.name,
     };
@@ -241,7 +246,7 @@ export class WhoIsOnPhotoGame extends BaseGame {
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage(STRINGS.errors.loadCharacters, 'error');
+        this.setMessage(this._loadError ?? STRINGS.errors.loadCharacters, 'error');
         if (this.newGameBtn) {
           this.newGameBtn.disabled = false;
         }
