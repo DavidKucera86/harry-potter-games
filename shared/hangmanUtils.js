@@ -1,17 +1,29 @@
+const DIACRITIC_MAP = {
+  'á': 'a', 'č': 'c', 'ď': 'd', 'é': 'e', 'ě': 'e',
+  'í': 'i', 'ň': 'n', 'ó': 'o', 'ř': 'r', 'š': 's',
+  'ť': 't', 'ú': 'u', 'ů': 'u', 'ý': 'y', 'ž': 'z',
+};
+
 export function normalizeLetter(char) {
-  const map = {
-    'á': 'a', 'č': 'c', 'ď': 'd', 'é': 'e', 'ě': 'e',
-    'í': 'i', 'ň': 'n', 'ó': 'o', 'ř': 'r', 'š': 's',
-    'ť': 't', 'ú': 'u', 'ů': 'u', 'ý': 'y', 'ž': 'z',
-  };
   const lower = char.toLowerCase();
-  return map[lower] || lower;
+  return DIACRITIC_MAP[lower] || lower;
 }
 
-export function isGuessableChar(ch) {
-  return /^[a-z]$/.test(normalizeLetter(ch));
+export function getWordLetters(word) {
+  return word.split('').filter(ch => ch !== ' ');
 }
 
-export function getGuessableLetters(word) {
-  return word.split('').filter(isGuessableChar);
+export function isGuessableLetter(char) {
+  const normalized = normalizeLetter(char);
+  return /^[a-z]$/.test(normalized);
+}
+
+export function getAutoRevealedLetters(word) {
+  const revealed = new Set();
+  for (const ch of getWordLetters(word)) {
+    if (!isGuessableLetter(ch)) {
+      revealed.add(normalizeLetter(ch));
+    }
+  }
+  return revealed;
 }

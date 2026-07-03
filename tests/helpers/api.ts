@@ -44,6 +44,12 @@ export async function mockImages(page: Page) {
   });
 }
 
+export async function mockFallbackFailure(page: Page, endpoint: 'characters' | 'spells') {
+  await page.route(`**/shared/fixtures/${endpoint}.json`, (route) => {
+    route.fulfill({ status: 500, body: 'Fallback unavailable' });
+  });
+}
+
 export async function mockApiFailure(page: Page, endpoint: 'characters' | 'spells') {
   await page.route(`**/api/${endpoint}`, (route) => {
     route.fulfill({ status: 500, body: 'Internal Server Error' });
@@ -54,6 +60,18 @@ export async function seedRandom(page: Page, value = 0) {
   await page.addInitScript((randomValue) => {
     Math.random = () => randomValue;
   }, value);
+}
+
+export async function setFetchTimeout(page: Page, timeoutMs: number) {
+  await page.addInitScript((timeout) => {
+    window.__HP_FETCH_TIMEOUT_MS = timeout;
+  }, timeoutMs);
+}
+
+export async function mockFetchHang(page: Page, endpoint: 'characters' | 'spells') {
+  await page.route(`**/api/${endpoint}`, async () => {
+    await new Promise(() => {});
+  });
 }
 
 export async function setupGameMocks(page: Page, options: {

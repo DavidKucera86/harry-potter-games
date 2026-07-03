@@ -14,6 +14,6 @@ test.describe('Hangman lose @edge', () => {
 
     await guessLetters(page, ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']);
     await expectModalOpen(page, 'Došly životy!');
-    await expect(page.locator(selectors.modalHighlight)).toHaveText('Al');
+    await expect(page.locator(selectors.modalHighlight).first()).toHaveText('Al');
   });
 });

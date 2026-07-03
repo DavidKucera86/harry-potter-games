@@ -10,6 +10,14 @@ export async function waitForQuizReady(page: Page) {
   await expect(page.locator(selectors.loadingOverlay)).toBeHidden();
   await expect(page.locator(selectors.newGameBtn)).toBeEnabled();
   await expect(page.locator(selectors.choices)).toHaveCount(4);
+
+  const photo = page.locator(selectors.characterPhoto);
+  if (await photo.count()) {
+    await page.waitForFunction(() => {
+      const img = document.getElementById('characterPhoto');
+      return img instanceof HTMLImageElement && img.naturalWidth > 0;
+    });
+  }
 }
 
 export async function guessLetter(page: Page, letter: string) {
