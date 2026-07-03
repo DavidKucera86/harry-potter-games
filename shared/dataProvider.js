@@ -1,4 +1,36 @@
-async function fetchCached(url, storageKey) {
+import { GAME_CONFIG } from './config.js';
+
+export class FetchTimeoutError extends Error {
+  constructor() {
+    super('Fetch timeout');
+    this.name = 'FetchTimeoutError';
+  }
+}
+
+async function fetchWithTimeout(url) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    GAME_CONFIG.FETCH_TIMEOUT_MS
+  );
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new FetchTimeoutError();
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+export async function fetchCached(url, storageKey) {
   try {
     const cachedRaw = sessionStorage.getItem(storageKey);
     if (cachedRaw) {
@@ -11,16 +43,12 @@ async function fetchCached(url, storageKey) {
     console.warn('Cache read failed, fetching fresh data:', error);
   }
 
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
+  const data = await fetchWithTimeout(url);
 
-  const data = await response.json();
   try {
     sessionStorage.setItem(storageKey, JSON.stringify({
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }));
   } catch (error) {
     console.warn('Cache write failed:', error);
@@ -29,10 +57,10 @@ async function fetchCached(url, storageKey) {
   return data;
 }
 
-async function getCharacters() {
+export async function getCharacters() {
   return fetchCached(GAME_CONFIG.API.CHARACTERS, GAME_CONFIG.CACHE_KEYS.CHARACTERS);
 }
 
-async function getSpells() {
+export async function getSpells() {
   return fetchCached(GAME_CONFIG.API.SPELLS, GAME_CONFIG.CACHE_KEYS.SPELLS);
 }
