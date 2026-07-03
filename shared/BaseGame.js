@@ -1,4 +1,6 @@
 import { GAME_CONFIG } from './config.js';
+import { pickFromRemaining, shuffle } from './deckUtils.js';
+import { STRINGS } from './strings.js';
 
 export class BaseGame {
   constructor() {
@@ -8,6 +10,7 @@ export class BaseGame {
     this.score = 0;
     this.remainingItems = [];
     this.deckSource = [];
+    this.roundTimeoutId = null;
     this._modalKeydownHandler = this._handleModalKeydown.bind(this);
     this._previousFocus = null;
     this.bindCommonElements();
@@ -30,8 +33,24 @@ export class BaseGame {
 
   bindCommonEvents(onNewGame) {
     this._onNewGame = onNewGame;
-    this.newGameBtn?.addEventListener('click', onNewGame);
-    this.modalBtn?.addEventListener('click', onNewGame);
+    if (this.newGameBtn) {
+      this.newGameBtn.addEventListener('click', onNewGame);
+    }
+    if (this.modalBtn) {
+      this.modalBtn.addEventListener('click', onNewGame);
+    }
+  }
+
+  clearRoundTimeout() {
+    if (this.roundTimeoutId !== null) {
+      clearTimeout(this.roundTimeoutId);
+      this.roundTimeoutId = null;
+    }
+  }
+
+  scheduleRoundTimeout(callback, delayMs = GAME_CONFIG.ROUND_DELAY_MS) {
+    this.clearRoundTimeout();
+    this.roundTimeoutId = setTimeout(callback, delayMs);
   }
 
   createHeartSvg() {
@@ -50,9 +69,12 @@ export class BaseGame {
     if (!this.heartsEl) return;
 
     this.heartsEl.replaceChildren();
+    this.heartsEl.setAttribute('aria-label', `${STRINGS.a11y.livesLabel}: ${this.lives}`);
+
     for (let i = 0; i < GAME_CONFIG.MAX_LIVES; i++) {
       const heart = document.createElement('div');
       heart.className = 'heart' + (i >= this.lives ? ' lost' : '');
+      heart.setAttribute('aria-hidden', 'true');
       heart.appendChild(this.createHeartSvg());
       this.heartsEl.appendChild(heart);
     }
@@ -75,6 +97,9 @@ export class BaseGame {
     if (!this.loadingOverlay) return;
 
     this.loadingOverlay.hidden = !show;
+    if (this.gameContainer) {
+      this.gameContainer.setAttribute('aria-busy', show ? 'true' : 'false');
+    }
     if (text) {
       const label = this.loadingOverlay.querySelector('p');
       if (label) label.textContent = text;
@@ -85,7 +110,9 @@ export class BaseGame {
     if (!this.overlay) return;
 
     this._previousFocus = document.activeElement;
+    this.overlay.removeAttribute('inert');
     this.overlay.classList.add('visible');
+    this.overlay.setAttribute('aria-hidden', 'false');
     this.modalDialog?.setAttribute('aria-hidden', 'false');
     this.gameContainer?.setAttribute('aria-hidden', 'true');
     document.addEventListener('keydown', this._modalKeydownHandler);
@@ -96,6 +123,8 @@ export class BaseGame {
     if (!this.overlay) return;
 
     this.overlay.classList.remove('visible');
+    this.overlay.setAttribute('aria-hidden', 'true');
+    this.overlay.setAttribute('inert', '');
     this.modalDialog?.setAttribute('aria-hidden', 'true');
     this.gameContainer?.setAttribute('aria-hidden', 'false');
     document.removeEventListener('keydown', this._modalKeydownHandler);
@@ -165,26 +194,26 @@ export class BaseGame {
   }
 
   shuffle(array) {
-    const copy = [...array];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
+    return shuffle(array);
   }
 
   resetDeck(items) {
     this.deckSource = items;
-    this.remainingItems = this.shuffle([...items]);
+    this.remainingItems = shuffle([...items]);
   }
 
-  pickFromDeck() {
+  pickFromDeck(filterFn) {
     if (this.remainingItems.length === 0) {
       this.resetDeck(this.deckSource);
     }
 
-    const index = Math.floor(Math.random() * this.remainingItems.length);
-    return this.remainingItems.splice(index, 1)[0];
+    const { item, index } = pickFromRemaining(this.remainingItems, filterFn);
+    if (!item || index === -1) {
+      return null;
+    }
+
+    this.remainingItems.splice(index, 1);
+    return item;
   }
 
   returnToDeck(item) {

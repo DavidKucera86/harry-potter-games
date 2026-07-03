@@ -1,12 +1,12 @@
-import { BaseGame } from './BaseGame.js';
 import { GAME_CONFIG } from './config.js';
-import { getWordLetters, normalizeLetter } from './hangmanUtils.js';
+import { BaseGame } from './BaseGame.js';
+import { getAutoRevealedLetters, getWordLetters, normalizeLetter } from './hangmanUtils.js';
 
 export class HangmanGame extends BaseGame {
-  constructor(options) {
+  constructor(config) {
     super();
-    this.options = options;
-    this.items = [];
+    this.config = config;
+    this.words = [];
     this.currentWord = '';
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
@@ -23,54 +23,62 @@ export class HangmanGame extends BaseGame {
   bindEvents() {
     this.bindCommonEvents(() => this.startNewGame());
 
-    this.guessBtn?.addEventListener('click', () => {
-      this.guessLetter(this.letterInput.value);
-    });
+    if (this.guessBtn) {
+      this.guessBtn.addEventListener('click', () => {
+        this.guessLetter(this.letterInput?.value ?? '');
+      });
+    }
 
-    this.letterInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.guessLetter(this.letterInput.value);
-      }
-    });
+    if (this.letterInput) {
+      this.letterInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          this.guessLetter(this.letterInput.value);
+        }
+      });
 
-    this.letterInput?.addEventListener('input', () => {
-      this.letterInput.value = this.letterInput.value.slice(-1);
-    });
+      this.letterInput.addEventListener('input', () => {
+        this.letterInput.value = this.letterInput.value.slice(-1);
+      });
+    }
   }
 
   async init() {
     this.setControlsEnabled(false);
-    this.showLoading(true, this.options.loadingText);
-    this.wordDisplayEl?.replaceChildren();
+    this.showLoading(true, this.config.loadingText);
+    if (this.wordDisplayEl) {
+      this.wordDisplayEl.replaceChildren();
+    }
 
-    const loaded = await this.loadItems();
+    const loaded = await this.loadWords();
     this.showLoading(false);
 
     if (loaded) {
-      this.resetDeck(this.items);
+      this.resetDeck(this.words);
       this.startNewGame();
     } else {
-      this.setMessage(this._loadError ?? this.options.loadError, 'error');
-      if (this.newGameBtn) this.newGameBtn.disabled = false;
+      this.setMessage(this._loadError ?? this.config.loadError, 'error');
+      if (this.newGameBtn) {
+        this.newGameBtn.disabled = false;
+      }
     }
   }
 
   resolveLoadError(error) {
     return error?.name === 'FetchTimeoutError'
-      ? this.options.fetchTimeoutError ?? this.options.loadError
-      : this.options.loadError;
+      ? this.config.fetchTimeoutError ?? this.config.loadError
+      : this.config.loadError;
   }
 
-  loadItems() {
+  loadWords() {
     return this.loadGameData({
-      fetchFn: this.options.fetchFn,
-      transform: this.options.transform,
-      minCount: this.options.minCount ?? 1,
-      emptyError: this.options.emptyError,
-      logLabel: this.options.logLabel,
-      assign: items => { this.items = items; },
+      fetchFn: this.config.fetchFn,
+      transform: this.config.transform,
+      minCount: 1,
+      emptyError: this.config.emptyError,
+      logLabel: this.config.logLabel,
+      assign: items => { this.words = items; },
       onError: (error) => {
-        this.items = [];
+        this.words = [];
         this._loadError = this.resolveLoadError(error);
       },
     });
@@ -92,6 +100,12 @@ export class HangmanGame extends BaseGame {
     return getWordLetters(this.currentWord).every(
       ch => this.guessedLetters.has(normalizeLetter(ch))
     );
+  }
+
+  applyAutoRevealedLetters() {
+    for (const letter of getAutoRevealedLetters(this.currentWord)) {
+      this.guessedLetters.add(letter);
+    }
   }
 
   renderWord() {
@@ -131,24 +145,28 @@ export class HangmanGame extends BaseGame {
     if (!this.wrongLettersEl) return;
 
     if (this.wrongLetters.size === 0) {
-      this.wrongLettersEl.textContent = this.options.noWrongLetters;
+      this.wrongLettersEl.textContent = this.config.strings.noWrongLetters;
     } else {
       this.wrongLettersEl.textContent = [...this.wrongLetters].join(' ').toUpperCase();
     }
   }
 
   showModal(won) {
+    if (!this.modalIcon || !this.modalTitle) return;
+
     if (won) {
       this.modalIcon.textContent = '🎉';
-      this.modalTitle.textContent = this.options.winTitle;
+      this.modalTitle.textContent = this.config.strings.winTitle;
       this.fillModalLines([
-        { label: this.options.winLabel, value: this.currentWord },
+        { label: this.config.strings.winLabel, value: this.currentWord },
+        { label: this.config.strings.scoreLabel, value: this.score, gap: true },
       ]);
     } else {
       this.modalIcon.textContent = '💀';
-      this.modalTitle.textContent = this.options.loseTitle;
+      this.modalTitle.textContent = this.config.strings.loseTitle;
       this.fillModalLines([
-        { label: this.options.loseLabel, value: this.currentWord },
+        { label: this.config.strings.loseLabel, value: this.currentWord },
+        { label: this.config.strings.scoreLabel, value: this.score, gap: true },
       ]);
     }
     this.openModal();
@@ -156,6 +174,10 @@ export class HangmanGame extends BaseGame {
 
   endGame(won) {
     this.gameOver = true;
+    if (won) {
+      this.score++;
+      this.renderScore();
+    }
     this.guessedLetters = new Set(
       getWordLetters(this.currentWord).map(ch => normalizeLetter(ch))
     );
@@ -166,33 +188,40 @@ export class HangmanGame extends BaseGame {
   }
 
   async startNewGame() {
+    this.clearRoundTimeout();
+
     if (!this.isReady) {
       this.setControlsEnabled(false);
-      this.showLoading(true, this.options.loadingText);
-      this.wordDisplayEl?.replaceChildren();
+      this.showLoading(true, this.config.loadingText);
+      if (this.wordDisplayEl) {
+        this.wordDisplayEl.replaceChildren();
+      }
 
-      const loaded = await this.loadItems();
+      const loaded = await this.loadWords();
       this.showLoading(false);
 
       if (!loaded) {
-        this.setMessage(this._loadError ?? this.options.loadError, 'error');
-        if (this.newGameBtn) this.newGameBtn.disabled = false;
+        this.setMessage(this.config.loadError, 'error');
+        if (this.newGameBtn) {
+          this.newGameBtn.disabled = false;
+        }
         return;
       }
 
-      this.resetDeck(this.items);
+      this.resetDeck(this.words);
     }
 
     this.currentWord = this.pickFromDeck();
     this.guessedLetters = new Set();
     this.wrongLetters = new Set();
+    this.applyAutoRevealedLetters();
     this.lives = GAME_CONFIG.MAX_LIVES;
     this.gameOver = false;
 
     this.renderHearts();
     this.renderWord();
     this.renderWrongLetters();
-    this.setMessage(this.options.guessPrompt, 'info');
+    this.setMessage(this.config.strings.guessPrompt, 'info');
 
     this.setControlsEnabled(true);
     if (this.letterInput) {
@@ -207,22 +236,26 @@ export class HangmanGame extends BaseGame {
 
     const letter = normalizeLetter(rawLetter);
     if (!letter || !/^[a-z]$/.test(letter)) {
-      this.setMessage(this.options.invalidLetter, 'error');
+      this.setMessage(this.config.strings.invalidLetter, 'error');
       return;
     }
 
     if (this.guessedLetters.has(letter) || this.wrongLetters.has(letter)) {
-      this.setMessage(this.options.letterAlreadyGuessed(letter), 'error');
-      if (this.letterInput) this.letterInput.value = '';
+      this.setMessage(this.config.strings.letterAlreadyGuessed(letter), 'error');
+      if (this.letterInput) {
+        this.letterInput.value = '';
+      }
       return;
     }
 
-    if (this.letterInput) this.letterInput.value = '';
+    if (this.letterInput) {
+      this.letterInput.value = '';
+    }
 
     if (this.isLetterInWord(letter)) {
       this.guessedLetters.add(letter);
       this.renderWord();
-      this.setMessage(this.options.correctMessage(letter), 'success');
+      this.setMessage(this.config.strings.correct(letter), 'success');
 
       if (this.isWordComplete()) {
         this.endGame(true);
@@ -232,7 +265,7 @@ export class HangmanGame extends BaseGame {
       this.lives--;
       this.renderHearts();
       this.renderWrongLetters();
-      this.setMessage(this.options.wrongMessage(letter), 'error');
+      this.setMessage(this.config.strings.wrong(letter), 'error');
 
       if (this.lives <= 0) {
         this.endGame(false);

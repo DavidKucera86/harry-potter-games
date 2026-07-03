@@ -21,6 +21,6 @@ test.describe('Hangman spell @critical', () => {
     await guessLetters(page, ['l', 'u', 'm', 'o', 's']);
     await expectModalOpen(page, 'Gratulujeme!');
     await expect(page.locator(selectors.modalText)).toContainText('zaklínadlo');
-    await expect(page.locator(selectors.modalHighlight)).toHaveText('Lumos');
+    await expect(page.locator(selectors.modalHighlight).first()).toHaveText('Lumos');
   });
 });

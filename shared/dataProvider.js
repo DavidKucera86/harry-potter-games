@@ -1,5 +1,9 @@
 import { GAME_CONFIG } from './config.js';
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export class FetchTimeoutError extends Error {
   constructor() {
     super('Fetch timeout');
@@ -7,32 +11,60 @@ export class FetchTimeoutError extends Error {
   }
 }
 
-async function fetchWithTimeout(url) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(
-    () => controller.abort(),
-    GAME_CONFIG.FETCH_TIMEOUT_MS
-  );
-
-  try {
-    const response = await fetch(url, { signal: controller.signal });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    return response.json();
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      throw new FetchTimeoutError();
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+function getFetchTimeoutMs() {
+  if (typeof window !== 'undefined' && window.__HP_FETCH_TIMEOUT_MS) {
+    return window.__HP_FETCH_TIMEOUT_MS;
   }
+  return GAME_CONFIG.FETCH_TIMEOUT_MS;
 }
 
-export async function fetchCached(url, storageKey) {
+function cacheStorageKey(storageKey) {
+  return `${storageKey}-v${GAME_CONFIG.CACHE_VERSION}`;
+}
+
+async function fetchWithRetry(url) {
+  let lastError;
+
+  for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), getFetchTimeoutMs());
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        return response;
+      }
+
+      lastError = new Error(`HTTP ${response.status}`);
+      if (response.status < 500) {
+        throw lastError;
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        lastError = new FetchTimeoutError();
+        throw lastError;
+      }
+
+      lastError = error instanceof Error ? error : new Error(String(error));
+    }
+
+    if (attempt < GAME_CONFIG.API_RETRIES - 1) {
+      await delay(GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1));
+    }
+  }
+
+  throw lastError ?? new Error('Fetch failed');
+}
+
+async function fetchCached(url, storageKey) {
+  const versionedKey = cacheStorageKey(storageKey);
+
   try {
-    const cachedRaw = sessionStorage.getItem(storageKey);
+    const cachedRaw = sessionStorage.getItem(versionedKey);
     if (cachedRaw) {
       const cached = JSON.parse(cachedRaw);
       if (Date.now() - cached.timestamp < GAME_CONFIG.CACHE_TTL_MS) {
@@ -43,10 +75,11 @@ export async function fetchCached(url, storageKey) {
     console.warn('Cache read failed, fetching fresh data:', error);
   }
 
-  const data = await fetchWithTimeout(url);
+  const response = await fetchWithRetry(url);
+  const data = await response.json();
 
   try {
-    sessionStorage.setItem(storageKey, JSON.stringify({
+    sessionStorage.setItem(versionedKey, JSON.stringify({
       data,
       timestamp: Date.now(),
     }));

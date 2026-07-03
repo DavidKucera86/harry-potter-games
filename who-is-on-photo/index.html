@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; base-uri 'self'; form-action 'self';">
   <title>Kdo je na fotce? — Harry Potter Games</title>
   <link rel="stylesheet" href="../shared/common.css">
 </head>
@@ -13,16 +14,16 @@
     <p>Podívej se na fotku a vyber správné jméno postavy. Máš 10 životů.</p>
   </header>
 
-  <div class="game-container">
+  <div class="game-container" aria-busy="false">
     <div class="loading-overlay" id="loadingOverlay" hidden>
-      <div class="spinner"></div>
+      <div class="spinner" role="status" aria-label="Načítám data"></div>
       <p>Načítám data…</p>
     </div>
 
     <div class="status-bar">
       <div class="lives">
         <span class="lives-label">Životy</span>
-        <div class="hearts" id="hearts"></div>
+        <div class="hearts" id="hearts" role="img"></div>
       </div>
       <div>
         <span class="score-label">Skóre </span>
@@ -34,7 +35,7 @@
       <img id="characterPhoto" src="" alt="Fotografie postavy — hádej jméno" loading="lazy">
     </div>
 
-    <div class="message info" id="message" role="status" aria-live="polite">Kdo je na fotce?</div>
+    <div class="message info" id="message" aria-live="polite">Kdo je na fotce?</div>
 
     <div class="choices-grid" id="choices"></div>
 
@@ -43,9 +44,9 @@
     </div>
   </div>
 
-  <div class="overlay" id="overlay">
+  <div class="overlay" id="overlay" aria-hidden="true" inert>
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
-      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-icon" id="modalIcon" aria-hidden="true"></div>
       <h2 id="modalTitle"></h2>
       <p id="modalText"></p>
       <button class="btn btn-primary" id="modalBtn">Hrát znovu</button>

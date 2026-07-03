@@ -13,11 +13,7 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 
 ## Spuštění lokálně
 
-Otevři [`index.html`](index.html) v prohlížeči přes statický server (ES moduly nefungují z `file://`), např.:
-
-```bash
-npx serve . -l 4173
-```
+Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný statický server v kořeni repozitáře.
 
 ## Deploy na Netlify
 
@@ -27,26 +23,24 @@ npx serve . -l 4173
 
 ## Tech stack
 
-- HTML, CSS, vanilla JavaScript (ES moduly, OOP třídy)
+- HTML, CSS, vanilla JavaScript (ES modules, OOP třídy)
 - Sdílené moduly v `shared/`:
-  - `config.js` — globální konfigurace (verze, životy, timeout, API URL)
-  - `strings.js` — lokalizované texty
-  - `dataProvider.js` — načítání dat s cache v `sessionStorage` a fetch timeoutem
-  - `BaseGame.js` — společná logika her (životy, modal, loader, deck, a11y)
-  - `HangmanGame.js` — sdílená hangman logika
-  - `QuizGame.js` — sdílená logika kvízových her
-  - `hangmanUtils.js` — normalizace diakritiky (Unicode NFD)
+  - `config.js` — globální konfigurace (životy, API URL, cache verze, retry)
+  - `dataProvider.js` — načítání dat s cache v `sessionStorage` a retry logikou
+  - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
+  - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
+  - `hangmanUtils.js` — utility pro hangman hry (diakritika, auto-odhalení speciálních znaků)
+  - `deckUtils.js` — shuffle a výběr z balíčku
 - Sdílené styly v `shared/common.css` a `shared/styles/hangman.css`
-- Bez build stepu a bez externích knihoven (vyžaduje statický server kvůli ES modulům)
-- CSP hlavičky v `netlify.toml`
+- Bez build stepu a bez runtime externích knihoven
 
 ## Sdílená cache dat
 
-`dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu.
+`dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina, verze cache v `GAME_CONFIG.CACHE_VERSION`). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu. Při chybě serveru (5xx) se request automaticky opakuje až 3×.
 
 ## Testování
 
-Playwright end-to-end testy pokrývají všechny 4 hry. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
+Playwright end-to-end testy a Vitest unit testy pokrývají všechny 4 hry. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
 
 ### Požadavky
 
@@ -71,8 +65,9 @@ npm test
 
 Co se stane:
 
-1. Playwright spustí lokální server (`npx serve . -l 4173`)
-2. Provede celou testovací sadu (smoke + critical + edge)
+1. Vitest spustí unit testy (`hangmanUtils`, `deckUtils`)
+2. Playwright spustí lokální server (`npx serve . -l 4173`)
+3. Provede celou testovací sadu (smoke + critical + edge + a11y)
 3. HP API je mockované — testy nepotřebují internet ani live API
 4. Při úspěchu můžeš pushnout
 5. Při failu viz níže „Co dělat, když test spadne“
@@ -83,6 +78,8 @@ Co se stane:
 
 | Příkaz | Účel |
 |---|---|
+| `npm run test:unit` | Jen Vitest unit testy |
+| `npm run test:e2e` | Jen Playwright E2E testy |
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
@@ -107,7 +104,7 @@ npx playwright show-trace test-results/.../trace.zip
 |---|---|
 | `@smoke` | Základní dostupnost stránek a her |
 | `@critical` | Hlavní happy-path scénáře |
-| `@edge` | Edge cases (validace, prohra, cache, XSS, …) |
+| `@edge` | Edge cases (validace, prohra, cache, XSS, speciální znaky, a11y, API retry, …) |
 
 ### CI pipeline (volitelné)
 
