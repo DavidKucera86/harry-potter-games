@@ -1,0 +1,15 @@
+{
+  "name": "harry-potter-games",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:production": "PLAYWRIGHT_TARGET=production playwright test",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.2",
+    "serve": "^14.2.4",
+    "typescript": "^5.7.2"
+  }
+}
