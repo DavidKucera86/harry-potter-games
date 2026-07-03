@@ -1,0 +1,21 @@
+:root {
+  --bg-deep: #0a0e1a;
+  --bg-card: #121829;
+  --bg-card-hover: #1a2236;
+  --gold: #d4a843;
+  --gold-light: #f0d078;
+  --gold-glow: rgba(212, 168, 67, 0.3);
+  --purple: #6b3fa0;
+  --purple-light: #9b6fd4;
+  --red: #c0392b;
+  --red-light: #e74c3c;
+  --green: #27ae60;
+  --green-light: #2ecc71;
+  --text: #e8e4dc;
+  --text-muted: #8a8494;
+  --border: rgba(212, 168, 67, 0.2);
+  --gryffindor: #740001;
+  --slytherin: #1a472a;
+  --ravenclaw: #0e1a40;
+  --hufflepuff: #ecb939;
+}
