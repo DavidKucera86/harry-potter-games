@@ -1,6 +1,8 @@
 import { GAME_CONFIG } from './config.js';
+import { pickFromRemaining, shuffle } from './deckUtils.js';
+import { STRINGS } from './strings.js';
 
-export default class BaseGame {
+export class BaseGame {
   constructor() {
     this.isReady = false;
     this.lives = GAME_CONFIG.MAX_LIVES;
@@ -8,6 +10,9 @@ export default class BaseGame {
     this.score = 0;
     this.remainingItems = [];
     this.deckSource = [];
+    this.roundTimeoutId = null;
+    this._modalKeydownHandler = this._handleModalKeydown.bind(this);
+    this._previousFocus = null;
     this.bindCommonElements();
   }
 
@@ -16,22 +21,36 @@ export default class BaseGame {
     this.messageEl = document.getElementById('message');
     this.newGameBtn = document.getElementById('newGameBtn');
     this.overlay = document.getElementById('overlay');
-    this.modal = this.overlay?.querySelector('.modal');
+    this.modalDialog = document.getElementById('modal');
     this.modalIcon = document.getElementById('modalIcon');
     this.modalTitle = document.getElementById('modalTitle');
     this.modalText = document.getElementById('modalText');
     this.modalBtn = document.getElementById('modalBtn');
     this.scoreEl = document.getElementById('score');
     this.loadingOverlay = document.getElementById('loadingOverlay');
-
-    if (this.overlay) {
-      this.overlay.setAttribute('aria-hidden', 'true');
-    }
+    this.gameContainer = document.querySelector('.game-container');
   }
 
   bindCommonEvents(onNewGame) {
-    this.newGameBtn.addEventListener('click', onNewGame);
-    this.modalBtn.addEventListener('click', onNewGame);
+    this._onNewGame = onNewGame;
+    if (this.newGameBtn) {
+      this.newGameBtn.addEventListener('click', onNewGame);
+    }
+    if (this.modalBtn) {
+      this.modalBtn.addEventListener('click', onNewGame);
+    }
+  }
+
+  clearRoundTimeout() {
+    if (this.roundTimeoutId !== null) {
+      clearTimeout(this.roundTimeoutId);
+      this.roundTimeoutId = null;
+    }
+  }
+
+  scheduleRoundTimeout(callback, delayMs = GAME_CONFIG.ROUND_DELAY_MS) {
+    this.clearRoundTimeout();
+    this.roundTimeoutId = setTimeout(callback, delayMs);
   }
 
   createHeartSvg() {
@@ -40,17 +59,22 @@ export default class BaseGame {
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute(
       'd',
-      'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+      'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
     );
     svg.appendChild(path);
     return svg;
   }
 
   renderHearts() {
+    if (!this.heartsEl) return;
+
     this.heartsEl.replaceChildren();
+    this.heartsEl.setAttribute('aria-label', `${STRINGS.a11y.livesLabel}: ${this.lives}`);
+
     for (let i = 0; i < GAME_CONFIG.MAX_LIVES; i++) {
       const heart = document.createElement('div');
       heart.className = 'heart' + (i >= this.lives ? ' lost' : '');
+      heart.setAttribute('aria-hidden', 'true');
       heart.appendChild(this.createHeartSvg());
       this.heartsEl.appendChild(heart);
     }
@@ -63,6 +87,8 @@ export default class BaseGame {
   }
 
   setMessage(text, type) {
+    if (!this.messageEl) return;
+
     this.messageEl.textContent = text;
     this.messageEl.className = 'message ' + type;
   }
@@ -71,24 +97,63 @@ export default class BaseGame {
     if (!this.loadingOverlay) return;
 
     this.loadingOverlay.hidden = !show;
+    if (this.gameContainer) {
+      this.gameContainer.setAttribute('aria-busy', show ? 'true' : 'false');
+    }
     if (text) {
       const label = this.loadingOverlay.querySelector('p');
       if (label) label.textContent = text;
     }
   }
 
-  getModalFocusables() {
-    if (!this.modal) return [this.modalBtn];
+  openModal() {
+    if (!this.overlay) return;
 
-    return [...this.modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    )].filter(el => !el.disabled);
+    this._previousFocus = document.activeElement;
+    this.overlay.removeAttribute('inert');
+    this.overlay.classList.add('visible');
+    this.overlay.setAttribute('aria-hidden', 'false');
+    this.modalDialog?.setAttribute('aria-hidden', 'false');
+    this.gameContainer?.setAttribute('aria-hidden', 'true');
+    document.addEventListener('keydown', this._modalKeydownHandler);
+    this.modalBtn?.focus();
   }
 
-  trapFocus(event) {
+  closeModal() {
+    if (!this.overlay) return;
+
+    this.overlay.classList.remove('visible');
+    this.overlay.setAttribute('aria-hidden', 'true');
+    this.overlay.setAttribute('inert', '');
+    this.modalDialog?.setAttribute('aria-hidden', 'true');
+    this.gameContainer?.setAttribute('aria-hidden', 'false');
+    document.removeEventListener('keydown', this._modalKeydownHandler);
+
+    if (this._previousFocus?.focus) {
+      this._previousFocus.focus();
+    }
+  }
+
+  _getModalFocusables() {
+    if (!this.modalDialog) return [];
+
+    return [...this.modalDialog.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )].filter(el => !el.hasAttribute('disabled'));
+  }
+
+  _handleModalKeydown(event) {
+    if (!this.overlay?.classList.contains('visible')) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this._onNewGame?.();
+      return;
+    }
+
     if (event.key !== 'Tab') return;
 
-    const focusables = this.getModalFocusables();
+    const focusables = this._getModalFocusables();
     if (focusables.length === 0) return;
 
     const first = focusables[0];
@@ -103,30 +168,9 @@ export default class BaseGame {
     }
   }
 
-  openModal() {
-    this._previousFocus = document.activeElement;
-    this.overlay.classList.add('visible');
-    this.overlay.setAttribute('aria-hidden', 'false');
-    this._trapFocusHandler = (event) => this.trapFocus(event);
-    this.overlay.addEventListener('keydown', this._trapFocusHandler);
-
-    const focusables = this.getModalFocusables();
-    (focusables[0] || this.modalBtn).focus();
-  }
-
-  closeModal() {
-    this.overlay.classList.remove('visible');
-    this.overlay.setAttribute('aria-hidden', 'true');
-    if (this._trapFocusHandler) {
-      this.overlay.removeEventListener('keydown', this._trapFocusHandler);
-      this._trapFocusHandler = null;
-    }
-    if (this._previousFocus?.focus) {
-      this._previousFocus.focus();
-    }
-  }
-
   fillModalLines(lines) {
+    if (!this.modalText) return;
+
     this.modalText.replaceChildren();
 
     lines.forEach((line, index) => {
@@ -150,30 +194,35 @@ export default class BaseGame {
   }
 
   shuffle(array) {
-    const copy = [...array];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
+    return shuffle(array);
   }
 
   resetDeck(items) {
     this.deckSource = items;
-    this.remainingItems = this.shuffle([...items]);
+    this.remainingItems = shuffle([...items]);
   }
 
-  pickFromDeck() {
+  pickFromDeck(filterFn) {
     if (this.remainingItems.length === 0) {
       this.resetDeck(this.deckSource);
     }
 
-    const index = Math.floor(Math.random() * this.remainingItems.length);
-    return this.remainingItems.splice(index, 1)[0];
+    const { item, index } = pickFromRemaining(this.remainingItems, filterFn);
+    if (!item || index === -1) {
+      return null;
+    }
+
+    this.remainingItems.splice(index, 1);
+    return item;
   }
 
   returnToDeck(item) {
     this.remainingItems.push(item);
+  }
+
+  removeFromDeck(item, compareFn = (a, b) => a === b) {
+    this.deckSource = this.deckSource.filter(entry => !compareFn(entry, item));
+    this.remainingItems = this.remainingItems.filter(entry => !compareFn(entry, item));
   }
 
   async loadGameData({ fetchFn, transform, minCount = 1, emptyError, logLabel, assign, onError }) {
@@ -192,7 +241,7 @@ export default class BaseGame {
       console.error(`Chyba při načítání ${logLabel}:`, error);
       this.isReady = false;
       if (onError) {
-        onError();
+        onError(error);
       }
       return false;
     }

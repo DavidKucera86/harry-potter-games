@@ -32,7 +32,7 @@ async function winHangmanRound(page: import('@playwright/test').Page, letters: s
   }
 
   await expectModalOpen(page, 'Gratulujeme!');
-  return page.locator(selectors.modalHighlight).textContent();
+  return page.locator(selectors.modalHighlight).first().textContent();
 }
 
 test.describe('Deck uniqueness @edge', () => {

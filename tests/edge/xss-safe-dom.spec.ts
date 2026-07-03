@@ -26,7 +26,7 @@ test.describe('XSS safe DOM @edge', () => {
 
     await guessLetters(page, ['b', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'o']);
     await expectModalOpen(page, 'Došly životy!');
-    await expect(page.locator(selectors.modalHighlight)).toHaveText('<script>alert(1)</script>');
+    await expect(page.locator(selectors.modalHighlight).first()).toHaveText('<script>alert(1)</script>');
     expect(dialogShown).toBe(false);
   });
 });

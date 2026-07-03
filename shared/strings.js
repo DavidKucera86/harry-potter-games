@@ -7,10 +7,18 @@ export const STRINGS = {
   errors: {
     loadCharacters: 'Nepodařilo se načíst postavy. Zkus to znovu tlačítkem Nová hra.',
     loadSpells: 'Nepodařilo se načíst kouzla. Zkus to znovu tlačítkem Nová hra.',
+    fetchTimeoutCharacters: 'Načítání postav trvá příliš dlouho. Zkus to znovu tlačítkem Nová hra.',
+    fetchTimeoutSpells: 'Načítání kouzel trvá příliš dlouho. Zkus to znovu tlačítkem Nová hra.',
     emptyCharacters: 'Prázdný seznam postav',
     emptySpells: 'Prázdný seznam kouzel',
     notEnoughCharacters: 'Nedostatek postav',
     notEnoughPhotoCharacters: 'Nedostatek postav s fotkou',
+    allPhotosBroken: 'Nepodařilo se načíst fotky postav. Zkus to znovu tlačítkem Nová hra.',
+  },
+  a11y: {
+    livesLabel: 'Zbývající životy',
+    photoAlt: 'Fotografie postavy — hádej jméno',
+    loadingBusy: 'Načítám data hry',
   },
   hangman: {
     guessCharacter: 'Hádej písmeno ve jménu postavy…',

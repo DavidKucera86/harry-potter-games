@@ -1,12 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const isProduction = process.env.PLAYWRIGHT_TARGET === 'production';
+const target = process.env.PLAYWRIGHT_TARGET ?? 'local';
+const isProduction = target === 'production';
 const baseURL = isProduction
   ? process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:4173'
   : 'http://127.0.0.1:4173';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore: '**/unit/**',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
