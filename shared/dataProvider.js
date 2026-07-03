@@ -60,7 +60,15 @@ async function fetchWithRetry(url) {
   throw lastError ?? new Error('Fetch failed');
 }
 
-async function fetchCached(url, storageKey) {
+async function loadFallback(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Fallback HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+async function fetchCached(url, storageKey, fallbackUrl) {
   const versionedKey = cacheStorageKey(storageKey);
 
   try {
@@ -75,25 +83,55 @@ async function fetchCached(url, storageKey) {
     console.warn('Cache read failed, fetching fresh data:', error);
   }
 
-  const response = await fetchWithRetry(url);
-  const data = await response.json();
-
   try {
-    sessionStorage.setItem(versionedKey, JSON.stringify({
-      data,
-      timestamp: Date.now(),
-    }));
+    const response = await fetchWithRetry(url);
+    const data = await response.json();
+
+    try {
+      sessionStorage.setItem(versionedKey, JSON.stringify({
+        data,
+        timestamp: Date.now(),
+      }));
+    } catch (error) {
+      console.warn('Cache write failed:', error);
+    }
+
+    return data;
   } catch (error) {
-    console.warn('Cache write failed:', error);
+    if (error instanceof FetchTimeoutError) {
+      throw error;
+    }
+    console.warn('API fetch failed, trying fallback:', error);
   }
 
-  return data;
+  if (fallbackUrl) {
+    const data = await loadFallback(fallbackUrl);
+    try {
+      sessionStorage.setItem(versionedKey, JSON.stringify({
+        data,
+        timestamp: Date.now(),
+      }));
+    } catch (error) {
+      console.warn('Cache write failed:', error);
+    }
+    return data;
+  }
+
+  throw new Error('Data unavailable');
 }
 
 export async function getCharacters() {
-  return fetchCached(GAME_CONFIG.API.CHARACTERS, GAME_CONFIG.CACHE_KEYS.CHARACTERS);
+  return fetchCached(
+    GAME_CONFIG.API.CHARACTERS,
+    GAME_CONFIG.CACHE_KEYS.CHARACTERS,
+    GAME_CONFIG.FALLBACK.CHARACTERS,
+  );
 }
 
 export async function getSpells() {
-  return fetchCached(GAME_CONFIG.API.SPELLS, GAME_CONFIG.CACHE_KEYS.SPELLS);
+  return fetchCached(
+    GAME_CONFIG.API.SPELLS,
+    GAME_CONFIG.CACHE_KEYS.SPELLS,
+    GAME_CONFIG.FALLBACK.SPELLS,
+  );
 }

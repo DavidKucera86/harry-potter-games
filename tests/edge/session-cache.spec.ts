@@ -3,7 +3,7 @@ import { clearSessionStorage, mockCharacters, mockImages, charactersFixture } fr
 import { waitForQuizReady } from '../helpers/hangman';
 
 test.describe('Session cache @edge', () => {
-  test('E8: second game reuses cached characters without new API request', { tag: '@edge' }, async ({ page }) => {
+  test('E12: second game reuses cached characters without new API request', { tag: '@edge' }, async ({ page }) => {
     let apiCalls = 0;
 
     await clearSessionStorage(page);

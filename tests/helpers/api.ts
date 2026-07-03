@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
-import charactersFixture from '../fixtures/characters.json';
-import spellsFixture from '../fixtures/spells.json';
+import charactersFixture from '../../shared/fixtures/characters.json' with { type: 'json' };
+import spellsFixture from '../../shared/fixtures/spells.json' with { type: 'json' };
 
 const PNG_1X1 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
@@ -41,6 +41,12 @@ export async function mockImages(page: Page) {
       contentType: 'image/png',
       body: PNG_1X1,
     });
+  });
+}
+
+export async function mockFallbackFailure(page: Page, endpoint: 'characters' | 'spells') {
+  await page.route(`**/shared/fixtures/${endpoint}.json`, (route) => {
+    route.fulfill({ status: 500, body: 'Fallback unavailable' });
   });
 }
 
