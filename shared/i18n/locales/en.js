@@ -18,7 +18,8 @@ const en = {
   a11y: {
     livesLabel: "Remaining lives",
     photoAlt: "Character photo \u2014 guess the name",
-    loadingBusy: "Loading game data"
+    loadingBusy: "Loading game data",
+    wordDisplayLabel: "Word to guess"
   },
   hangman: {
     guessCharacter: "Guess a letter in the character name\u2026",
@@ -76,7 +77,11 @@ const en = {
     localeLabel: "Language",
     footerText: "Enjoying the games? Buy the author a butterbeer",
     buyMeCoffee: "\u2615 Buy Me a Coffee",
-    loadingDefault: "Loading data\u2026"
+    loadingDefault: "Loading data\u2026",
+    livesLabel: "Lives",
+    scoreLabel: "Score",
+    letterPlaceholder: "Enter a letter",
+    keyboardHint: "Tip: you can type directly on the keyboard and press Enter"
   },
   pages: {
     menuTitle: "Harry Potter Games",
