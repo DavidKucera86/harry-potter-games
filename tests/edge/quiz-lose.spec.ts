@@ -6,7 +6,7 @@ import { quizCharacters } from '../helpers/quiz';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Quiz lose @edge', () => {
-  test('E07: guess-house shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
+  test('E07.01: guess-house shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej kolej je načtená', async () => {
       await setupGameMocks(page, { characters: quizCharacters, random: 0 });
       await page.goto('/guess-house/');
@@ -31,7 +31,7 @@ test.describe('Quiz lose @edge', () => {
     });
   });
 
-  test('E08: who-is-on-photo shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
+  test('E08.01: who-is-on-photo shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
     await given('hra Kdo je na fotce je načtená', async () => {
       await setupGameMocks(page, {
         characters: [
@@ -72,7 +72,7 @@ test.describe('Quiz lose @edge', () => {
     });
   });
 
-  test('E09: quiz always shows four choices including correct answer', { tag: '@edge' }, async ({ page }) => {
+  test('E09.01: quiz always shows four choices including correct answer', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej kolej je načtená', async () => {
       await setupGameMocks(page, { characters: quizCharacters, random: 0 });
       await page.goto('/guess-house/');

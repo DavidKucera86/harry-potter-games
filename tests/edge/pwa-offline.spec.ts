@@ -14,7 +14,7 @@ async function waitForServiceWorker(page: import('@playwright/test').Page) {
 }
 
 test.describe('PWA offline @edge', () => {
-  test('E44: game remains playable offline after initial load', { tag: '@edge' }, async ({ page, context }) => {
+  test('E44.01: game remains playable offline after initial load', { tag: '@edge' }, async ({ page, context }) => {
     await given('hra je načtená a service worker je aktivní', async () => {
       await setupGameMocks(page);
       await page.goto('/guess-character-name/');
@@ -33,7 +33,7 @@ test.describe('PWA offline @edge', () => {
     });
   });
 
-  test('E45: service worker registers successfully', { tag: '@edge' }, async ({ page }) => {
+  test('E45.01: service worker registers successfully', { tag: '@edge' }, async ({ page }) => {
     await given('uživatel otevře hlavní menu', async () => {
       await setupGameMocks(page);
       await page.goto('/');

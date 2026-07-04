@@ -5,7 +5,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Hangman lose @edge', () => {
-  test('E04: losing all lives shows defeat modal with answer', { tag: '@edge' }, async ({ page }) => {
+  test('E04.02: losing all lives shows defeat modal with answer', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej postavu je načtená s mockovanou postavou „Albus“', async () => {
       await setupGameMocks(page, {
         characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],

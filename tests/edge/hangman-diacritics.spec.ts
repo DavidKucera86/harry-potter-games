@@ -4,7 +4,7 @@ import { waitForHangmanReady, guessLetter } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
 
 test.describe('Hangman diacritics @edge', () => {
-  test('E06: normalized letter reveals accented character', { tag: '@edge' }, async ({ page }) => {
+  test('E06.01: normalized letter reveals accented character', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s postavou „Bélby“', async () => {
       await setupGameMocks(page, {
         characters: [

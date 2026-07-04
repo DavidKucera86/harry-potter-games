@@ -23,7 +23,7 @@ test.describe('Hangman character @critical', () => {
     });
   });
 
-  test('H1: win by guessing all letters', { tag: '@critical' }, async ({ page }) => {
+  test('H01.01: win by guessing all letters', { tag: '@critical' }, async ({ page }) => {
     await then('slovo má pět písmen v jedné skupině', async () => {
       await expect(page.locator(selectors.wordGroup)).toHaveCount(1);
       await expect(page.locator(`${selectors.wordDisplay} ${selectors.letterSlot}`)).toHaveCount(5);
@@ -44,7 +44,7 @@ test.describe('Hangman character @critical', () => {
     });
   });
 
-  test('G1: new game resets state', { tag: '@critical' }, async ({ page }) => {
+  test('G01.01: new game resets state', { tag: '@critical' }, async ({ page }) => {
     await when('uživatel vyhraje hru uhádnutím slova „Albus“', async () => {
       await guessLetter(page, 'a');
       await guessLetter(page, 'l');

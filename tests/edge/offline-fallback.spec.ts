@@ -5,7 +5,7 @@ import { given, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Offline fallback @edge', () => {
-  test('E28: game loads from local fixture when API fails', { tag: '@edge' }, async ({ page }) => {
+  test('E28.01: game loads from local fixture when API fails', { tag: '@edge' }, async ({ page }) => {
     await given('API selže a hra Hádej kolej se načte z lokálního fixture', async () => {
       await clearSessionStorage(page);
       await mockApiFailure(page, 'characters');

@@ -15,7 +15,7 @@ test.describe('Hangman input @edge', () => {
     });
   });
 
-  test('E01: invalid input shows error message', { tag: '@edge' }, async ({ page }) => {
+  test('E01.01: invalid input shows error message', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel odešle prázdný vstup', async () => {
       await guessLetter(page, '');
     });
@@ -32,7 +32,7 @@ test.describe('Hangman input @edge', () => {
     });
   });
 
-  test('E02: duplicate letter shows error', { tag: '@edge' }, async ({ page }) => {
+  test('E02.01: duplicate letter shows error', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel poprvé uhádne písmeno q', async () => {
       await guessLetter(page, 'q');
     });
@@ -48,7 +48,7 @@ test.describe('Hangman input @edge', () => {
     });
   });
 
-  test('E03: Enter key submits guess', { tag: '@edge' }, async ({ page }) => {
+  test('E03.01: Enter key submits guess', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel zadá písmeno a a stiskne Enter', async () => {
       await page.locator('#letterInput').fill('a');
       await page.locator('#letterInput').press('Enter');
@@ -58,7 +58,7 @@ test.describe('Hangman input @edge', () => {
     });
   });
 
-  test('E04: win via Enter on last letter keeps modal open', { tag: '@edge' }, async ({ page }) => {
+  test('E04.01: win via Enter on last letter keeps modal open', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel uhádne poslední písmeno s klávesou Enter', async () => {
       await guessLetters(page, ['a', 'l', 'b', 'u']);
       await page.locator('#letterInput').fill('s');
@@ -69,7 +69,7 @@ test.describe('Hangman input @edge', () => {
     });
   });
 
-  test('E05: lose via Enter on last wrong letter keeps modal open', { tag: '@edge' }, async ({ page }) => {
+  test('E05.01: lose via Enter on last wrong letter keeps modal open', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel minul poslední život stiskem Enter', async () => {
       await guessLetters(page, ['q', 'w', 'e', 'r', 't', 'y', 'i', 'o', 'p']);
       await page.locator('#letterInput').fill('d');
@@ -82,7 +82,7 @@ test.describe('Hangman input @edge', () => {
 });
 
 test.describe('Hangman spell input @edge', () => {
-  test('E06: win spell via Enter on last letter keeps modal open', { tag: '@edge' }, async ({ page }) => {
+  test('E06.02: win spell via Enter on last letter keeps modal open', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej zaklínadlo je načtená se slovem „Lumos“', async () => {
       await setupGameMocks(page, {
         spells: [{ name: 'Lumos' }],

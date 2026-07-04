@@ -4,7 +4,7 @@ import { waitForHangmanReady, expectNoHorizontalOverflow, expectLetterSlotSizes,
 import { given, then } from '../helpers/gwt';
 
 test.describe('Hangman word wrap @edge', () => {
-  test('E05: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
+  test('E05.02: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s dlouhým jménem „Nearly Headless Nick“ na mobilním viewportu', async () => {
       await setupGameMocks(page, {
         characters: [
@@ -52,7 +52,7 @@ test.describe('Hangman word wrap @edge', () => {
     });
   });
 
-  test('E29: letter slots have uniform width across word groups', { tag: '@edge' }, async ({ page }) => {
+  test('E29.01: letter slots have uniform width across word groups', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej zaklínadlo je načtená se slovem „Expecto Patronum“ na mobilním viewportu', async () => {
       await setupGameMocks(page, {
         spells: [{ name: 'Expecto Patronum' }],

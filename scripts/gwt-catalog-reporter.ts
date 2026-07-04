@@ -42,29 +42,60 @@ function extractTag(test: TestCase): string {
   return '@edge';
 }
 
+const TEST_ID_PATTERN = /^([A-Z]\d{2}\.\d{2}[a-z]?):/;
+
 function extractTestId(title: string): string {
-  const match = title.match(/^([A-Z]\d+[a-z]?|\d+):/);
+  const match = title.match(TEST_ID_PATTERN);
   if (match) return match[1];
-  const dynamicMatch = title.match(/^(E\d+):/);
-  if (dynamicMatch) return dynamicMatch[1];
   return title;
+}
+
+function parseTestId(id: string): { letter: string; base: number; index: number } | null {
+  const match = id.match(/^([A-Z])(\d{2})\.(\d{2})/);
+  if (!match) return null;
+  return {
+    letter: match[1],
+    base: Number(match[2]),
+    index: Number(match[3]),
+  };
 }
 
 function compareEntries(a: CatalogEntry, b: CatalogEntry): number {
   const idA = extractTestId(a.title);
   const idB = extractTestId(b.title);
 
-  const numA = idA.match(/^([A-Z])(\d+)/);
-  const numB = idB.match(/^([A-Z])(\d+)/);
+  const parsedA = parseTestId(idA);
+  const parsedB = parseTestId(idB);
 
-  if (numA && numB) {
-    if (numA[1] !== numB[1]) {
-      return numA[1].localeCompare(numB[1]);
+  if (parsedA && parsedB) {
+    if (parsedA.letter !== parsedB.letter) {
+      return parsedA.letter.localeCompare(parsedB.letter);
     }
-    return Number(numA[2]) - Number(numB[2]);
+    if (parsedA.base !== parsedB.base) {
+      return parsedA.base - parsedB.base;
+    }
+    return parsedA.index - parsedB.index;
   }
 
   return a.title.localeCompare(b.title);
+}
+
+function validateUniqueIds(entries: CatalogEntry[]): void {
+  const seen = new Map<string, CatalogEntry>();
+
+  for (const entry of entries) {
+    const id = extractTestId(entry.title);
+    const existing = seen.get(id);
+    if (existing) {
+      console.warn(
+        `[gwt-catalog-reporter] Duplicate test ID "${id}":\n` +
+          `  - ${existing.file}: ${existing.title}\n` +
+          `  - ${entry.file}: ${entry.title}`
+      );
+      continue;
+    }
+    seen.set(id, entry);
+  }
 }
 
 function collectGwtSteps(steps: TestStep[]): GwtStep[] {
@@ -163,6 +194,8 @@ class GwtCatalogReporter implements Reporter {
       console.warn('[gwt-catalog-reporter] No GWT steps collected — catalog not written.');
       return;
     }
+
+    validateUniqueIds(this.entries);
 
     fs.mkdirSync(path.dirname(this.outputPath), { recursive: true });
     fs.writeFileSync(this.outputPath, renderMarkdown(this.entries), 'utf8');

@@ -3,7 +3,7 @@ import { waitForHangmanReady, clickNewGame } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
 
 test.describe('API retry @edge', () => {
-  test('E26: retries after server errors and eventually loads', { tag: '@edge' }, async ({ page }) => {
+  test('E26.01: retries after server errors and eventually loads', { tag: '@edge' }, async ({ page }) => {
     let attempts = 0;
 
     await given('API vrací 5xx chyby první dva pokusy', async () => {

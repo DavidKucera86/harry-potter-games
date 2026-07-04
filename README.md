@@ -165,42 +165,46 @@ npx playwright show-trace test-results/.../trace.zip
 | `@smoke` | Základní dostupnost stránek a her |
 | `@critical` | Hlavní happy-path scénáře |
 | `@edge` | Edge cases (validace, prohra, cache, XSS, speciální znaky, a11y, API retry, i18n, PWA, …) |
-| `@visual` | Visual regression screenshoty (V01–V05) |
+| `@visual` | Visual regression screenshoty (V01.01–V05.01) |
 
-### Test catalog (E2E edge ID)
+### Test catalog (E2E ID)
+
+Formát ID: `{Prefix}{NN}.{NN}` — base číslo a index vždy 2 cifry, index od `.01`. Duplicity stejného base ID mají `.02`, `.03`, …
 
 Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-TEST-CATALOG.md](docs/E2E-TEST-CATALOG.md). Při commitu se automaticky přegeneruje (pre-commit hook); ručně: `npm run docs:test-catalog`.
 
 | ID | Soubor | Popis |
 |---|---|---|
-| E01–E03 | hangman-input | Validace vstupu hangmanu |
-| E04 | hangman-lose | Prohra hangmanu |
-| E05, E29 | hangman-word-wrap | Zalamování slov |
-| E06 | hangman-diacritics | Diakritika |
-| E07–E09 | quiz-lose | Prohra kvízů |
-| E10–E11 | api-failure | Recovery po API chybě |
-| E12 | session-cache | Session cache dat |
-| E13 | hangman-special-chars | Auto-odhalení speciálních znaků |
-| E14 | photo-image-error | Rozbitá fotka |
-| E15–E17 | deck-uniqueness | Unikátnost balíčku |
-| E18–E20 | modal-accessibility | Přístupnost modalu |
-| E21 | duplicate-names | Kvíz podle ID |
-| E22 | hangman-duplicate-names | Deduplikace jmen |
-| E23–E24 | fetch-timeout | Timeout a retry |
-| E25 | xss-safe-dom | XSS bezpečnost |
-| E26 | api-retry | Retry 5xx |
-| E27 | photo-all-broken | Všechny fotky rozbité |
-| E28 | offline-fallback | Fallback fixtures |
-| E30–E31 | quiz-mobile | Mobilní kvízy |
-| E32–E38 | hangman-mobile | Mobilní hangman |
-| E39–E42 | a11y | Axe accessibility |
-| E43 | i18n | Konzistence statických textů po přepnutí jazyka |
-| E44–E45 | pwa-offline | Service worker a offline hra |
-| E46–E47 | sw-update | Update banner a network-first HTML |
-| E48 | sw-update | Prefetch dat na menu (session cache) |
-| E49 | a11y | Axe scan menu stránky |
-| E50–E52 | i18n | `?lang=en`, dynamický feedback a modal po přepnutí jazyka |
-| V01–V05 | visual/screenshots | Visual regression snapshoty |
+| S01.01–S02.01, S04.01–S05.01 | smoke/ | Smoke testy menu, navigace, skripty, zpět |
+| S03.01–S03.04 | smoke/games-load | Načtení každé ze 4 her |
+| G01.01, H01.01–H02.01, N01.01, Q01.01–Q02.01 | critical/ | Happy-path scénáře |
+| E01.01–E03.01 | hangman-input | Validace vstupu hangmanu |
+| E04.01–E04.02 | hangman-input, hangman-lose | Enter win / prohra hangmanu |
+| E05.01–E05.02, E29.01 | hangman-input, hangman-word-wrap | Enter lose / zalamování slov |
+| E06.01–E06.02 | hangman-diacritics, hangman-input | Diakritika / Enter spell win |
+| E07.01–E09.01 | quiz-lose | Prohra kvízů |
+| E10.01–E11.01 | api-failure | Recovery po API chybě |
+| E12.01 | session-cache | Session cache dat |
+| E13.01 | hangman-special-chars | Auto-odhalení speciálních znaků |
+| E14.01 | photo-image-error | Rozbitá fotka |
+| E15.01–E17.01 | deck-uniqueness | Unikátnost balíčku |
+| E18.01–E20.01 | modal-accessibility | Přístupnost modalu |
+| E21.01 | duplicate-names | Kvíz podle ID |
+| E22.01 | hangman-duplicate-names | Deduplikace jmen |
+| E23.01–E24.01 | fetch-timeout | Timeout a retry |
+| E25.01 | xss-safe-dom | XSS bezpečnost |
+| E26.01 | api-retry | Retry 5xx |
+| E27.01 | photo-all-broken | Všechny fotky rozbité |
+| E28.01 | offline-fallback | Fallback fixtures |
+| E30.01–E31.01 | quiz-mobile | Mobilní kvízy |
+| E32.01–E38.01 | hangman-mobile | Mobilní hangman |
+| E39.01–E42.01 | a11y | Axe accessibility her |
+| E43.01–E43.10 | i18n | Konzistence statických textů po přepnutí jazyka |
+| E44.01–E45.01 | pwa-offline | Service worker a offline hra |
+| E46.01–E48.01 | sw-update | Update banner, network-first HTML, prefetch |
+| E49.01 | a11y | Axe scan menu stránky |
+| E50.01–E52.01 | i18n | `?lang=en`, dynamický feedback a modal po přepnutí jazyka |
+| V01.01–V05.01 | visual/screenshots | Visual regression snapshoty |
 
 ### Visual regression
 
@@ -220,7 +224,7 @@ Průběh:
 
 1. **Pre-deploy** — `verify:build`, `typecheck`, celá testovací sada proti localhost (~83 testů včetně visual)
 2. **Deploy** — Netlify CLI
-3. **Post-deploy** — menu smoke testy S1 + S2 proti produkční URL (`tests/smoke/menu.spec.ts`, `--workers=1`)
+3. **Post-deploy** — menu smoke testy S01.01 + S02.01 proti produkční URL (`tests/smoke/menu.spec.ts`, `--workers=1`)
 
 Při selhání v CI se do GitHub Actions nahraje Playwright HTML report včetně trace (Artifacts → stáhnout → `npx playwright show-report playwright-report`).
 

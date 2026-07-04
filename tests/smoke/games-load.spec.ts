@@ -3,6 +3,7 @@ import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
+import { testId } from '../helpers/testId';
 
 const gamePages = [
   { path: '/guess-character-name/', wait: waitForHangmanReady },
@@ -12,8 +13,8 @@ const gamePages = [
 ];
 
 test.describe('Games load @smoke', () => {
-  for (const game of gamePages) {
-    test(`S3: ${game.path} loads and becomes playable`, { tag: '@smoke' }, async ({ page }) => {
+  gamePages.forEach((game, i) => {
+    test(`${testId('S', 3, i + 1)}: ${game.path} loads and becomes playable`, { tag: '@smoke' }, async ({ page }) => {
       await given(`hra na adrese ${game.path} je načtená s mockovanými daty`, async () => {
         await setupGameMocks(page);
         await page.goto(game.path);
@@ -26,9 +27,9 @@ test.describe('Games load @smoke', () => {
         await expect(page.locator(selectors.newGameBtn)).toBeEnabled();
       });
     });
-  }
+  });
 
-  test('S4: shared scripts load without critical console errors', { tag: '@smoke' }, async ({ page }) => {
+  test('S04.01: shared scripts load without critical console errors', { tag: '@smoke' }, async ({ page }) => {
     const criticalErrors: string[] = [];
 
     page.on('pageerror', (error) => {
@@ -61,7 +62,7 @@ test.describe('Games load @smoke', () => {
     });
   });
 
-  test('S5: back link returns to menu', { tag: '@smoke' }, async ({ page }) => {
+  test('S05.01: back link returns to menu', { tag: '@smoke' }, async ({ page }) => {
     await given('hra Hádej postavu je načtená', async () => {
       await setupGameMocks(page);
       await page.goto('/guess-character-name/');

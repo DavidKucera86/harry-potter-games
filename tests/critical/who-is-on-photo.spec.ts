@@ -9,7 +9,7 @@ const photoCharacters = charactersFixture.filter(
 ).slice(0, 4);
 
 test.describe('Who is on photo @critical', () => {
-  test('Q2: correct name answer increases score', { tag: '@critical' }, async ({ page }) => {
+  test('Q02.01: correct name answer increases score', { tag: '@critical' }, async ({ page }) => {
     await given('hra Kdo je na fotce je načtená s mockovanými postavami', async () => {
       await setupGameMocks(page, {
         characters: photoCharacters,

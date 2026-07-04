@@ -3,7 +3,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Menu @smoke', () => {
-  test('S1: menu page loads with game cards and footer', { tag: '@smoke' }, async ({ page }) => {
+  test('S01.01: menu page loads with game cards and footer', { tag: '@smoke' }, async ({ page }) => {
     await given('uživatel otevře hlavní menu', async () => {
       await page.goto('/');
     });
@@ -22,7 +22,7 @@ test.describe('Menu @smoke', () => {
     });
   });
 
-  test('S2: navigation from menu to each game', { tag: '@smoke' }, async ({ page }) => {
+  test('S02.01: navigation from menu to each game', { tag: '@smoke' }, async ({ page }) => {
     const games = [
       { href: 'guess-character-name/', title: /Hádej postavu/ },
       { href: 'guess-house/', title: /Hádej kolej/ },

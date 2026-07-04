@@ -14,7 +14,7 @@ async function waitForServiceWorker(page: import('@playwright/test').Page) {
 }
 
 test.describe('SW update @edge', () => {
-  test('E46: update banner appears after SW update message', { tag: '@edge' }, async ({ page }) => {
+  test('E46.01: update banner appears after SW update message', { tag: '@edge' }, async ({ page }) => {
     await given('service worker je registrovaný na hlavní stránce', async () => {
       await setupGameMocks(page);
       await page.goto('/');
@@ -36,7 +36,7 @@ test.describe('SW update @edge', () => {
     });
   });
 
-  test('E47: HTML navigation uses network-first content', { tag: '@edge' }, async ({ page }) => {
+  test('E47.01: HTML navigation uses network-first content', { tag: '@edge' }, async ({ page }) => {
     await given('service worker je registrovaný', async () => {
       await setupGameMocks(page);
       await page.goto('/');
@@ -61,7 +61,7 @@ test.describe('SW update @edge', () => {
 });
 
 test.describe('Prefetch cache @edge', () => {
-  test('E48: menu prefetch warms cache before entering game', { tag: '@edge' }, async ({ page }) => {
+  test('E48.01: menu prefetch warms cache before entering game', { tag: '@edge' }, async ({ page }) => {
     let charactersApiCalls = 0;
 
     let callsAfterPrefetch = 0;

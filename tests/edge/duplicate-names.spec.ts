@@ -5,7 +5,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Duplicate character names @edge', () => {
-  test('E21: photo quiz matches by id not name', { tag: '@edge' }, async ({ page }) => {
+  test('E21.01: photo quiz matches by id not name', { tag: '@edge' }, async ({ page }) => {
     await given('kvíz je načtený se dvěma postavami Tom Riddle s různými ID', async () => {
       await setupGameMocks(page, {
         characters: [

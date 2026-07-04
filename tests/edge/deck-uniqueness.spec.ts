@@ -37,7 +37,7 @@ async function winHangmanRound(page: import('@playwright/test').Page, letters: s
 }
 
 test.describe('Deck uniqueness @edge', () => {
-  test('E15: no duplicate characters within a deck cycle', { tag: '@edge' }, async ({ page }) => {
+  test('E15.01: no duplicate characters within a deck cycle', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej kolej je načtená s náhodným balíčkem postav', async () => {
       await setupGameMocks(page, { characters: quizCharacters, random: 0.1 });
       await page.goto('/guess-house/');
@@ -63,7 +63,7 @@ test.describe('Deck uniqueness @edge', () => {
     await then('v každém kole se objeví jiná postava', async () => {});
   });
 
-  test('E16: no duplicate hangman character names within a deck cycle', { tag: '@edge' }, async ({ page }) => {
+  test('E16.01: no duplicate hangman character names within a deck cycle', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej postavu je načtená s třemi unikátními jmény', async () => {
       await setupGameMocks(page, { characters: deckCharacters, random: 0.1 });
       await page.goto('/guess-character-name/');
@@ -89,7 +89,7 @@ test.describe('Deck uniqueness @edge', () => {
     await then('v každém kole se objeví jiné jméno', async () => {});
   });
 
-  test('E17: no duplicate hangman spells within a deck cycle', { tag: '@edge' }, async ({ page }) => {
+  test('E17.01: no duplicate hangman spells within a deck cycle', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej zaklínadlo je načtená se třemi unikátními zaklínadly', async () => {
       await setupGameMocks(page, { spells: deckSpells, random: 0.1 });
       await page.goto('/guess-spell/');
