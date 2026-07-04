@@ -85,7 +85,7 @@ Vygenerované soubory (`index.html`, `guess-*/index.html`, …) commituj do repo
 npm run verify:build
 ```
 
-Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) spouští `verify:build`, `lint` a `typecheck` automaticky.
+Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) spouští `verify:build`, `lint`, `typecheck` a regeneraci [E2E test katalogu](docs/E2E-TEST-CATALOG.md) automaticky.
 
 ## Sdílená cache dat
 
@@ -138,6 +138,7 @@ Co se stane:
 | `npm run test:unit` | Jen Vitest unit testy |
 | `npm run test:e2e` | Jen Playwright E2E testy |
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
+| `npm run docs:test-catalog` | Vygeneruje [E2E test katalog](docs/E2E-TEST-CATALOG.md) ve stylu Given-When-Then |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
 | `npx playwright test --grep @visual` | Visual regression screenshoty |
@@ -167,6 +168,8 @@ npx playwright show-trace test-results/.../trace.zip
 | `@visual` | Visual regression screenshoty (V01–V05) |
 
 ### Test catalog (E2E edge ID)
+
+Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-TEST-CATALOG.md](docs/E2E-TEST-CATALOG.md). Při commitu se automaticky přegeneruje (pre-commit hook); ručně: `npm run docs:test-catalog`.
 
 | ID | Soubor | Popis |
 |---|---|---|

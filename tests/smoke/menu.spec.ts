@@ -1,17 +1,25 @@
 import { test, expect } from '@playwright/test';
+import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Menu @smoke', () => {
   test('S1: menu page loads with game cards and footer', { tag: '@smoke' }, async ({ page }) => {
-    await page.goto('/');
+    await given('uživatel otevře hlavní menu', async () => {
+      await page.goto('/');
+    });
 
-    await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
-    await expect(page.locator(selectors.gameCard)).toHaveCount(4);
-    await expect(page.locator('.bmc-link')).toHaveAttribute(
-      'href',
-      'https://buymeacoffee.com/dvdkcrb'
-    );
-    await expect(page.getByRole('heading', { name: 'Harry Potter Games' })).toBeVisible();
+    await then('stránka je v češtině a zobrazí čtyři herní karty', async () => {
+      await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
+      await expect(page.locator(selectors.gameCard)).toHaveCount(4);
+    });
+
+    await then('footer obsahuje odkaz Buy Me a Coffee a nadpis stránky', async () => {
+      await expect(page.locator('.bmc-link')).toHaveAttribute(
+        'href',
+        'https://buymeacoffee.com/dvdkcrb'
+      );
+      await expect(page.getByRole('heading', { name: 'Harry Potter Games' })).toBeVisible();
+    });
   });
 
   test('S2: navigation from menu to each game', { tag: '@smoke' }, async ({ page }) => {
@@ -23,11 +31,19 @@ test.describe('Menu @smoke', () => {
     ];
 
     for (const game of games) {
-      await page.goto('/');
-      await page.locator(`a.game-card[href="${game.href}"]`).click();
-      await expect(page).toHaveURL(new RegExp(game.href));
-      await expect(page.locator('h1')).toBeVisible();
-      await expect(page).toHaveTitle(game.title);
+      await given('uživatel je na hlavním menu', async () => {
+        await page.goto('/');
+      });
+
+      await when(`uživatel klikne na kartu hry ${game.href}`, async () => {
+        await page.locator(`a.game-card[href="${game.href}"]`).click();
+      });
+
+      await then('otevře se správná hra s viditelným nadpisem', async () => {
+        await expect(page).toHaveURL(new RegExp(game.href));
+        await expect(page.locator('h1')).toBeVisible();
+        await expect(page).toHaveTitle(game.title);
+      });
     }
   });
 });

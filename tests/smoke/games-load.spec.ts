@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
+import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 const gamePages = [
@@ -13,13 +14,17 @@ const gamePages = [
 test.describe('Games load @smoke', () => {
   for (const game of gamePages) {
     test(`S3: ${game.path} loads and becomes playable`, { tag: '@smoke' }, async ({ page }) => {
-      await setupGameMocks(page);
-      await page.goto(game.path);
-      await game.wait(page);
+      await given(`hra na adrese ${game.path} je načtená s mockovanými daty`, async () => {
+        await setupGameMocks(page);
+        await page.goto(game.path);
+        await game.wait(page);
+      });
 
-      await expect(page.locator(selectors.loadingOverlay)).toBeHidden();
-      await expect(page.locator(selectors.hearts)).toHaveCount(10);
-      await expect(page.locator(selectors.newGameBtn)).toBeEnabled();
+      await then('hra je hratelná se skrytým loading overlay a deseti životy', async () => {
+        await expect(page.locator(selectors.loadingOverlay)).toBeHidden();
+        await expect(page.locator(selectors.hearts)).toHaveCount(10);
+        await expect(page.locator(selectors.newGameBtn)).toBeEnabled();
+      });
     });
   }
 
@@ -42,23 +47,34 @@ test.describe('Games load @smoke', () => {
       }
     });
 
-    await setupGameMocks(page);
+    await given('uživatel postupně navštíví všechny čtyři hry', async () => {
+      await setupGameMocks(page);
 
-    for (const game of gamePages) {
-      await page.goto(game.path);
-      await game.wait(page);
-    }
+      for (const game of gamePages) {
+        await page.goto(game.path);
+        await game.wait(page);
+      }
+    });
 
-    expect(criticalErrors).toEqual([]);
+    await then('v konzoli se neobjeví kritické chyby', async () => {
+      expect(criticalErrors).toEqual([]);
+    });
   });
 
   test('S5: back link returns to menu', { tag: '@smoke' }, async ({ page }) => {
-    await setupGameMocks(page);
-    await page.goto('/guess-character-name/');
-    await waitForHangmanReady(page);
+    await given('hra Hádej postavu je načtená', async () => {
+      await setupGameMocks(page);
+      await page.goto('/guess-character-name/');
+      await waitForHangmanReady(page);
+    });
 
-    await page.locator(selectors.backLink).click();
-    await expect(page).toHaveURL(/\/index\.html?$|\/$/);
-    await expect(page.locator(selectors.gameCard)).toHaveCount(4);
+    await when('uživatel klikne na odkaz zpět do menu', async () => {
+      await page.locator(selectors.backLink).click();
+    });
+
+    await then('zobrazí se hlavní menu se čtyřmi kartami her', async () => {
+      await expect(page).toHaveURL(/\/index\.html?$|\/$/);
+      await expect(page.locator(selectors.gameCard)).toHaveCount(4);
+    });
   });
 });
