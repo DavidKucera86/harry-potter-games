@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
 import {
   waitForHangmanReady,
@@ -9,14 +9,49 @@ import {
 
 const isProduction = (process.env.PLAYWRIGHT_TARGET ?? 'local') === 'production';
 
+const VISUAL_TEST_FONTS_CSS = `
+*, *::before, *::after {
+  font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif !important;
+}
+`;
+
+async function setupVisualTestRoutes(page: Page) {
+  await page.route('**/shared/visual-test-fonts.css', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'text/css',
+      body: VISUAL_TEST_FONTS_CSS,
+    });
+  });
+}
+
+async function stabilizeVisualRendering(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/shared/visual-test-fonts.css';
+        link.onload = () => resolve();
+        link.onerror = () => reject(new Error('Failed to load visual test fonts'));
+        document.head.appendChild(link);
+      }),
+  );
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
+}
+
 test.describe('Visual regression @visual', () => {
   test.beforeEach(async ({ page }) => {
     test.skip(isProduction, 'Visual tests run only against local build');
     await page.setViewportSize({ width: 1280, height: 720 });
+    await setupVisualTestRoutes(page);
   });
 
   test('V01: menu page layout', { tag: '@visual' }, async ({ page }) => {
     await page.goto('/');
+    await stabilizeVisualRendering(page);
     await expect(page.locator('#main-content .game-grid')).toHaveScreenshot('menu-game-grid.png');
   });
 
@@ -24,6 +59,7 @@ test.describe('Visual regression @visual', () => {
     await setupGameMocks(page, { random: 0 });
     await page.goto('/guess-character-name/');
     await waitForHangmanReady(page);
+    await stabilizeVisualRendering(page);
     await expect(page.locator('.game-container')).toHaveScreenshot('hangman-ready.png');
   });
 
@@ -31,6 +67,7 @@ test.describe('Visual regression @visual', () => {
     await setupGameMocks(page, { random: 0 });
     await page.goto('/guess-house/');
     await waitForQuizReady(page);
+    await stabilizeVisualRendering(page);
     await expect(page.locator('.game-container')).toHaveScreenshot('quiz-house-ready.png');
   });
 
@@ -38,6 +75,7 @@ test.describe('Visual regression @visual', () => {
     await setupGameMocks(page, { random: 0 });
     await page.goto('/who-is-on-photo/');
     await waitForQuizReady(page);
+    await stabilizeVisualRendering(page);
     await expect(page.locator('.game-container')).toHaveScreenshot('photo-quiz-ready.png');
   });
 
@@ -50,6 +88,7 @@ test.describe('Visual regression @visual', () => {
     await waitForHangmanReady(page);
     await guessLetters(page, ['q', 'w', 'e', 'r', 't', 'y', 'i', 'o', 'p', 'd']);
     await expectModalOpen(page, 'Došly životy!');
+    await stabilizeVisualRendering(page);
     await expect(page.locator('#overlay')).toHaveScreenshot('hangman-lose-modal.png');
   });
 });
