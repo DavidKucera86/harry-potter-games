@@ -1,8 +1,8 @@
 import { getCharacters, getSpells } from './dataProvider.js';
 
 function isMenuPage(): boolean {
-  const path = window.location.pathname;
-  return path === '/' || path.endsWith('/index.html') || path.endsWith('/');
+  const normalized = window.location.pathname.replace(/\/$/, '') || '/';
+  return normalized === '/' || normalized === '/index.html';
 }
 
 export function prefetchGameData(): void {
