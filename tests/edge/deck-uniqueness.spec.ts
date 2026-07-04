@@ -11,15 +11,15 @@ import { houseByName, quizCharacters } from '../helpers/quiz';
 import { selectors } from '../helpers/selectors';
 
 const deckCharacters = [
-  { id: '1', name: 'A', house: 'Gryffindor', image: 'https://hp-api.local/a.png' },
-  { id: '2', name: 'B', house: 'Slytherin', image: 'https://hp-api.local/b.png' },
-  { id: '3', name: 'C', house: 'Ravenclaw', image: 'https://hp-api.local/c.png' },
+  { id: '1', name: 'Ann', house: 'Gryffindor', image: 'https://hp-api.local/a.png' },
+  { id: '2', name: 'Bob', house: 'Slytherin', image: 'https://hp-api.local/b.png' },
+  { id: '3', name: 'Cyd', house: 'Ravenclaw', image: 'https://hp-api.local/c.png' },
 ];
 
 const deckSpells = [
-  { name: 'X' },
-  { name: 'Y' },
-  { name: 'Z' },
+  { name: 'XYZ' },
+  { name: 'ABC' },
+  { name: 'DEF' },
 ];
 
 async function winHangmanRound(page: import('@playwright/test').Page, letters: string) {
@@ -64,7 +64,7 @@ test.describe('Deck uniqueness @edge', () => {
     const seen = new Set<string>();
 
     for (let round = 0; round < 3; round++) {
-      const word = await winHangmanRound(page, 'abc');
+      const word = await winHangmanRound(page, 'annbobcyd');
       expect(word).toBeTruthy();
       expect(seen.has(word!)).toBe(false);
       seen.add(word!);
@@ -84,7 +84,7 @@ test.describe('Deck uniqueness @edge', () => {
     const seen = new Set<string>();
 
     for (let round = 0; round < 3; round++) {
-      const word = await winHangmanRound(page, 'xyz');
+      const word = await winHangmanRound(page, 'xyzabcdef');
       expect(word).toBeTruthy();
       expect(seen.has(word!)).toBe(false);
       seen.add(word!);

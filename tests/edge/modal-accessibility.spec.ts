@@ -9,10 +9,16 @@ import {
 } from '../helpers/hangman';
 import { selectors } from '../helpers/selectors';
 
+async function winAlbus(page: import('@playwright/test').Page) {
+  for (const letter of ['a', 'l', 'b', 'u', 's']) {
+    await guessLetter(page, letter);
+  }
+}
+
 test.describe('Modal accessibility @edge', () => {
   test.beforeEach(async ({ page }) => {
     await setupGameMocks(page, {
-      characters: [{ id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' }],
+      characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
       random: 0,
     });
     await page.goto('/guess-character-name/');
@@ -20,8 +26,7 @@ test.describe('Modal accessibility @edge', () => {
   });
 
   test('E14: modal has dialog semantics and traps focus', { tag: '@edge' }, async ({ page }) => {
-    await guessLetter(page, 'a');
-    await guessLetter(page, 'l');
+    await winAlbus(page);
     await expectModalOpen(page, 'Gratulujeme!');
 
     await expect(page.locator(selectors.modalDialog)).toHaveAttribute('role', 'dialog');
@@ -31,8 +36,7 @@ test.describe('Modal accessibility @edge', () => {
   });
 
   test('E15: Escape closes modal and starts new game', { tag: '@edge' }, async ({ page }) => {
-    await guessLetter(page, 'a');
-    await guessLetter(page, 'l');
+    await winAlbus(page);
     await expectModalOpen(page, 'Gratulujeme!');
 
     await page.keyboard.press('Escape');
@@ -42,8 +46,7 @@ test.describe('Modal accessibility @edge', () => {
   });
 
   test('E16: modal button starts new game', { tag: '@edge' }, async ({ page }) => {
-    await guessLetter(page, 'a');
-    await guessLetter(page, 'l');
+    await winAlbus(page);
     await expectModalOpen(page, 'Gratulujeme!');
 
     await clickNewGame(page);

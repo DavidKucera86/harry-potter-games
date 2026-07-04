@@ -1,0 +1,21 @@
+  <header>
+    <a class="back-link" href="../index.html">← Zpět na menu</a>
+    <h1>Kdo je na fotce?</h1>
+    <p>Podívej se na fotku a vyber správné jméno postavy. Máš 10 životů.</p>
+  </header>
+
+  <div class="game-container" aria-busy="false">
+{{LOADING_OVERLAY}}
+{{STATUS_BAR_QUIZ}}
+    <div class="photo-frame">
+      <img id="characterPhoto" src="" alt="Fotografie postavy — hádej jméno" loading="lazy">
+    </div>
+
+    <div class="message info" id="message" aria-live="polite">Kdo je na fotce?</div>
+
+    <div class="choices-grid" id="choices"></div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" id="newGameBtn">Nová hra</button>
+    </div>
+  </div>

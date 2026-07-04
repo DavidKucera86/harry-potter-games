@@ -46,10 +46,9 @@ async function fetchWithRetry(url) {
 
       if (error instanceof Error && error.name === 'AbortError') {
         lastError = new FetchTimeoutError();
-        throw lastError;
+      } else {
+        lastError = error instanceof Error ? error : new Error(String(error));
       }
-
-      lastError = error instanceof Error ? error : new Error(String(error));
     }
 
     if (attempt < GAME_CONFIG.API_RETRIES - 1) {
@@ -83,6 +82,7 @@ async function fetchCached(url, storageKey, fallbackUrl) {
     console.warn('Cache read failed, fetching fresh data:', error);
   }
 
+  let apiError;
   try {
     const response = await fetchWithRetry(url);
     const data = await response.json();
@@ -98,26 +98,31 @@ async function fetchCached(url, storageKey, fallbackUrl) {
 
     return data;
   } catch (error) {
-    if (error instanceof FetchTimeoutError) {
-      throw error;
-    }
+    apiError = error;
     console.warn('API fetch failed, trying fallback:', error);
   }
 
   if (fallbackUrl) {
-    const data = await loadFallback(fallbackUrl);
     try {
-      sessionStorage.setItem(versionedKey, JSON.stringify({
-        data,
-        timestamp: Date.now(),
-      }));
-    } catch (error) {
-      console.warn('Cache write failed:', error);
+      const data = await loadFallback(fallbackUrl);
+      try {
+        sessionStorage.setItem(versionedKey, JSON.stringify({
+          data,
+          timestamp: Date.now(),
+        }));
+      } catch (error) {
+        console.warn('Cache write failed:', error);
+      }
+      return data;
+    } catch (fallbackError) {
+      if (apiError instanceof FetchTimeoutError) {
+        throw apiError;
+      }
+      throw fallbackError;
     }
-    return data;
   }
 
-  throw new Error('Data unavailable');
+  throw apiError ?? new Error('Data unavailable');
 }
 
 export async function getCharacters() {

@@ -1,5 +1,5 @@
 [
-  { "id": "1", "name": "Al", "house": "Gryffindor", "image": "https://hp-api.local/al.png" },
+  { "id": "1", "name": "Albus", "house": "Gryffindor", "image": "https://hp-api.local/albus.png" },
   { "id": "2", "name": "Nearly Headless Nick", "house": "Gryffindor", "image": "https://hp-api.local/nick.png" },
   { "id": "3", "name": "Harry Potter", "house": "Gryffindor", "image": "https://hp-api.local/harry.png" },
   { "id": "4", "name": "Broken Photo", "house": "Slytherin", "image": "https://invalid.local/broken.jpg" },

@@ -14,7 +14,7 @@ test.describe('API retry @edge', () => {
         return;
       }
       route.fulfill({
-        json: [{ id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' }],
+        json: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
       });
     });
 

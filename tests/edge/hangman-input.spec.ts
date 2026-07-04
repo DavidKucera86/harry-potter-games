@@ -5,7 +5,7 @@ import { waitForHangmanReady, guessLetter } from '../helpers/hangman';
 test.describe('Hangman input @edge', () => {
   test.beforeEach(async ({ page }) => {
     await setupGameMocks(page, {
-      characters: [{ id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' }],
+      characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
       random: 0,
     });
     await page.goto('/guess-character-name/');

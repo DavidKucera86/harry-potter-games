@@ -28,11 +28,24 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
   - `config.js` — globální konfigurace (životy, API URL, cache verze, retry)
   - `dataProvider.js` — načítání dat s cache v `sessionStorage` a retry logikou
   - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
+  - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
+  - `wordUtils.js` — deduplikace a filtrování slov pro hangman
   - `hangmanUtils.js` — utility pro hangman hry (diakritika, auto-odhalení speciálních znaků)
   - `deckUtils.js` — shuffle a výběr z balíčku
 - Sdílené styly v `shared/common.css` a `shared/styles/hangman.css`
-- Bez build stepu a bez runtime externích knihoven
+- Dev-time HTML generátor (`npm run build:html`) ze šablon v `shared/templates/`
+- Bez runtime build stepu a bez runtime externích knihoven
+
+## Úprava HTML
+
+HTML stránky se generují ze šablon v `shared/templates/`. Po úpravě šablony spusť:
+
+```bash
+npm run build:html
+```
+
+Vygenerované soubory (`index.html`, `guess-*/index.html`, …) commituj do repozitáře — `npm test` spouští build automaticky přes `pretest` hook.
 
 ## Sdílená cache dat
 
