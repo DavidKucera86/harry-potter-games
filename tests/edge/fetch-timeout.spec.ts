@@ -10,7 +10,7 @@ import { clickNewGame, waitForHangmanReady } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
 
 test.describe('Fetch timeout @edge', () => {
-  test('E23: hangman shows timeout error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
+  test('E23.01: hangman shows timeout error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
     await given('API request visí a fallback selže', async () => {
       await setFetchTimeout(page, 100);
       await mockFetchHang(page, 'characters');
@@ -45,7 +45,7 @@ test.describe('Fetch timeout @edge', () => {
     });
   });
 
-  test('E24: retries hung requests and loads on later attempt', { tag: '@edge' }, async ({ page }) => {
+  test('E24.01: retries hung requests and loads on later attempt', { tag: '@edge' }, async ({ page }) => {
     let attempts = 0;
 
     await given('první dva API requesty visí a třetí uspěje', async () => {

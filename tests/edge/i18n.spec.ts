@@ -8,6 +8,8 @@ import {
   type Locale,
 } from '../helpers/i18nConsistency';
 
+import { testId } from '../helpers/testId';
+
 const pages: Array<{
   path: string;
   ready: ((page: Page) => Promise<void>) | null;
@@ -21,9 +23,10 @@ const pages: Array<{
 ];
 
 test.describe('Internationalization @edge', () => {
+  let e43Index = 1;
   for (const locale of ['cs', 'en'] as const satisfies Locale[]) {
     for (const { path, ready, messageKey } of pages) {
-      test(`E43: ${path} — po přepnutí na ${locale} jsou všechny statické texty konzistentní`, { tag: '@edge' }, async ({ page }) => {
+      test(`${testId('E', 43, e43Index++)}: ${path} — po přepnutí na ${locale} jsou všechny statické texty konzistentní`, { tag: '@edge' }, async ({ page }) => {
         await given(`stránka ${path} je načtená s mockovanými daty`, async () => {
           await setupGameMocks(page);
           await page.goto(path);
@@ -48,7 +51,7 @@ test.describe('Internationalization @edge', () => {
     }
   }
 
-  test('E50: ?lang=en loads page directly in English', { tag: '@edge' }, async ({ page }) => {
+  test('E50.01: ?lang=en loads page directly in English', { tag: '@edge' }, async ({ page }) => {
     await given('uživatel otevře hru s parametrem ?lang=en', async () => {
       await setupGameMocks(page);
       await page.goto('/guess-character-name/?lang=en');
@@ -62,7 +65,7 @@ test.describe('Internationalization @edge', () => {
     });
   });
 
-  test('E51: hangman feedback message updates after locale switch', { tag: '@edge' }, async ({ page }) => {
+  test('E51.01: hangman feedback message updates after locale switch', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená a uživatel uhodne špatné písmeno', async () => {
       await setupGameMocks(page, { random: 0 });
       await page.goto('/guess-character-name/');
@@ -82,7 +85,7 @@ test.describe('Internationalization @edge', () => {
     });
   });
 
-  test('E52: lose modal title updates after locale switch', { tag: '@edge' }, async ({ page }) => {
+  test('E52.01: lose modal title updates after locale switch', { tag: '@edge' }, async ({ page }) => {
     await given('uživatel prohraje hangman hru', async () => {
       await setupGameMocks(page, {
         characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/a.png' }],

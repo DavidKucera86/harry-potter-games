@@ -52,7 +52,7 @@ test.describe('Visual regression @visual', () => {
     });
   });
 
-  test('V01: menu page layout', { tag: '@visual' }, async ({ page }) => {
+  test('V01.01: menu page layout', { tag: '@visual' }, async ({ page }) => {
     await given('uživatel otevře hlavní menu', async () => {
       await page.goto('/');
       await stabilizeVisualRendering(page);
@@ -63,7 +63,7 @@ test.describe('Visual regression @visual', () => {
     });
   });
 
-  test('V02: hangman ready state', { tag: '@visual' }, async ({ page }) => {
+  test('V02.01: hangman ready state', { tag: '@visual' }, async ({ page }) => {
     await given('hra Hádej postavu je ve stavu připraveno ke hře', async () => {
       await setupGameMocks(page, { random: 0 });
       await page.goto('/guess-character-name/');
@@ -76,7 +76,7 @@ test.describe('Visual regression @visual', () => {
     });
   });
 
-  test('V03: quiz house ready state', { tag: '@visual' }, async ({ page }) => {
+  test('V03.01: quiz house ready state', { tag: '@visual' }, async ({ page }) => {
     await given('hra Hádej kolej je ve stavu připraveno ke hře', async () => {
       await setupGameMocks(page, { random: 0 });
       await page.goto('/guess-house/');
@@ -89,7 +89,7 @@ test.describe('Visual regression @visual', () => {
     });
   });
 
-  test('V04: photo quiz ready state', { tag: '@visual' }, async ({ page }) => {
+  test('V04.01: photo quiz ready state', { tag: '@visual' }, async ({ page }) => {
     await given('hra Kdo je na fotce je ve stavu připraveno ke hře', async () => {
       await setupGameMocks(page, { random: 0 });
       await page.goto('/who-is-on-photo/');
@@ -102,7 +102,7 @@ test.describe('Visual regression @visual', () => {
     });
   });
 
-  test('V05: hangman lose modal', { tag: '@visual' }, async ({ page }) => {
+  test('V05.01: hangman lose modal', { tag: '@visual' }, async ({ page }) => {
     await given('uživatel prohraje hangman hru', async () => {
       await setupGameMocks(page, {
         characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],

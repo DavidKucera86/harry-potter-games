@@ -5,14 +5,14 @@ import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
 
 const gamePages = [
-  { id: 'E39', path: '/guess-character-name/', ready: waitForHangmanReady },
-  { id: 'E40', path: '/guess-spell/', ready: waitForHangmanReady },
-  { id: 'E41', path: '/guess-house/', ready: waitForQuizReady },
-  { id: 'E42', path: '/who-is-on-photo/', ready: waitForQuizReady },
+  { id: 'E39.01', path: '/guess-character-name/', ready: waitForHangmanReady },
+  { id: 'E40.01', path: '/guess-spell/', ready: waitForHangmanReady },
+  { id: 'E41.01', path: '/guess-house/', ready: waitForQuizReady },
+  { id: 'E42.01', path: '/who-is-on-photo/', ready: waitForQuizReady },
 ];
 
 test.describe('Accessibility @edge', () => {
-  test('E49: menu page has no serious axe violations', { tag: '@edge' }, async ({ page }) => {
+  test('E49.01: menu page has no serious axe violations', { tag: '@edge' }, async ({ page }) => {
     await given('uživatel otevře hlavní menu', async () => {
       await page.goto('/');
     });

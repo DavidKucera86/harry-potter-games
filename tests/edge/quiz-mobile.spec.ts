@@ -10,7 +10,7 @@ test.describe('Quiz mobile viewport @edge', () => {
     await page.setViewportSize({ width: 375, height: 667 });
   });
 
-  test('E30: guess-house renders four choices on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E30.01: guess-house renders four choices on mobile', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej kolej je načtená na mobilním viewportu', async () => {
       await setupGameMocks(page, { characters: quizCharacters, random: 0 });
       await page.goto('/guess-house/');
@@ -31,7 +31,7 @@ test.describe('Quiz mobile viewport @edge', () => {
     });
   });
 
-  test('E31: who-is-on-photo renders photo and choices on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E31.01: who-is-on-photo renders photo and choices on mobile', { tag: '@edge' }, async ({ page }) => {
     await given('hra Kdo je na fotce je načtená na mobilním viewportu', async () => {
       await setupGameMocks(page, { characters: quizCharacters, random: 0 });
       await page.goto('/who-is-on-photo/');

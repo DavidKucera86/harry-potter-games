@@ -5,7 +5,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Navigation @critical', () => {
-  test('N1: menu → game → back → another game', { tag: '@critical' }, async ({ page }) => {
+  test('N01.01: menu → game → back → another game', { tag: '@critical' }, async ({ page }) => {
     await given('API je mockované a uživatel je na hlavním menu', async () => {
       await setupGameMocks(page);
       await page.goto('/');

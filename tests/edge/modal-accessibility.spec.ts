@@ -28,7 +28,7 @@ test.describe('Modal accessibility @edge', () => {
     });
   });
 
-  test('E18: modal has dialog semantics and traps focus', { tag: '@edge' }, async ({ page }) => {
+  test('E18.01: modal has dialog semantics and traps focus', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel vyhraje hru', async () => {
       await winAlbus(page);
       await expectModalOpen(page, 'Gratulujeme!');
@@ -42,7 +42,7 @@ test.describe('Modal accessibility @edge', () => {
     });
   });
 
-  test('E19: Escape closes modal and starts new game', { tag: '@edge' }, async ({ page }) => {
+  test('E19.01: Escape closes modal and starts new game', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel vyhraje hru a stiskne Escape', async () => {
       await winAlbus(page);
       await expectModalOpen(page, 'Gratulujeme!');
@@ -56,7 +56,7 @@ test.describe('Modal accessibility @edge', () => {
     });
   });
 
-  test('E20: modal button starts new game', { tag: '@edge' }, async ({ page }) => {
+  test('E20.01: modal button starts new game', { tag: '@edge' }, async ({ page }) => {
     await when('uživatel vyhraje hru a klikne na tlačítko v modalu', async () => {
       await winAlbus(page);
       await expectModalOpen(page, 'Gratulujeme!');

@@ -11,7 +11,7 @@ async function mockFallbackFailure(page: import('@playwright/test').Page) {
 }
 
 test.describe('API failure @edge', () => {
-  test('E10: hangman shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
+  test('E10.01: hangman shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
     await given('API i fallback selhávají při načtení hangman hry', async () => {
       await mockApiFailure(page, 'characters');
       await mockFallbackFailure(page);
@@ -42,7 +42,7 @@ test.describe('API failure @edge', () => {
     });
   });
 
-  test('E11: guess-house shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
+  test('E11.01: guess-house shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
     await given('API i fallback selhávají při načtení kvízu Hádej kolej', async () => {
       await mockApiFailure(page, 'characters');
       await mockFallbackFailure(page);

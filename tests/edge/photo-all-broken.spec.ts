@@ -3,7 +3,7 @@ import { setupGameMocks } from '../helpers/api';
 import { given, then } from '../helpers/gwt';
 
 test.describe('Photo all broken images @edge', () => {
-  test('E27: all broken images show error instead of looping', { tag: '@edge' }, async ({ page }) => {
+  test('E27.01: all broken images show error instead of looping', { tag: '@edge' }, async ({ page }) => {
     await given('všechny fotky v kvízu jsou neplatné', async () => {
       await setupGameMocks(page, {
         characters: [

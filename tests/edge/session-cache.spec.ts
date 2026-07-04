@@ -4,7 +4,7 @@ import { waitForQuizReady } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
 
 test.describe('Session cache @edge', () => {
-  test('E12: second game reuses cached characters without new API request', { tag: '@edge' }, async ({ page }) => {
+  test('E12.01: second game reuses cached characters without new API request', { tag: '@edge' }, async ({ page }) => {
     let apiCalls = 0;
 
     await given('API postav je mockované a první hra načte data', async () => {

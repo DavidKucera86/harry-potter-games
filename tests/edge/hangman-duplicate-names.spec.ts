@@ -5,7 +5,7 @@ import { given, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Hangman duplicate names @edge', () => {
-  test('E22: dedupes duplicate character names in deck', { tag: '@edge' }, async ({ page }) => {
+  test('E22.01: dedupes duplicate character names in deck', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená se dvěma postavami se stejným jménem Tom Riddle', async () => {
       await setupGameMocks(page, {
         characters: [

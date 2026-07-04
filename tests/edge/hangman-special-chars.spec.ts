@@ -9,7 +9,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Hangman special characters @edge', () => {
-  test('E13: auto-revealed apostrophe allows winning', { tag: '@edge' }, async ({ page }) => {
+  test('E13.01: auto-revealed apostrophe allows winning', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s postavou „O\'Brien“', async () => {
       await setupGameMocks(page, {
         characters: [

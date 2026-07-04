@@ -6,7 +6,7 @@ import { quizCharacters } from '../helpers/quiz';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Guess house @critical', () => {
-  test('Q1: correct house answer increases score and starts new round', { tag: '@critical' }, async ({ page }) => {
+  test('Q01.01: correct house answer increases score and starts new round', { tag: '@critical' }, async ({ page }) => {
     await given('hra Hádej kolej je načtená s mockovanými postavami', async () => {
       await setupGameMocks(page, { characters: quizCharacters, random: 0 });
       await page.goto('/guess-house/');

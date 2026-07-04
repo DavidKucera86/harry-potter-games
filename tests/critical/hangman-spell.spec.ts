@@ -9,7 +9,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Hangman spell @critical', () => {
-  test('H2: win spell hangman game', { tag: '@critical' }, async ({ page }) => {
+  test('H02.01: win spell hangman game', { tag: '@critical' }, async ({ page }) => {
     await given('hra Hádej zaklínadlo je načtená se slovem „Lumos“', async () => {
       await setupGameMocks(page, {
         spells: [{ name: 'Lumos' }],

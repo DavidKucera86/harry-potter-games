@@ -5,7 +5,7 @@ import { given, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Photo image error @edge', () => {
-  test('E14: broken image does not crash the game', { tag: '@edge' }, async ({ page }) => {
+  test('E14.01: broken image does not crash the game', { tag: '@edge' }, async ({ page }) => {
     await given('kvíz Kdo je na fotce je načtený s jednou rozbitou fotkou', async () => {
       await setupGameMocks(page, {
         characters: [

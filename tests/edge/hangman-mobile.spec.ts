@@ -15,7 +15,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await page.setViewportSize({ width: 375, height: 667 });
   });
 
-  test('E32: character long name fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E32.01: character long name fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s dlouhým jménem na mobilním viewportu', async () => {
       await setupGameMocks(page, {
         characters: [
@@ -40,7 +40,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     });
   });
 
-  test('E33: character long single word fits without overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E33.01: character long single word fits without overflow', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s dlouhým jednoslovným jménem', async () => {
       await setupGameMocks(page, {
         characters: [
@@ -64,7 +64,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     });
   });
 
-  test('E34: spell long word fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E34.01: spell long word fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
     await given('hra Hádej zaklínadlo je načtená s dlouhým slovem Expelliarmus', async () => {
       await setupGameMocks(page, {
         spells: [{ name: 'Expelliarmus' }],
@@ -82,7 +82,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     });
   });
 
-  test('E35: input and guess button fully visible on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E35.01: input and guess button fully visible on mobile', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená na mobilním viewportu', async () => {
       await setupGameMocks(page, {
         characters: [
@@ -108,7 +108,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     });
   });
 
-  test('E36: short viewport with focused input has no horizontal overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E36.01: short viewport with focused input has no horizontal overflow', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená na krátkém mobilním viewportu se zaměřeným vstupem', async () => {
       await page.setViewportSize({ width: 375, height: 400 });
       await setupGameMocks(page, {
@@ -127,7 +127,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     });
   });
 
-  test('E37: short word has readable slot size on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E37.01: short word has readable slot size on mobile', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s krátkým slovem Severus na mobilu', async () => {
       await setupGameMocks(page, {
         characters: [
@@ -151,7 +151,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     });
   });
 
-  test('E38: short word has larger slot size on desktop', { tag: '@edge' }, async ({ page }) => {
+  test('E38.01: short word has larger slot size on desktop', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s krátkým slovem Severus na desktopu', async () => {
       await page.setViewportSize({ width: 1280, height: 800 });
       await setupGameMocks(page, {

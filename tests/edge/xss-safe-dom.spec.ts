@@ -5,7 +5,7 @@ import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 
 test.describe('XSS safe DOM @edge', () => {
-  test('E25: malicious character name is rendered as text in modal', { tag: '@edge' }, async ({ page }) => {
+  test('E25.01: malicious character name is rendered as text in modal', { tag: '@edge' }, async ({ page }) => {
     let dialogShown = false;
     page.on('dialog', () => {
       dialogShown = true;
