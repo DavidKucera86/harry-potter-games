@@ -54,3 +54,27 @@ export async function expectModalOpen(page: Page, title: string) {
   await expect(page.locator(selectors.overlay)).toHaveClass(/visible/);
   await expect(page.locator(selectors.modalTitle)).toHaveText(title);
 }
+
+export async function expectNoHorizontalOverflow(page: Page) {
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
+  );
+  expect(overflow).toBe(true);
+}
+
+export async function expectFullyInViewport(page: Page, selector: string) {
+  const box = await page.locator(selector).boundingBox();
+  const viewport = page.viewportSize()!;
+  expect(box).not.toBeNull();
+  expect(box!.x).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
+}
+
+export async function expectLetterSlotsInViewport(page: Page) {
+  const viewportWidth = page.viewportSize()!.width;
+  const overflow = await page.evaluate((width) => {
+    const slots = Array.from(document.querySelectorAll('#wordDisplay .letter-slot:not(.space)'));
+    return slots.every((slot) => slot.getBoundingClientRect().right <= width + 1);
+  }, viewportWidth);
+  expect(overflow).toBe(true);
+}

@@ -4,6 +4,11 @@
   padding: 0;
 }
 
+html, body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 body {
   min-height: 100vh;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -62,4 +67,19 @@ header p {
     0 4px 24px rgba(0, 0, 0, 0.4),
     0 0 60px var(--gold-glow);
   position: relative;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 1rem 0.75rem;
+  }
+
+  header {
+    margin-bottom: 1.25rem;
+  }
+
+  .game-container {
+    padding: 1.25rem 1rem;
+    border-radius: 16px;
+  }
 }

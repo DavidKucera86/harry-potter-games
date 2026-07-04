@@ -5,6 +5,12 @@
   margin-top: 1rem;
 }
 
+@media (max-width: 480px) {
+  .keyboard-hint {
+    display: none;
+  }
+}
+
 .quiz-prompt {
   text-align: center;
   font-size: clamp(1.2rem, 3vw, 1.6rem);
