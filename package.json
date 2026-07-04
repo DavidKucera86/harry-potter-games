@@ -31,7 +31,6 @@
     "eslint": "^9.17.0",
     "globals": "^15.14.0",
     "happy-dom": "^16.8.1",
-    "netlify-cli": "^20.0.0",
     "serve": "^14.2.4",
     "simple-git-hooks": "^2.12.1",
     "typescript": "^5.7.2",
