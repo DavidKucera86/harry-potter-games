@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
-import { waitForHangmanReady, expectNoHorizontalOverflow, expectLetterSlotSizes } from '../helpers/hangman';
+import { waitForHangmanReady, expectNoHorizontalOverflow, expectLetterSlotSizes, expectUniformLetterSlotSizes } from '../helpers/hangman';
 
 test.describe('Hangman word wrap @edge', () => {
   test('E5: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
@@ -20,6 +20,7 @@ test.describe('Hangman word wrap @edge', () => {
     await waitForHangmanReady(page);
     await expectNoHorizontalOverflow(page);
     await expectLetterSlotSizes(page, { min: 24 });
+    await expectUniformLetterSlotSizes(page);
 
     const layout = await page.evaluate(() => {
       const groups = Array.from(document.querySelectorAll('#wordDisplay .word-group'));
@@ -43,5 +44,19 @@ test.describe('Hangman word wrap @edge', () => {
     expect(layout[0].hasSpace).toBe(true);
     expect(layout[1].hasSpace).toBe(true);
     expect(layout[2].hasSpace).toBe(false);
+  });
+
+  test('E28: letter slots have uniform width across word groups', { tag: '@edge' }, async ({ page }) => {
+    await setupGameMocks(page, {
+      spells: [{ name: 'Expecto Patronum' }],
+      random: 0,
+    });
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/guess-spell/');
+    await waitForHangmanReady(page);
+
+    await expect(page.locator('#wordDisplay .word-group')).toHaveCount(2);
+    await expectNoHorizontalOverflow(page);
+    await expectUniformLetterSlotSizes(page);
   });
 });

@@ -92,3 +92,15 @@ export async function expectLetterSlotSizes(page: Page, opts: { min: number; max
     }
   }
 }
+
+export async function expectUniformLetterSlotSizes(page: Page) {
+  const widths = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('#wordDisplay .letter-slot:not(.space)'))
+      .map((el) => el.getBoundingClientRect().width)
+  );
+  expect(widths.length).toBeGreaterThan(1);
+  const reference = widths[0];
+  for (const width of widths) {
+    expect(Math.abs(width - reference)).toBeLessThanOrEqual(1);
+  }
+}

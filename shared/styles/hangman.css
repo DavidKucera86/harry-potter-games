@@ -19,6 +19,12 @@
   gap: 0.6rem;
   margin-bottom: 2rem;
   min-height: 60px;
+  --slot-gap: 0.6rem;
+  --slot-max: clamp(40px, 7cqw, 52px);
+  --slot-size: min(
+    var(--slot-max),
+    calc((100cqw - (var(--slot-count, 1) - 1) * var(--slot-gap)) / var(--slot-count, 1))
+  );
 }
 
 .word-group {
@@ -26,12 +32,6 @@
   flex-wrap: nowrap;
   gap: var(--slot-gap, 0.6rem);
   max-width: 100%;
-  --slot-gap: 0.6rem;
-  --slot-max: clamp(40px, 7cqw, 52px);
-  --slot-size: min(
-    var(--slot-max),
-    calc((100cqw - (var(--slot-count, 1) - 1) * var(--slot-gap)) / var(--slot-count, 1))
-  );
 }
 
 .letter-slot {
@@ -100,9 +100,6 @@
   .word-display {
     gap: 0.4rem;
     margin-bottom: 1.25rem;
-  }
-
-  .word-group {
     --slot-gap: 0.35rem;
     --slot-max: clamp(36px, 10cqw, 44px);
   }
