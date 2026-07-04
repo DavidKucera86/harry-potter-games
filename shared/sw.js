@@ -1,4 +1,5 @@
-const CACHE_NAME = "hp-games-v3";
+import { GAME_CONFIG } from "./config.js";
+const CACHE_NAME = GAME_CONFIG.SW_CACHE_NAME;
 const PRECACHE_URLS = [
   "/",
   "/index.html",
@@ -33,8 +34,7 @@ const PRECACHE_URLS = [
   "/guess-house/index.html",
   "/guess-house/script.js",
   "/who-is-on-photo/index.html",
-  "/who-is-on-photo/script.js",
-  "/who-is-on-photo/WhoIsOnPhotoGame.js"
+  "/who-is-on-photo/script.js"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(

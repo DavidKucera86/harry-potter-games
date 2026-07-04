@@ -6,13 +6,18 @@
     "build:html": "node scripts/build-html.mjs",
     "build:js": "node scripts/build-js.mjs",
     "build": "npm run build:html && npm run build:js",
+    "verify:build": "node scripts/verify-build.mjs",
+    "prepare": "simple-git-hooks",
     "pretest": "npm run build && npm run lint",
     "test": "vitest run && playwright test",
     "test:e2e": "playwright test",
     "test:unit": "vitest run",
     "test:production": "PLAYWRIGHT_TARGET=production playwright test",
     "test:ui": "playwright test --ui",
-    "lint": "eslint src/"
+    "lint": "eslint src/ tests/"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run verify:build"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
@@ -27,6 +32,7 @@
     "happy-dom": "^16.8.1",
     "netlify-cli": "^20.0.0",
     "serve": "^14.2.4",
+    "simple-git-hooks": "^2.12.1",
     "typescript": "^5.7.2",
     "vitest": "^3.0.5"
   }

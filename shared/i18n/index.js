@@ -1,8 +1,15 @@
 import { cs } from "./locales/cs.js";
 import { en } from "./locales/en.js";
+const LOCALE_CHANGE_EVENT = "hp-localechange";
 const locales = { cs, en };
 const STORAGE_KEY = "hp-games-locale";
 let currentLocale = "cs";
+function isDynamicI18nElement(el) {
+  if (el.id === "message") {
+    return true;
+  }
+  return Boolean(el.closest("#loadingOverlay"));
+}
 function resolveLocale() {
   if (typeof window === "undefined") {
     return "cs";
@@ -36,6 +43,9 @@ function applyPageTranslations() {
   }
   const strings = getStrings();
   document.querySelectorAll("[data-i18n-key]").forEach((el) => {
+    if (isDynamicI18nElement(el)) {
+      return;
+    }
     const key = el.dataset.i18nKey;
     if (!key) {
       return;
@@ -46,6 +56,9 @@ function applyPageTranslations() {
     }
   });
   document.querySelectorAll("[data-i18n-ui]").forEach((el) => {
+    if (isDynamicI18nElement(el)) {
+      return;
+    }
     const key = el.dataset.i18nUi;
     if (!key) {
       return;
@@ -108,6 +121,7 @@ function setLocale(locale) {
   if (select instanceof HTMLSelectElement) {
     select.value = locale;
   }
+  document.dispatchEvent(new CustomEvent(LOCALE_CHANGE_EVENT, { detail: { locale } }));
 }
 function initLocale() {
   currentLocale = resolveLocale();
@@ -125,6 +139,7 @@ function initLocale() {
   }
 }
 export {
+  LOCALE_CHANGE_EVENT,
   applyPageTranslations,
   cs,
   en,

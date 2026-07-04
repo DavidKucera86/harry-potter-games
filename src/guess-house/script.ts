@@ -14,26 +14,28 @@ export class GuessHouseGame extends QuizGame {
   characterNameEl: HTMLElement | null = null;
 
   constructor() {
-    const strings = getStrings();
     super({
       transform: data => data.filter(
         c => c.name && (GuessHouseGame.HOUSES as readonly string[]).includes(c.house)
       ),
-      emptyError: strings.errors.notEnoughCharacters,
-      prompt: strings.quiz.housePrompt,
+      resolveEmptyError: () => getStrings().errors.notEnoughCharacters,
+      resolvePrompt: () => getStrings().quiz.housePrompt,
       buildLastAnswer: character => ({
         name: character.name,
         house: character.house,
       }),
       getCorrectMessage: (character) =>
-        strings.quiz.houseCorrect(character.name, character.house),
+        getStrings().quiz.houseCorrect(character.name, character.house),
       getWrongMessage: (character) =>
-        strings.quiz.houseWrong(character.name, character.house),
-      buildModalLines: (lastAnswer, score) => [
-        { label: strings.quiz.scoreLabel, value: score },
-        { label: strings.quiz.lastCharacterLabel, value: lastAnswer.name, gap: true },
-        { label: strings.quiz.correctHouseLabel, value: lastAnswer.house },
-      ],
+        getStrings().quiz.houseWrong(character.name, character.house),
+      buildModalLines: (lastAnswer, score) => {
+        const strings = getStrings();
+        return [
+          { label: strings.quiz.scoreLabel, value: score },
+          { label: strings.quiz.lastCharacterLabel, value: lastAnswer.name, gap: true },
+          { label: strings.quiz.correctHouseLabel, value: lastAnswer.house },
+        ];
+      },
     });
 
     this.characterNameEl = document.getElementById('characterName');

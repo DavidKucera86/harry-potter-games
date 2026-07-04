@@ -7,11 +7,11 @@ function createHangmanGame(words = ['albus']) {
   return new HangmanGame({
     fetchFn: async () => words.map(name => ({ name })),
     transform: data => (data as { name: string }[]).map(item => item.name),
-    loadingText: 'Loading',
-    loadError: 'Load error',
-    emptyError: 'Empty deck',
+    resolveLoadingText: () => 'Loading',
+    resolveLoadError: () => 'Load error',
+    resolveEmptyError: () => 'Empty deck',
     logLabel: 'test',
-    strings: {
+    resolveStrings: () => ({
       guessPrompt: 'Guess',
       invalidLetter: 'Invalid',
       letterAlreadyGuessed: (letter) => `Duplicate ${letter}`,
@@ -24,7 +24,7 @@ function createHangmanGame(words = ['albus']) {
       scoreLabel: 'Score',
       noWrongLetters: '—',
       wrongLettersLabel: 'Wrong',
-    },
+    }),
   });
 }
 

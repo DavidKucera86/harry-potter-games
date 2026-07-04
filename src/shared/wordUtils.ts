@@ -1,5 +1,5 @@
-export function dedupeWords(words) {
-  const byKey = new Map();
+export function dedupeWords(words: string[]): string[] {
+  const byKey = new Map<string, string>();
   for (const word of words) {
     const key = word.toLowerCase();
     const existing = byKey.get(key);
@@ -10,10 +10,10 @@ export function dedupeWords(words) {
   return [...byKey.values()];
 }
 
-export function filterMinLength(words, minLength) {
+export function filterMinLength(words: string[], minLength: number): string[] {
   return words.filter(w => w.length >= minLength);
 }
 
-export function prepareHangmanWords(words, minLength) {
+export function prepareHangmanWords(words: string[], minLength: number): string[] {
   return filterMinLength(dedupeWords(words), minLength);
 }

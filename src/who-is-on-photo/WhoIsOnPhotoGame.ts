@@ -1,7 +1,7 @@
 import { GAME_CONFIG } from '../shared/config.js';
 import { getStrings } from '../shared/i18n/index.js';
 import { QuizGame } from '../shared/QuizGame.js';
-import type { Character } from '../shared/types.js';
+import type { Character, QuizConfig } from '../shared/types.js';
 
 export class WhoIsOnPhotoGame extends QuizGame {
   failedImageIds = new Set<string>();
@@ -11,19 +11,21 @@ export class WhoIsOnPhotoGame extends QuizGame {
   _photoRoundId: string | null = null;
 
   constructor() {
-    const strings = getStrings();
     super({
       transform: data => data.filter(c => c.name && c.image),
-      emptyError: strings.errors.notEnoughPhotoCharacters,
-      prompt: strings.quiz.photoPrompt,
+      resolveEmptyError: () => getStrings().errors.notEnoughPhotoCharacters,
+      resolvePrompt: () => getStrings().quiz.photoPrompt,
       buildLastAnswer: character => ({ name: character.name }),
-      getCorrectMessage: (character) => strings.quiz.photoCorrect(character.name),
-      getWrongMessage: (character) => strings.quiz.photoWrong(character.name),
-      buildModalLines: (lastAnswer, score) => [
-        { label: strings.quiz.scoreLabel, value: score },
-        { label: strings.quiz.lastCharacterLabel, value: lastAnswer.name, gap: true },
-      ],
-      bindExtraEvents() {
+      getCorrectMessage: (character) => getStrings().quiz.photoCorrect(character.name),
+      getWrongMessage: (character) => getStrings().quiz.photoWrong(character.name),
+      buildModalLines: (lastAnswer, score) => {
+        const strings = getStrings();
+        return [
+          { label: strings.quiz.scoreLabel, value: score },
+          { label: strings.quiz.lastCharacterLabel, value: lastAnswer.name, gap: true },
+        ];
+      },
+      bindExtraEvents(this: WhoIsOnPhotoGame) {
         this.failedImageIds = new Set();
         this.imageErrorCount = 0;
         this.photoLoadTimeoutId = null;
@@ -33,12 +35,12 @@ export class WhoIsOnPhotoGame extends QuizGame {
           this.photoEl.addEventListener('load', () => this.clearPhotoLoadTimeout());
         }
       },
-      onBeforeStartNewGame() {
+      onBeforeStartNewGame(this: WhoIsOnPhotoGame) {
         this.clearPhotoLoadTimeout();
         this.failedImageIds.clear();
         this.imageErrorCount = 0;
       },
-    });
+    } satisfies QuizConfig<WhoIsOnPhotoGame>);
   }
 
   clearPhotoLoadTimeout() {

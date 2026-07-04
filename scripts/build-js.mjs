@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const srcRoot = join(root, 'src');
+const sharedRoot = join(srcRoot, 'shared');
 
 function collectTsFiles(dir, files = []) {
   for (const entry of readdirSync(dir)) {
@@ -19,12 +20,28 @@ function collectTsFiles(dir, files = []) {
   return files;
 }
 
-const entryPoints = collectTsFiles(srcRoot);
-const outbase = srcRoot;
+const sharedExternalPlugin = {
+  name: 'external-shared',
+  setup(build) {
+    build.onResolve({ filter: /^\.\.\/shared\// }, (args) => ({
+      path: args.path,
+      external: true,
+    }));
+  },
+};
+
+const gameEntries = [
+  join(srcRoot, 'guess-character-name/script.ts'),
+  join(srcRoot, 'guess-spell/script.ts'),
+  join(srcRoot, 'guess-house/script.ts'),
+  join(srcRoot, 'who-is-on-photo/script.ts'),
+];
+
+const sharedEntries = collectTsFiles(sharedRoot);
 
 await build({
-  entryPoints,
-  outbase,
+  entryPoints: sharedEntries,
+  outbase: srcRoot,
   outdir: root,
   bundle: false,
   format: 'esm',
@@ -34,4 +51,19 @@ await build({
   logLevel: 'info',
 });
 
-console.log(`Built ${entryPoints.length} TypeScript modules`);
+for (const entry of gameEntries) {
+  const relDir = dirname(relative(srcRoot, entry));
+  await build({
+    entryPoints: [entry],
+    outfile: join(root, relDir, 'script.js'),
+    bundle: true,
+    format: 'esm',
+    platform: 'browser',
+    target: 'es2022',
+    sourcemap: true,
+    logLevel: 'info',
+    plugins: [sharedExternalPlugin],
+  });
+}
+
+console.log(`Built ${sharedEntries.length} shared modules and ${gameEntries.length} bundled game entries`);

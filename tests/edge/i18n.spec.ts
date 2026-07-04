@@ -50,4 +50,37 @@ test.describe('Internationalization @edge', () => {
     await assertPageLocaleConsistency(page, 'en');
     await expect(page.locator('#message')).toHaveText(getLocaleString('en', 'hangman.guessCharacter'));
   });
+
+  test('E46: hangman feedback message updates after locale switch', { tag: '@edge' }, async ({ page }) => {
+    await setupGameMocks(page, { random: 0 });
+    await page.goto('/guess-character-name/');
+    await waitForHangmanReady(page);
+
+    await page.locator('#letterInput').fill('z');
+    await page.locator('#guessBtn').click();
+    await expect(page.locator('#message')).toHaveClass(/error/);
+
+    await page.selectOption('#localeSelect', 'en');
+    await expect(page.locator('#message')).toContainText('Wrong!');
+    await expect(page.locator('#message')).toContainText('Z');
+  });
+
+  test('E47: lose modal title updates after locale switch', { tag: '@edge' }, async ({ page }) => {
+    await setupGameMocks(page, {
+      characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/a.png' }],
+      random: 0,
+    });
+    await page.goto('/guess-character-name/');
+    await waitForHangmanReady(page);
+
+    const wrongLetters = ['c', 'd', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p'];
+    for (const letter of wrongLetters) {
+      await page.locator('#letterInput').fill(letter);
+      await page.locator('#guessBtn').click();
+    }
+
+    await expect(page.locator('#modalTitle')).toHaveText('Došly životy!');
+    await page.selectOption('#localeSelect', 'en');
+    await expect(page.locator('#modalTitle')).toHaveText('Out of lives!');
+  });
 });

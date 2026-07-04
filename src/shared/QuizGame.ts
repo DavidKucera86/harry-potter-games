@@ -5,13 +5,14 @@ import { BaseGame } from './BaseGame.js';
 import type { Character, QuizConfig } from './types.js';
 
 export class QuizGame extends BaseGame {
-  config: QuizConfig;
+  config: QuizConfig<this>;
   characters: Character[] = [];
   currentCharacter: Character | null = null;
   lastAnswer: Record<string, string> | null = null;
   choicesEl: HTMLElement | null = null;
+  _lastFeedback: { correct: boolean } | null = null;
 
-  constructor(config: QuizConfig) {
+  constructor(config: QuizConfig<this>) {
     super();
     this.config = config;
     this.choicesEl = document.getElementById('choices');
@@ -45,7 +46,7 @@ export class QuizGame extends BaseGame {
       fetchFn: getCharacters,
       transform: this.config.transform,
       minCount: this.config.minCount ?? 4,
-      emptyError: this.config.emptyError,
+      emptyError: this.config.resolveEmptyError(),
       logLabel: 'postav',
       assign: items => { this.characters = items; },
       onError: (error) => {
@@ -73,6 +74,7 @@ export class QuizGame extends BaseGame {
 
     this.setControlsEnabled(false);
     this.lastAnswer = this.config.buildLastAnswer(this.currentCharacter);
+    this._lastFeedback = { correct: isCorrect };
 
     if (isCorrect) {
       btn.classList.add('correct');
@@ -100,9 +102,10 @@ export class QuizGame extends BaseGame {
 
   nextRound() {
     if (this.gameOver) return;
+    this._lastFeedback = null;
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage(this.config.prompt, 'info');
+    this.setMessage(this.config.resolvePrompt(), 'info');
   }
 
   showModal() {
@@ -145,6 +148,7 @@ export class QuizGame extends BaseGame {
     this.lives = GAME_CONFIG.MAX_LIVES;
     this.score = 0;
     this.gameOver = false;
+    this._lastFeedback = null;
     this.resetDeck(this.characters);
     this.renderHearts();
     this.renderScore();
@@ -154,7 +158,31 @@ export class QuizGame extends BaseGame {
       return;
     }
     this.setControlsEnabled(true);
-    this.setMessage(this.config.prompt, 'info');
+    this.setMessage(this.config.resolvePrompt(), 'info');
     this.closeModal();
+  }
+
+  onLocaleChange() {
+    if (this.isModalOpen()) {
+      this.showModal();
+      return;
+    }
+
+    if (this.gameOver || !this.currentCharacter) {
+      return;
+    }
+
+    const messageType = this.getMessageType();
+    if (messageType === 'info') {
+      this.setMessage(this.config.resolvePrompt(), 'info');
+      return;
+    }
+
+    if (this._lastFeedback && (messageType === 'success' || messageType === 'error')) {
+      const message = this._lastFeedback.correct
+        ? this.config.getCorrectMessage(this.currentCharacter)
+        : this.config.getWrongMessage(this.currentCharacter);
+      this.setMessage(message, messageType);
+    }
   }
 }

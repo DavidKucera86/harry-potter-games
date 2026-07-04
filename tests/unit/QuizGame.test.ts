@@ -34,8 +34,8 @@ const characters: Character[] = [
 function createConfig(): QuizConfig {
   return {
     transform: data => data,
-    prompt: 'Pick one',
-    emptyError: 'Not enough',
+    resolvePrompt: () => 'Pick one',
+    resolveEmptyError: () => 'Not enough',
     buildLastAnswer: character => ({ name: character.name }),
     getCorrectMessage: character => `Correct ${character.name}`,
     getWrongMessage: character => `Wrong ${character.name}`,

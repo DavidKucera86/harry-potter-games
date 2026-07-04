@@ -1,6 +1,6 @@
 import { GAME_CONFIG } from "./config.js";
 import { pickFromRemaining, shuffle } from "./deckUtils.js";
-import { getStrings } from "./i18n/index.js";
+import { getStrings, LOCALE_CHANGE_EVENT } from "./i18n/index.js";
 class BaseGame {
   isReady = false;
   lives = GAME_CONFIG.MAX_LIVES;
@@ -23,11 +23,30 @@ class BaseGame {
   loadingOverlay = null;
   gameContainer = null;
   _modalKeydownHandler;
+  _localeChangeHandler;
   _previousFocus = null;
   _onNewGame;
   constructor() {
     this._modalKeydownHandler = this._handleModalKeydown.bind(this);
+    this._localeChangeHandler = this._handleLocaleChange.bind(this);
     this.bindCommonElements();
+    if (typeof document !== "undefined") {
+      document.addEventListener(LOCALE_CHANGE_EVENT, this._localeChangeHandler);
+    }
+  }
+  _handleLocaleChange() {
+    this.renderHearts();
+    this.onLocaleChange();
+  }
+  onLocaleChange() {
+  }
+  isModalOpen() {
+    return this.overlay?.classList.contains("visible") ?? false;
+  }
+  getMessageType() {
+    if (!this.messageEl) return null;
+    const match = this.messageEl.className.match(/\b(info|success|error)\b/);
+    return match ? match[1] : null;
   }
   bindCommonElements() {
     this.heartsEl = document.getElementById("hearts");
