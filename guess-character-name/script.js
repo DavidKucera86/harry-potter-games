@@ -27,5 +27,6 @@ new HangmanGame({
     loseLabel: STRINGS.hangman.loseCharacter,
     scoreLabel: STRINGS.quiz.scoreLabel,
     noWrongLetters: STRINGS.hangman.noWrongLetters,
+    wrongLettersLabel: STRINGS.hangman.wrongLettersLabel,
   },
 });

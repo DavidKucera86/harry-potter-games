@@ -46,6 +46,7 @@ export const STRINGS = {
     winSpell: 'Uhodl/a jsi zaklínadlo:',
     loseSpell: 'Správné zaklínadlo bylo:',
     noWrongLetters: '—',
+    wrongLettersLabel: 'Špatná písmena:',
   },
   quiz: {
     housePrompt: 'Vyber kolej, do které postava patří…',
