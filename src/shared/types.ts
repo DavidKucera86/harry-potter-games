@@ -1,3 +1,5 @@
+import type { QuizGame } from './QuizGame.js';
+
 export type Character = {
   id: string;
   name: string;
@@ -36,36 +38,27 @@ export type HangmanStrings = {
 export type HangmanConfig = {
   fetchFn: () => Promise<unknown>;
   transform: (data: unknown) => string[];
-  loadingText: string;
-  loadError: string;
-  fetchTimeoutError?: string;
-  emptyError: string;
+  resolveLoadingText: () => string;
+  resolveLoadError: () => string;
+  resolveFetchTimeoutError?: () => string;
+  resolveEmptyError: () => string;
   logLabel: string;
-  strings: HangmanStrings;
+  resolveStrings: () => HangmanStrings;
 };
 
 export type QuizLastAnswer = Record<string, string>;
 
-export type QuizConfig = {
+export type QuizConfig<TGame extends QuizGame = QuizGame> = {
   transform: (data: Character[]) => Character[];
   minCount?: number;
-  emptyError: string;
-  prompt: string;
+  resolveEmptyError: () => string;
+  resolvePrompt: () => string;
   buildLastAnswer: (character: Character) => QuizLastAnswer;
   getCorrectMessage: (character: Character) => string;
   getWrongMessage: (character: Character) => string;
   buildModalLines: (lastAnswer: QuizLastAnswer, score: number) => ModalLine[];
-  bindExtraEvents?: (this: QuizGameLike) => void;
-  onBeforeStartNewGame?: (this: QuizGameLike) => void;
-};
-
-export type QuizGameLike = {
-  failedImageIds?: Set<string>;
-  imageErrorCount?: number;
-  photoLoadTimeoutId?: ReturnType<typeof setTimeout> | null;
-  photoEl?: HTMLImageElement | null;
-  clearPhotoLoadTimeout?: () => void;
-  handleImageError?: () => void;
+  bindExtraEvents?: (this: TGame) => void;
+  onBeforeStartNewGame?: (this: TGame) => void;
 };
 
 export type LoadGameDataOptions<T, R> = {

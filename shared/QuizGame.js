@@ -8,6 +8,7 @@ class QuizGame extends BaseGame {
   currentCharacter = null;
   lastAnswer = null;
   choicesEl = null;
+  _lastFeedback = null;
   constructor(config) {
     super();
     this.config = config;
@@ -37,7 +38,7 @@ class QuizGame extends BaseGame {
       fetchFn: getCharacters,
       transform: this.config.transform,
       minCount: this.config.minCount ?? 4,
-      emptyError: this.config.emptyError,
+      emptyError: this.config.resolveEmptyError(),
       logLabel: "postav",
       assign: (items) => {
         this.characters = items;
@@ -62,6 +63,7 @@ class QuizGame extends BaseGame {
     if (this.gameOver || !this.isReady || !this.currentCharacter) return;
     this.setControlsEnabled(false);
     this.lastAnswer = this.config.buildLastAnswer(this.currentCharacter);
+    this._lastFeedback = { correct: isCorrect };
     if (isCorrect) {
       btn.classList.add("correct");
       this.score++;
@@ -85,9 +87,10 @@ class QuizGame extends BaseGame {
   }
   nextRound() {
     if (this.gameOver) return;
+    this._lastFeedback = null;
     this.renderRound();
     this.setControlsEnabled(true);
-    this.setMessage(this.config.prompt, "info");
+    this.setMessage(this.config.resolvePrompt(), "info");
   }
   showModal() {
     if (!this.modalIcon || !this.modalTitle || !this.lastAnswer) return;
@@ -122,6 +125,7 @@ class QuizGame extends BaseGame {
     this.lives = GAME_CONFIG.MAX_LIVES;
     this.score = 0;
     this.gameOver = false;
+    this._lastFeedback = null;
     this.resetDeck(this.characters);
     this.renderHearts();
     this.renderScore();
@@ -131,8 +135,26 @@ class QuizGame extends BaseGame {
       return;
     }
     this.setControlsEnabled(true);
-    this.setMessage(this.config.prompt, "info");
+    this.setMessage(this.config.resolvePrompt(), "info");
     this.closeModal();
+  }
+  onLocaleChange() {
+    if (this.isModalOpen()) {
+      this.showModal();
+      return;
+    }
+    if (this.gameOver || !this.currentCharacter) {
+      return;
+    }
+    const messageType = this.getMessageType();
+    if (messageType === "info") {
+      this.setMessage(this.config.resolvePrompt(), "info");
+      return;
+    }
+    if (this._lastFeedback && (messageType === "success" || messageType === "error")) {
+      const message = this._lastFeedback.correct ? this.config.getCorrectMessage(this.currentCharacter) : this.config.getWrongMessage(this.currentCharacter);
+      this.setMessage(message, messageType);
+    }
   }
 }
 export {

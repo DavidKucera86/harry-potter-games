@@ -9,10 +9,10 @@ function createAbortError() {
 }
 
 function mockSessionStorage() {
-  const storage = new Map();
+  const storage = new Map<string, string>();
   vi.stubGlobal('sessionStorage', {
-    getItem: (key) => storage.get(key) ?? null,
-    setItem: (key, value) => storage.set(key, value),
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, value),
     clear: () => storage.clear(),
   });
   storage.clear();
@@ -54,7 +54,7 @@ describe('fetchWithRetry timeout handling', () => {
   });
 
   it('falls back to fixtures after all timeout attempts fail', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string | URL | Request) => {
       if (String(url).includes('/api/characters')) {
         throw createAbortError();
       }
@@ -72,17 +72,17 @@ describe('fetchWithRetry timeout handling', () => {
   });
 
   it('throws FetchTimeoutError when API times out and fallback fails', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url) => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string | URL | Request) => {
       if (String(url).includes('/api/characters')) {
         throw createAbortError();
       }
       return { ok: false, status: 500 };
     }));
 
-    let caught;
+    let caught: unknown;
     const promise = getCharacters().then(
       () => { throw new Error('Expected rejection'); },
-      (error) => { caught = error; },
+      (error: unknown) => { caught = error; },
     );
     await vi.runAllTimersAsync();
     await promise;

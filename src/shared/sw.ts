@@ -1,4 +1,6 @@
-const CACHE_NAME = 'hp-games-v3';
+import { GAME_CONFIG } from './config.js';
+
+const CACHE_NAME = GAME_CONFIG.SW_CACHE_NAME;
 
 const PRECACHE_URLS = [
   '/',
@@ -35,7 +37,6 @@ const PRECACHE_URLS = [
   '/guess-house/script.js',
   '/who-is-on-photo/index.html',
   '/who-is-on-photo/script.js',
-  '/who-is-on-photo/WhoIsOnPhotoGame.js',
 ];
 
 /// <reference lib="webworker" />

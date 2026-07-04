@@ -1,4 +1,4 @@
-export function shuffle(array) {
+export function shuffle<T>(array: T[]): T[] {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -7,7 +7,10 @@ export function shuffle(array) {
   return copy;
 }
 
-export function pickFromRemaining(remainingItems, filterFn) {
+export function pickFromRemaining<T>(
+  remainingItems: T[],
+  filterFn?: (item: T) => boolean,
+): { item: T | null; index: number } {
   const pool = filterFn
     ? remainingItems.filter(filterFn)
     : remainingItems;

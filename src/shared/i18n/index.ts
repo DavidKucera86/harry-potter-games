@@ -3,12 +3,22 @@ import { en } from './locales/en.js';
 
 export type Locale = 'cs' | 'en';
 
+export const LOCALE_CHANGE_EVENT = 'hp-localechange';
+
 const locales: Record<Locale, LocaleStrings> = { cs, en };
 const STORAGE_KEY = 'hp-games-locale';
 
 type PageKey = keyof LocaleStrings['pages'];
 
 let currentLocale: Locale = 'cs';
+
+function isDynamicI18nElement(el: Element): boolean {
+  if (el.id === 'message') {
+    return true;
+  }
+
+  return Boolean(el.closest('#loadingOverlay'));
+}
 
 function resolveLocale(): Locale {
   if (typeof window === 'undefined') {
@@ -53,6 +63,10 @@ export function applyPageTranslations(): void {
   const strings = getStrings();
 
   document.querySelectorAll<HTMLElement>('[data-i18n-key]').forEach((el) => {
+    if (isDynamicI18nElement(el)) {
+      return;
+    }
+
     const key = el.dataset.i18nKey as PageKey | undefined;
     if (!key) {
       return;
@@ -65,6 +79,10 @@ export function applyPageTranslations(): void {
   });
 
   document.querySelectorAll<HTMLElement>('[data-i18n-ui]').forEach((el) => {
+    if (isDynamicI18nElement(el)) {
+      return;
+    }
+
     const key = el.dataset.i18nUi as keyof LocaleStrings['ui'] | undefined;
     if (!key) {
       return;
@@ -141,6 +159,8 @@ export function setLocale(locale: Locale): void {
   if (select instanceof HTMLSelectElement) {
     select.value = locale;
   }
+
+  document.dispatchEvent(new CustomEvent(LOCALE_CHANGE_EVENT, { detail: { locale } }));
 }
 
 export function initLocale(): void {

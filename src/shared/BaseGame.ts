@@ -1,6 +1,6 @@
 import { GAME_CONFIG } from './config.js';
 import { pickFromRemaining, shuffle } from './deckUtils.js';
-import { getStrings } from './i18n/index.js';
+import { getStrings, LOCALE_CHANGE_EVENT } from './i18n/index.js';
 import type { LoadGameDataOptions, MessageType, ModalLine } from './types.js';
 
 export class BaseGame {
@@ -27,12 +27,36 @@ export class BaseGame {
   gameContainer: HTMLElement | null = null;
 
   _modalKeydownHandler: (event: KeyboardEvent) => void;
+  _localeChangeHandler: () => void;
   _previousFocus: HTMLElement | null = null;
   _onNewGame?: () => void;
 
   constructor() {
     this._modalKeydownHandler = this._handleModalKeydown.bind(this);
+    this._localeChangeHandler = this._handleLocaleChange.bind(this);
     this.bindCommonElements();
+    if (typeof document !== 'undefined') {
+      document.addEventListener(LOCALE_CHANGE_EVENT, this._localeChangeHandler);
+    }
+  }
+
+  _handleLocaleChange() {
+    this.renderHearts();
+    this.onLocaleChange();
+  }
+
+  onLocaleChange(): void {
+    // override in subclasses
+  }
+
+  isModalOpen() {
+    return this.overlay?.classList.contains('visible') ?? false;
+  }
+
+  getMessageType(): MessageType | null {
+    if (!this.messageEl) return null;
+    const match = this.messageEl.className.match(/\b(info|success|error)\b/);
+    return match ? match[1] as MessageType : null;
   }
 
   bindCommonElements() {

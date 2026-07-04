@@ -62,9 +62,19 @@ npm run build:html
 
 Vygenerované soubory (`index.html`, `guess-*/index.html`, …) commituj do repozitáře — `npm test` spouští build automaticky přes `pretest` hook.
 
+### Před commitem
+
+```bash
+npm run verify:build
+```
+
+Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) spouští stejnou kontrolu automaticky.
+
 ## Sdílená cache dat
 
 `dataProvider.js` ukládá odpovědi z HP API do `sessionStorage` (TTL 1 hodina, verze cache v `GAME_CONFIG.CACHE_VERSION`). První hra v prohlížečové session stáhne data z API, další hry je načtou z cache bez nového network requestu. Při chybě serveru (5xx) se request automaticky opakuje až 3×.
+
+**Bump cache:** změň `APP_VERSION` v [`src/shared/config.ts`](src/shared/config.ts) — invaliduje sessionStorage cache (`CACHE_VERSION`) i service worker cache (`SW_CACHE_NAME`), pak spusť `npm run build`.
 
 ## Testování
 

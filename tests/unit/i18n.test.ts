@@ -1,6 +1,12 @@
-import { describe, expect, it, beforeEach, afterEach } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { Window } from 'happy-dom';
-import { getLocale, getStrings, setLocale, applyPageTranslations } from '../../src/shared/i18n/index.ts';
+import {
+  LOCALE_CHANGE_EVENT,
+  getLocale,
+  getStrings,
+  setLocale,
+  applyPageTranslations,
+} from '../../src/shared/i18n/index.ts';
 
 describe('i18n', () => {
   let window: Window;
@@ -49,5 +55,30 @@ describe('i18n', () => {
     expect(input.placeholder).toBe('Enter a letter');
     expect(input.getAttribute('aria-label')).toBe('Enter a letter');
     expect(wordDisplay?.getAttribute('aria-label')).toBe('Word to guess');
+  });
+
+  it('dispatches hp-localechange when locale changes', () => {
+    const handler = vi.fn();
+    document.addEventListener(LOCALE_CHANGE_EVENT, handler);
+
+    setLocale('en');
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler.mock.calls[0][0].detail).toEqual({ locale: 'en' });
+    document.removeEventListener(LOCALE_CHANGE_EVENT, handler);
+    setLocale('cs');
+  });
+
+  it('does not overwrite #message during applyPageTranslations', () => {
+    document.body.innerHTML = `
+      <div id="message" class="message success" data-i18n-key="hangmanCharacterInitial">Initial</div>
+    `;
+    const message = document.getElementById('message')!;
+    message.textContent = 'Game feedback';
+
+    setLocale('en');
+    applyPageTranslations();
+
+    expect(message.textContent).toBe('Game feedback');
   });
 });
