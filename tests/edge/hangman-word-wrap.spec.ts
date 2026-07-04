@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
-import { waitForHangmanReady, expectNoHorizontalOverflow } from '../helpers/hangman';
+import { waitForHangmanReady, expectNoHorizontalOverflow, expectLetterSlotSizes } from '../helpers/hangman';
 
 test.describe('Hangman word wrap @edge', () => {
   test('E5: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
@@ -19,6 +19,7 @@ test.describe('Hangman word wrap @edge', () => {
     await page.goto('/guess-character-name/');
     await waitForHangmanReady(page);
     await expectNoHorizontalOverflow(page);
+    await expectLetterSlotSizes(page, { min: 24 });
 
     const layout = await page.evaluate(() => {
       const groups = Array.from(document.querySelectorAll('#wordDisplay .word-group'));

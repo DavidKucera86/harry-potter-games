@@ -78,3 +78,17 @@ export async function expectLetterSlotsInViewport(page: Page) {
   }, viewportWidth);
   expect(overflow).toBe(true);
 }
+
+export async function expectLetterSlotSizes(page: Page, opts: { min: number; max?: number }) {
+  const sizes = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('#wordDisplay .letter-slot:not(.space)'))
+      .map((el) => el.getBoundingClientRect().width)
+  );
+  expect(sizes.length).toBeGreaterThan(0);
+  for (const width of sizes) {
+    expect(width).toBeGreaterThanOrEqual(opts.min - 1);
+    if (opts.max !== undefined) {
+      expect(width).toBeLessThanOrEqual(opts.max + 1);
+    }
+  }
+}
