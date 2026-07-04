@@ -9,23 +9,23 @@ import {
 } from '../../src/shared/i18n/index.ts';
 
 describe('i18n', () => {
-  let window: Window;
+  let happyWindow: Window;
   let originalDocument: Document;
-  let originalWindow: Window & typeof globalThis;
+  let originalWindow: typeof globalThis.window;
 
   beforeEach(() => {
-    window = new Window();
+    happyWindow = new Window();
     originalDocument = globalThis.document;
     originalWindow = globalThis.window;
-    globalThis.document = window.document as unknown as Document;
-    globalThis.window = window as unknown as Window & typeof globalThis;
+    globalThis.document = happyWindow.document as unknown as Document;
+    globalThis.window = happyWindow as unknown as typeof globalThis.window;
     setLocale('cs');
   });
 
   afterEach(() => {
     globalThis.document = originalDocument;
     globalThis.window = originalWindow;
-    window.close();
+    happyWindow.close();
     setLocale('cs');
   });
 

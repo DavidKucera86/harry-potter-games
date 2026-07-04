@@ -2,11 +2,13 @@ import { expect, Page } from '@playwright/test';
 import { selectors } from './selectors';
 
 export async function waitForHangmanReady(page: Page) {
+  await expect(page.locator(selectors.guessBtn)).toBeVisible({ timeout: 15_000 });
   await expect(page.locator(selectors.loadingOverlay)).toBeHidden();
   await expect(page.locator(selectors.guessBtn)).toBeEnabled();
 }
 
 export async function waitForQuizReady(page: Page) {
+  await expect(page.locator(selectors.newGameBtn)).toBeVisible({ timeout: 15_000 });
   await expect(page.locator(selectors.loadingOverlay)).toBeHidden();
   await expect(page.locator(selectors.newGameBtn)).toBeEnabled();
   await expect(page.locator(selectors.choices)).toHaveCount(4);
