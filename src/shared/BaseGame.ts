@@ -3,13 +3,13 @@ import { pickFromRemaining, shuffle } from './deckUtils.js';
 import { getStrings, LOCALE_CHANGE_EVENT } from './i18n/index.js';
 import type { LoadGameDataOptions, MessageType, ModalLine } from './types.js';
 
-export class BaseGame {
+export class BaseGame<TItem = unknown> {
   isReady = false;
   lives = GAME_CONFIG.MAX_LIVES;
   gameOver = false;
   score = 0;
-  remainingItems: unknown[] = [];
-  deckSource: unknown[] = [];
+  remainingItems: TItem[] = [];
+  deckSource: TItem[] = [];
   roundTimeoutId: ReturnType<typeof setTimeout> | null = null;
   _loadError?: string;
 
@@ -242,17 +242,17 @@ export class BaseGame {
     return shuffle(array);
   }
 
-  resetDeck<T>(items: T[]) {
+  resetDeck(items: TItem[]) {
     this.deckSource = items;
     this.remainingItems = shuffle([...items]);
   }
 
-  pickFromDeck<T>(filterFn?: (item: T) => boolean): T | null {
+  pickFromDeck(filterFn?: (item: TItem) => boolean): TItem | null {
     if (this.remainingItems.length === 0) {
-      this.resetDeck(this.deckSource as T[]);
+      this.resetDeck(this.deckSource);
     }
 
-    const { item, index } = pickFromRemaining(this.remainingItems as T[], filterFn);
+    const { item, index } = pickFromRemaining(this.remainingItems, filterFn);
     if (!item || index === -1) {
       return null;
     }
@@ -261,13 +261,13 @@ export class BaseGame {
     return item;
   }
 
-  returnToDeck<T>(item: T) {
+  returnToDeck(item: TItem) {
     this.remainingItems.push(item);
   }
 
-  removeFromDeck<T>(item: T, compareFn: (a: T, b: T) => boolean = (a, b) => a === b) {
-    this.deckSource = this.deckSource.filter(entry => !compareFn(entry as T, item));
-    this.remainingItems = this.remainingItems.filter(entry => !compareFn(entry as T, item));
+  removeFromDeck(item: TItem, compareFn: (a: TItem, b: TItem) => boolean = (a, b) => a === b) {
+    this.deckSource = this.deckSource.filter(entry => !compareFn(entry, item));
+    this.remainingItems = this.remainingItems.filter(entry => !compareFn(entry, item));
   }
 
   async loadGameData<T, R>({
@@ -291,7 +291,7 @@ export class BaseGame {
       this.isReady = true;
       return true;
     } catch (error) {
-      console.error(`Chyba při načítání ${logLabel}:`, error);
+      console.error(`Failed to load ${logLabel}:`, error);
       this.isReady = false;
       onError?.(error);
       return false;

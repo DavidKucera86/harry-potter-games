@@ -4,15 +4,15 @@ import { getStrings } from './i18n/index.js';
 import { BaseGame } from './BaseGame.js';
 import type { Character, QuizConfig } from './types.js';
 
-export class QuizGame extends BaseGame {
-  config: QuizConfig<this>;
+export class QuizGame extends BaseGame<Character> {
+  config: QuizConfig;
   characters: Character[] = [];
   currentCharacter: Character | null = null;
   lastAnswer: Record<string, string> | null = null;
   choicesEl: HTMLElement | null = null;
   _lastFeedback: { correct: boolean } | null = null;
 
-  constructor(config: QuizConfig<this>) {
+  constructor(config: QuizConfig) {
     super();
     this.config = config;
     this.choicesEl = document.getElementById('choices');

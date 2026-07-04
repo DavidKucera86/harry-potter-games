@@ -160,4 +160,3 @@ class QuizGame extends BaseGame {
 export {
   QuizGame
 };
-//# sourceMappingURL=QuizGame.js.map

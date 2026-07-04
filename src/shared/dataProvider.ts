@@ -1,7 +1,8 @@
 import { GAME_CONFIG } from './config.js';
+import type { Character } from './types.js';
 
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function delay(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
 export class FetchTimeoutError extends Error {
@@ -11,19 +12,19 @@ export class FetchTimeoutError extends Error {
   }
 }
 
-function getFetchTimeoutMs() {
+function getFetchTimeoutMs(): number {
   if (typeof window !== 'undefined' && window.__HP_FETCH_TIMEOUT_MS) {
     return window.__HP_FETCH_TIMEOUT_MS;
   }
   return GAME_CONFIG.FETCH_TIMEOUT_MS;
 }
 
-function cacheStorageKey(storageKey) {
+function cacheStorageKey(storageKey: string): string {
   return `${storageKey}-v${GAME_CONFIG.CACHE_VERSION}`;
 }
 
-async function fetchWithRetry(url) {
-  let lastError;
+async function fetchWithRetry(url: string): Promise<Response> {
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
     const controller = new AbortController();
@@ -59,7 +60,7 @@ async function fetchWithRetry(url) {
   throw lastError ?? new Error('Fetch failed');
 }
 
-async function loadFallback(url) {
+async function loadFallback(url: string): Promise<unknown> {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Fallback HTTP ${response.status}`);
@@ -67,13 +68,17 @@ async function loadFallback(url) {
   return response.json();
 }
 
-async function fetchCached(url, storageKey, fallbackUrl) {
+async function fetchCached(
+  url: string,
+  storageKey: string,
+  fallbackUrl?: string,
+): Promise<unknown> {
   const versionedKey = cacheStorageKey(storageKey);
 
   try {
     const cachedRaw = sessionStorage.getItem(versionedKey);
     if (cachedRaw) {
-      const cached = JSON.parse(cachedRaw);
+      const cached = JSON.parse(cachedRaw) as { data: unknown; timestamp: number };
       if (Date.now() - cached.timestamp < GAME_CONFIG.CACHE_TTL_MS) {
         return cached.data;
       }
@@ -82,7 +87,7 @@ async function fetchCached(url, storageKey, fallbackUrl) {
     console.warn('Cache read failed, fetching fresh data:', error);
   }
 
-  let apiError;
+  let apiError: unknown;
   try {
     const response = await fetchWithRetry(url);
     const data = await response.json();
@@ -125,18 +130,18 @@ async function fetchCached(url, storageKey, fallbackUrl) {
   throw apiError ?? new Error('Data unavailable');
 }
 
-export async function getCharacters() {
+export async function getCharacters(): Promise<Character[]> {
   return fetchCached(
     GAME_CONFIG.API.CHARACTERS,
     GAME_CONFIG.CACHE_KEYS.CHARACTERS,
     GAME_CONFIG.FALLBACK.CHARACTERS,
-  );
+  ) as Promise<Character[]>;
 }
 
-export async function getSpells() {
+export async function getSpells(): Promise<{ name: string }[]> {
   return fetchCached(
     GAME_CONFIG.API.SPELLS,
     GAME_CONFIG.CACHE_KEYS.SPELLS,
     GAME_CONFIG.FALLBACK.SPELLS,
-  );
+  ) as Promise<{ name: string }[]>;
 }

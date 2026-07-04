@@ -20,4 +20,3 @@ export {
   filterMinLength,
   prepareHangmanWords
 };
-//# sourceMappingURL=wordUtils.js.map

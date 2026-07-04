@@ -12,7 +12,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 2 : undefined,
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01,
+      animations: 'disabled',
+    },
+  },
   reporter: process.env.CI
     ? [['list'], ['html', { open: 'never' }], ['github']]
     : [['list'], ['html', { open: 'never' }]],

@@ -23,6 +23,30 @@ export async function clearSessionStorage(page: Page) {
   await page.evaluate(() => sessionStorage.clear());
 }
 
+export async function setupGameMocks(page: Page, options: {
+  characters?: Character[];
+  spells?: Spell[];
+  mockImages?: boolean;
+  random?: number;
+} = {}) {
+  if (options.characters) {
+    await mockCharacters(page, options.characters);
+  } else {
+    await mockCharacters(page);
+  }
+  if (options.spells) {
+    await mockSpells(page, options.spells);
+  }
+  if (options.mockImages !== false) {
+    await mockImages(page);
+  }
+  if (options.random !== undefined) {
+    await seedRandom(page, options.random);
+  }
+
+  await clearSessionStorage(page);
+}
+
 export async function mockCharacters(page: Page, data: Character[] = charactersFixture) {
   await page.route('**/api/characters', (route) => {
     route.fulfill({ json: data });
@@ -72,29 +96,6 @@ export async function mockFetchHang(page: Page, endpoint: 'characters' | 'spells
   await page.route(`**/api/${endpoint}`, async () => {
     await new Promise(() => {});
   });
-}
-
-export async function setupGameMocks(page: Page, options: {
-  characters?: Character[];
-  spells?: Spell[];
-  mockImages?: boolean;
-  random?: number;
-} = {}) {
-  await clearSessionStorage(page);
-  if (options.characters) {
-    await mockCharacters(page, options.characters);
-  } else {
-    await mockCharacters(page);
-  }
-  if (options.spells) {
-    await mockSpells(page, options.spells);
-  }
-  if (options.mockImages !== false) {
-    await mockImages(page);
-  }
-  if (options.random !== undefined) {
-    await seedRandom(page, options.random);
-  }
 }
 
 export { charactersFixture, spellsFixture };

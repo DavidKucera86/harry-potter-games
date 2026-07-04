@@ -22,6 +22,7 @@ const PRECACHE_URLS = [
   "/shared/deckUtils.js",
   "/shared/wordUtils.js",
   "/shared/hangmanUtils.js",
+  "/shared/prefetchGameData.js",
   "/shared/i18n/index.js",
   "/shared/i18n/locales/cs.js",
   "/shared/i18n/locales/en.js",
@@ -45,7 +46,13 @@ self.addEventListener("install", (event) => {
 });
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim())
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))).then(async () => {
+      const clients = await self.clients.matchAll({ type: "window" });
+      for (const client of clients) {
+        client.postMessage({ type: "SW_UPDATED" });
+      }
+      await self.clients.claim();
+    })
   );
 });
 self.addEventListener("fetch", (event) => {
@@ -54,8 +61,35 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || url.origin !== self.location.origin) {
     return;
   }
+  if (isHtmlRequest(request, url)) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
   event.respondWith(cacheFirst(request));
 });
+function isHtmlRequest(request, url) {
+  if (request.mode === "navigate") {
+    return true;
+  }
+  const path = url.pathname;
+  return path === "/" || path.endsWith(".html");
+}
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request);
+    if (cached) {
+      return cached;
+    }
+    throw new Error("Network and cache both failed");
+  }
+}
 async function cacheFirst(request) {
   const cached = await caches.match(request);
   if (cached) {
@@ -64,8 +98,7 @@ async function cacheFirst(request) {
   const response = await fetch(request);
   if (response.ok) {
     const cache = await caches.open(CACHE_NAME);
-    cache.put(request, response.clone());
+    await cache.put(request, response.clone());
   }
   return response;
 }
-//# sourceMappingURL=sw.js.map

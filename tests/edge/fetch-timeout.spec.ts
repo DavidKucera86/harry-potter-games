@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import {
-  clearSessionStorage,
   mockFetchHang,
   mockCharacters,
   mockImages,
@@ -11,11 +10,12 @@ import { clickNewGame, waitForHangmanReady } from '../helpers/hangman';
 
 test.describe('Fetch timeout @edge', () => {
   test('E23: hangman shows timeout error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
-    await clearSessionStorage(page);
     await setFetchTimeout(page, 100);
     await mockFetchHang(page, 'characters');
     await mockFallbackFailure(page, 'characters');
     await mockImages(page);
+    await page.goto('/');
+    await page.evaluate(() => sessionStorage.clear());
     await page.goto('/guess-character-name/');
 
     await expect(page.locator('#message')).toHaveClass(/error/, { timeout: 15000 });
@@ -38,7 +38,6 @@ test.describe('Fetch timeout @edge', () => {
   test('E24: retries hung requests and loads on later attempt', { tag: '@edge' }, async ({ page }) => {
     let attempts = 0;
 
-    await clearSessionStorage(page);
     await setFetchTimeout(page, 100);
     await page.route('**/api/characters', async (route) => {
       attempts++;
@@ -51,6 +50,8 @@ test.describe('Fetch timeout @edge', () => {
       });
     });
     await mockImages(page);
+    await page.goto('/');
+    await page.evaluate(() => sessionStorage.clear());
     await page.goto('/guess-character-name/');
 
     await waitForHangmanReady(page);

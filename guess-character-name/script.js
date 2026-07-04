@@ -33,4 +33,3 @@ new HangmanGame({
     };
   }
 });
-//# sourceMappingURL=script.js.map

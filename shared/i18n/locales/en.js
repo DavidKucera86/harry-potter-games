@@ -81,7 +81,10 @@ const en = {
     livesLabel: "Lives",
     scoreLabel: "Score",
     letterPlaceholder: "Enter a letter",
-    keyboardHint: "Tip: you can type directly on the keyboard and press Enter"
+    keyboardHint: "Tip: you can type directly on the keyboard and press Enter",
+    skipToContent: "Skip to content",
+    swUpdateMessage: "A new version of the app is available.",
+    swUpdateReload: "Reload"
   },
   pages: {
     menuTitle: "Harry Potter Games",
@@ -114,4 +117,3 @@ const en = {
 export {
   en
 };
-//# sourceMappingURL=en.js.map

@@ -149,4 +149,3 @@ export {
   initLocale,
   setLocale
 };
-//# sourceMappingURL=index.js.map
