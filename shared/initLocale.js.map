@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/shared/initLocale.ts"],
+  "sourcesContent": ["import { initLocale } from './i18n/index.js';\nimport { registerServiceWorker } from './registerSw.js';\n\ninitLocale();\nregisterServiceWorker();\n"],
+  "mappings": "AAAA,SAAS,kBAAkB;AAC3B,SAAS,6BAA6B;AAEtC,WAAW;AACX,sBAAsB;",
+  "names": []
+}

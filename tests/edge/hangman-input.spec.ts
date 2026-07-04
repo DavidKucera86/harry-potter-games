@@ -12,7 +12,7 @@ test.describe('Hangman input @edge', () => {
     await waitForHangmanReady(page);
   });
 
-  test('E1: invalid input shows error message', { tag: '@edge' }, async ({ page }) => {
+  test('E01: invalid input shows error message', { tag: '@edge' }, async ({ page }) => {
     await guessLetter(page, '');
     await expect(page.locator('#message')).toHaveClass(/error/);
     await expect(page.locator('#message')).toContainText('platné písmeno');
@@ -21,7 +21,7 @@ test.describe('Hangman input @edge', () => {
     await expect(page.locator('#message')).toContainText('platné písmeno');
   });
 
-  test('E2: duplicate letter shows error', { tag: '@edge' }, async ({ page }) => {
+  test('E02: duplicate letter shows error', { tag: '@edge' }, async ({ page }) => {
     await guessLetter(page, 'q');
     await expect(page.locator('#message')).toHaveClass(/error/);
 
@@ -29,7 +29,7 @@ test.describe('Hangman input @edge', () => {
     await expect(page.locator('#message')).toContainText('už jsi hádal');
   });
 
-  test('E3: Enter key submits guess', { tag: '@edge' }, async ({ page }) => {
+  test('E03: Enter key submits guess', { tag: '@edge' }, async ({ page }) => {
     await page.locator('#letterInput').fill('a');
     await page.locator('#letterInput').press('Enter');
     await expect(page.locator('#message')).toHaveClass(/success/);

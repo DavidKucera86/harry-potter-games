@@ -23,19 +23,34 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 
 ## Tech stack
 
-- HTML, CSS, vanilla JavaScript (ES modules, OOP třídy)
-- Sdílené moduly v `shared/`:
+- **Zdrojový kód:** TypeScript v `src/` (ES modules, OOP třídy)
+- **Build:** `npm run build` = HTML ze šablon + kompilace TS → JS (esbuild)
+- **Deploy artefakty:** generované `*.js` a `index.html` soubory v kořeni (commitované)
+- **i18n:** čeština + angličtina (`src/shared/i18n/`), přepínač ve footeru, `?lang=en|cs`
+- **PWA:** service worker (`shared/sw.js`), `manifest.webmanifest`, offline cache statických assetů
+- **Sdílené moduly** (kompilované do `shared/`):
   - `config.js` — globální konfigurace (životy, API URL, cache verze, retry)
   - `dataProvider.js` — načítání dat s cache v `sessionStorage` a retry logikou
   - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
-  - `wordUtils.js` — deduplikace a filtrování slov pro hangman
-  - `hangmanUtils.js` — utility pro hangman hry (diakritika, auto-odhalení speciálních znaků)
-  - `deckUtils.js` — shuffle a výběr z balíčku
-- Sdílené styly v `shared/common.css` a `shared/styles/hangman.css`
-- Dev-time HTML generátor (`npm run build:html`) ze šablon v `shared/templates/`
-- Bez runtime build stepu a bez runtime externích knihoven
+  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js` — utility
+  - `i18n/index.js` — lokalizace UI textů
+- **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry)
+- **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
+- **Testování:** Vitest (unit) + Playwright (E2E), ESLint pro `src/`
+
+## Build a úpravy kódu
+
+```bash
+npm run build        # build:html + build:js
+npm run build:html   # jen HTML ze šablon
+npm run build:js     # jen kompilace TypeScriptu z src/ do shared/ a her
+npm run lint         # ESLint pro src/
+npm test             # build + lint + unit + E2E
+```
+
+Po úpravě šablony nebo TypeScriptu spusť `npm run build` a commitni vygenerované soubory.
 
 ## Úprava HTML
 
@@ -78,12 +93,13 @@ npm test
 
 Co se stane:
 
-1. Vitest spustí unit testy (`hangmanUtils`, `deckUtils`)
-2. Playwright spustí lokální server (`npx serve . -l 4173`)
-3. Provede celou testovací sadu (smoke + critical + edge + a11y)
-3. HP API je mockované — testy nepotřebují internet ani live API
-4. Při úspěchu můžeš pushnout
-5. Při failu viz níže „Co dělat, když test spadne“
+1. `npm run build` — HTML + JS + lint
+2. Vitest spustí unit testy (utility, dataProvider, BaseGame, HangmanGame, QuizGame, i18n)
+3. Playwright spustí lokální server (`npx serve . -l 4173`)
+4. Provede celou testovací sadu (smoke + critical + edge + a11y)
+5. HP API je mockované — testy nepotřebují internet ani live API
+6. Při úspěchu můžeš pushnout
+7. Při failu viz níže „Co dělat, když test spadne“
 
 **Poznámka:** Nepotřebuješ nastavovat GitHub secrets ani Netlify tokeny — to platí jen pro volitelné CI.
 
@@ -117,7 +133,35 @@ npx playwright show-trace test-results/.../trace.zip
 |---|---|
 | `@smoke` | Základní dostupnost stránek a her |
 | `@critical` | Hlavní happy-path scénáře |
-| `@edge` | Edge cases (validace, prohra, cache, XSS, speciální znaky, a11y, API retry, …) |
+| `@edge` | Edge cases (validace, prohra, cache, XSS, speciální znaky, a11y, API retry, i18n, PWA, …) |
+
+### Test catalog (E2E edge ID)
+
+| ID | Soubor | Popis |
+|---|---|---|
+| E01–E03 | hangman-input | Validace vstupu hangmanu |
+| E04 | hangman-lose | Prohra hangmanu |
+| E05, E29 | hangman-word-wrap | Zalamování slov |
+| E06 | hangman-diacritics | Diakritika |
+| E07–E09 | quiz-lose | Prohra kvízů |
+| E10–E11 | api-failure | Recovery po API chybě |
+| E12 | session-cache | Session cache dat |
+| E13 | hangman-special-chars | Auto-odhalení speciálních znaků |
+| E14 | photo-image-error | Rozbitá fotka |
+| E15–E17 | deck-uniqueness | Unikátnost balíčku |
+| E18–E20 | modal-accessibility | Přístupnost modalu |
+| E21 | duplicate-names | Kvíz podle ID |
+| E22 | hangman-duplicate-names | Deduplikace jmen |
+| E23–E24 | fetch-timeout | Timeout a retry |
+| E25 | xss-safe-dom | XSS bezpečnost |
+| E26 | api-retry | Retry 5xx |
+| E27 | photo-all-broken | Všechny fotky rozbité |
+| E28 | offline-fallback | Fallback fixtures |
+| E30–E31 | quiz-mobile | Mobilní kvízy |
+| E32–E38 | hangman-mobile | Mobilní hangman |
+| E39–E42 | a11y | Axe accessibility |
+| E43 | i18n | Přepnutí jazyka |
+| E44–E45 | pwa-offline | Service worker a offline |
 
 ### CI pipeline (volitelné)
 

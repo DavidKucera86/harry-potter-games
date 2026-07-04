@@ -10,7 +10,7 @@ import {
 import { clickNewGame, waitForHangmanReady } from '../helpers/hangman';
 
 test.describe('Fetch timeout @edge', () => {
-  test('E17: hangman shows timeout error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
+  test('E23: hangman shows timeout error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
     await clearSessionStorage(page);
     await setFetchTimeout(page, 100);
     await mockFetchHang(page, 'characters');
@@ -35,7 +35,7 @@ test.describe('Fetch timeout @edge', () => {
     await expect(page.locator('#wordDisplay .word-group')).toHaveCount(1);
   });
 
-  test('E17b: retries hung requests and loads on later attempt', { tag: '@edge' }, async ({ page }) => {
+  test('E24: retries hung requests and loads on later attempt', { tag: '@edge' }, async ({ page }) => {
     let attempts = 0;
 
     await clearSessionStorage(page);

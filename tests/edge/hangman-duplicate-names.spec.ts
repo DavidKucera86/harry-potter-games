@@ -4,7 +4,7 @@ import { waitForHangmanReady } from '../helpers/hangman';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Hangman duplicate names @edge', () => {
-  test('E19: dedupes duplicate character names in deck', { tag: '@edge' }, async ({ page }) => {
+  test('E22: dedupes duplicate character names in deck', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         { id: '1', name: 'Tom Riddle', house: 'Slytherin', image: 'https://hp-api.local/tom1.png' },

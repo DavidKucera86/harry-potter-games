@@ -9,7 +9,7 @@ test.describe('Quiz mobile viewport @edge', () => {
     await page.setViewportSize({ width: 375, height: 667 });
   });
 
-  test('E19: guess-house renders four choices on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E30: guess-house renders four choices on mobile', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { characters: quizCharacters, random: 0 });
     await page.goto('/guess-house/');
     await waitForQuizReady(page);
@@ -20,7 +20,7 @@ test.describe('Quiz mobile viewport @edge', () => {
     await expect(page.locator('#message')).toHaveClass(/success/);
   });
 
-  test('E20: who-is-on-photo renders photo and choices on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E31: who-is-on-photo renders photo and choices on mobile', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { characters: quizCharacters, random: 0 });
     await page.goto('/who-is-on-photo/');
     await waitForQuizReady(page);

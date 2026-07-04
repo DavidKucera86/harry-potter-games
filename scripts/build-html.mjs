@@ -21,7 +21,6 @@ const partials = {
   STATUS_BAR_QUIZ: readPartial('status-bar-quiz.html'),
   STATUS_BAR_HANGMAN: readPartial('status-bar-hangman.html'),
   MODAL: readPartial('modal.html'),
-  FOOTER: readPartial('footer.html'),
 };
 
 function stylesToHtml(styles) {
@@ -36,15 +35,31 @@ function replacePlaceholders(template, vars) {
   return result;
 }
 
-function buildPage({ output, title, styles, bodyTemplate, bodyVars = {}, includeScript = true, includeModal = true, versionComment = false }) {
+function buildPage({
+  output,
+  title,
+  styles,
+  bodyTemplate,
+  bodyVars = {},
+  includeScript = true,
+  includeModal = true,
+  versionComment = false,
+  manifestHref,
+  initLocaleScript,
+}) {
   const head = replacePlaceholders(readPartial('head.html'), {
     TITLE: title,
     STYLES: stylesToHtml(styles),
+    MANIFEST_HREF: manifestHref,
   });
 
   let body = replacePlaceholders(bodyTemplate, {
     ...partials,
     ...bodyVars,
+  });
+
+  const footer = replacePlaceholders(readPartial('footer.html'), {
+    INIT_LOCALE_SCRIPT: initLocaleScript,
   });
 
   const modal = includeModal ? partials.MODAL : '';
@@ -56,7 +71,7 @@ function buildPage({ output, title, styles, bodyTemplate, bodyVars = {}, include
 <head>
 ${head}</head>
 <body>
-${body}${modal}${partials.FOOTER}${script}
+${body}${modal}${footer}${script}
 </body>
 </html>${versionLine}
 `;
@@ -74,18 +89,24 @@ const pages = [
     includeScript: false,
     includeModal: false,
     versionComment: true,
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: 'shared/initLocale.js',
   },
   {
     output: 'guess-house/index.html',
     title: 'Hádej kolej — Harry Potter Games',
     styles: ['../shared/common.css'],
     bodyTemplate: readBody('quiz-house.html'),
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
   },
   {
     output: 'who-is-on-photo/index.html',
     title: 'Kdo je na fotce? — Harry Potter Games',
     styles: ['../shared/common.css'],
     bodyTemplate: readBody('quiz-photo.html'),
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
   },
   {
     output: 'guess-character-name/index.html',
@@ -93,10 +114,15 @@ const pages = [
     styles: ['../shared/common.css', '../shared/styles/hangman.css'],
     bodyTemplate: readBody('hangman.html'),
     bodyVars: {
+      H1_KEY: 'hangmanCharacterTitle',
       H1: 'Hádej postavu z Harryho Pottera',
+      HEADER_DESC_KEY: 'hangmanCharacterDesc',
       HEADER_DESC: 'Uhodni jméno postavy písmeno po písmenu. Máš 10 životů.',
+      INITIAL_MESSAGE_KEY: 'hangmanCharacterInitial',
       INITIAL_MESSAGE: 'Hádej písmeno ve jménu postavy…',
     },
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
   },
   {
     output: 'guess-spell/index.html',
@@ -104,10 +130,15 @@ const pages = [
     styles: ['../shared/common.css', '../shared/styles/hangman.css'],
     bodyTemplate: readBody('hangman.html'),
     bodyVars: {
+      H1_KEY: 'hangmanSpellTitle',
       H1: 'Hádej zaklínadlo',
+      HEADER_DESC_KEY: 'hangmanSpellDesc',
       HEADER_DESC: 'Uhodni zaklínadlo písmeno po písmenu. Máš 10 životů.',
+      INITIAL_MESSAGE_KEY: 'hangmanSpellInitial',
       INITIAL_MESSAGE: 'Hádej písmeno v zaklínadle…',
     },
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
   },
 ];
 

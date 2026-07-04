@@ -1,9 +1,10 @@
 [build]
+  command = "npm run build"
   publish = "."
 
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; base-uri 'self'; form-action 'self';"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self';"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"

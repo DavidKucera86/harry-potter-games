@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FetchTimeoutError, getCharacters } from '../../shared/dataProvider.js';
-import { GAME_CONFIG } from '../../shared/config.js';
+import { FetchTimeoutError, getCharacters } from '../../src/shared/dataProvider.ts';
+import { GAME_CONFIG } from '../../src/shared/config.ts';
 
 function createAbortError() {
   const error = new Error('The operation was aborted');

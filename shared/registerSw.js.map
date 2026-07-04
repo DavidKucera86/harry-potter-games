@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/shared/registerSw.ts"],
+  "sourcesContent": ["export function registerServiceWorker(): void {\n  if (!('serviceWorker' in navigator)) {\n    return;\n  }\n\n  const register = () => {\n    navigator.serviceWorker.register('/shared/sw.js').catch((error) => {\n      console.warn('Service worker registration failed:', error);\n    });\n  };\n\n  if (document.readyState === 'complete') {\n    register();\n  } else {\n    window.addEventListener('load', register, { once: true });\n  }\n}\n"],
+  "mappings": "AAAO,SAAS,wBAA8B;AAC5C,MAAI,EAAE,mBAAmB,YAAY;AACnC;AAAA,EACF;AAEA,QAAM,WAAW,MAAM;AACrB,cAAU,cAAc,SAAS,eAAe,EAAE,MAAM,CAAC,UAAU;AACjE,cAAQ,KAAK,uCAAuC,KAAK;AAAA,IAC3D,CAAC;AAAA,EACH;AAEA,MAAI,SAAS,eAAe,YAAY;AACtC,aAAS;AAAA,EACX,OAAO;AACL,WAAO,iBAAiB,QAAQ,UAAU,EAAE,MAAM,KAAK,CAAC;AAAA,EAC1D;AACF;",
+  "names": []
+}

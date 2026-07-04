@@ -1,6 +1,14 @@
   <footer class="site-footer">
-    <p>Líbí se ti hry? Pošli autorovi kouzelný nápoj</p>
-    <a class="bmc-link" href="https://buymeacoffee.com/dvdkcrb" target="_blank" rel="noopener noreferrer">
+    <div class="locale-switcher">
+      <label for="localeSelect" data-i18n-ui="localeLabel">Jazyk</label>
+      <select id="localeSelect" aria-label="Language">
+        <option value="cs">Čeština</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <p data-i18n-ui="footerText">Líbí se ti hry? Pošli autorovi kouzelný nápoj</p>
+    <a class="bmc-link" href="https://buymeacoffee.com/dvdkcrb" target="_blank" rel="noopener noreferrer" data-i18n-ui="buyMeCoffee">
       ☕ Buy Me a Coffee
     </a>
   </footer>
+  <script type="module" src="{{INIT_LOCALE_SCRIPT}}"></script>

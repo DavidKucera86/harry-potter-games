@@ -1,7 +1,7 @@
   <header>
-    <a class="back-link" href="../index.html">← Zpět na menu</a>
-    <h1>Kdo je na fotce?</h1>
-    <p>Podívej se na fotku a vyber správné jméno postavy. Máš 10 životů.</p>
+    <a class="back-link" href="../index.html" data-i18n-ui="backToMenu">← Zpět na menu</a>
+    <h1 data-i18n-key="quizPhotoTitle">Kdo je na fotce?</h1>
+    <p data-i18n-key="quizPhotoDesc">Podívej se na fotku a vyber správné jméno postavy.</p>
   </header>
 
   <div class="game-container" aria-busy="false">
@@ -11,11 +11,11 @@
       <img id="characterPhoto" src="" alt="Fotografie postavy — hádej jméno" loading="lazy">
     </div>
 
-    <div class="message info" id="message" aria-live="polite">Kdo je na fotce?</div>
+    <div class="message info" id="message" aria-live="polite" data-i18n-key="quizPhotoInitial">Kdo je na fotce?</div>
 
     <div class="choices-grid" id="choices"></div>
 
     <div class="actions">
-      <button class="btn btn-secondary" id="newGameBtn">Nová hra</button>
+      <button class="btn btn-secondary" id="newGameBtn" data-i18n-ui="newGame">Nová hra</button>
     </div>
   </div>

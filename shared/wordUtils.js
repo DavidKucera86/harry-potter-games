@@ -1,5 +1,5 @@
-export function dedupeWords(words) {
-  const byKey = new Map();
+function dedupeWords(words) {
+  const byKey = /* @__PURE__ */ new Map();
   for (const word of words) {
     const key = word.toLowerCase();
     const existing = byKey.get(key);
@@ -9,11 +9,15 @@ export function dedupeWords(words) {
   }
   return [...byKey.values()];
 }
-
-export function filterMinLength(words, minLength) {
-  return words.filter(w => w.length >= minLength);
+function filterMinLength(words, minLength) {
+  return words.filter((w) => w.length >= minLength);
 }
-
-export function prepareHangmanWords(words, minLength) {
+function prepareHangmanWords(words, minLength) {
   return filterMinLength(dedupeWords(words), minLength);
 }
+export {
+  dedupeWords,
+  filterMinLength,
+  prepareHangmanWords
+};
+//# sourceMappingURL=wordUtils.js.map

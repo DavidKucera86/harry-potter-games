@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { pickFromRemaining, shuffle } from '../../shared/deckUtils.js';
+import { pickFromRemaining, shuffle } from '../../src/shared/deckUtils.ts';
 
 describe('shuffle', () => {
   it('returns a permutation with the same elements', () => {

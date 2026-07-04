@@ -5,7 +5,7 @@ import { quizCharacters } from '../helpers/quiz';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Quiz lose @edge', () => {
-  test('E7: guess-house shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
+  test('E07: guess-house shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { characters: quizCharacters, random: 0 });
     await page.goto('/guess-house/');
     await waitForQuizReady(page);
@@ -24,7 +24,7 @@ test.describe('Quiz lose @edge', () => {
     await expect(page.locator(selectors.modalText)).toContainText('Správná kolej:');
   });
 
-  test('E8: who-is-on-photo shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
+  test('E08: who-is-on-photo shows defeat modal after 10 wrong answers', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         { id: '3', name: 'Harry Potter', house: 'Gryffindor', image: 'https://hp-api.local/harry.png' },
@@ -59,7 +59,7 @@ test.describe('Quiz lose @edge', () => {
     await expect(page.locator(selectors.modalText)).toContainText('Poslední postava:');
   });
 
-  test('E9: quiz always shows four choices including correct answer', { tag: '@edge' }, async ({ page }) => {
+  test('E09: quiz always shows four choices including correct answer', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { characters: quizCharacters, random: 0 });
     await page.goto('/guess-house/');
     await waitForQuizReady(page);

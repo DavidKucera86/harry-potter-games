@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Harry Potter Games">
+  <rect width="512" height="512" rx="96" fill="#1a1025"/>
+  <circle cx="256" cy="200" r="88" fill="none" stroke="#d4a843" stroke-width="20"/>
+  <rect x="196" y="292" width="120" height="140" rx="24" fill="#6b3fa0"/>
+  <text x="256" y="430" text-anchor="middle" font-size="72" fill="#d4a843" font-family="serif">HP</text>
+</svg>

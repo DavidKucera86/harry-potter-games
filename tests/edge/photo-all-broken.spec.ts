@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
 
 test.describe('Photo all broken images @edge', () => {
-  test('E14: all broken images show error instead of looping', { tag: '@edge' }, async ({ page }) => {
+  test('E27: all broken images show error instead of looping', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         { id: '1', name: 'A', house: 'Gryffindor', image: 'https://invalid.local/a.jpg' },
