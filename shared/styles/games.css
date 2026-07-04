@@ -57,7 +57,7 @@
 .house-gryffindor { background: var(--gryffindor); border-color: #ae0001; color: #fff; }
 .house-slytherin { background: var(--slytherin); border-color: #2a623d; color: #fff; }
 .house-ravenclaw { background: var(--ravenclaw); border-color: #222f5b; color: #fff; }
-.house-hufflepuff { background: var(--hufflepuff); border-color: #f0c75e; color: #372e29; }
+.house-hufflepuff { background: var(--hufflepuff); border-color: #f0c75e; color: #2a2218; }
 
 .house-gryffindor:hover:not(:disabled),
 .house-slytherin:hover:not(:disabled),

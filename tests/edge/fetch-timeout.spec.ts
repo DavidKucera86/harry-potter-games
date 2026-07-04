@@ -18,7 +18,7 @@ test.describe('Fetch timeout @edge', () => {
     await mockImages(page);
     await page.goto('/guess-character-name/');
 
-    await expect(page.locator('#message')).toHaveClass(/error/, { timeout: 10000 });
+    await expect(page.locator('#message')).toHaveClass(/error/, { timeout: 15000 });
     await expect(page.locator('#message')).toContainText('příliš dlouho');
     await expect(page.locator('#newGameBtn')).toBeEnabled();
 
@@ -28,10 +28,33 @@ test.describe('Fetch timeout @edge', () => {
     await page.unroute('**/api/characters');
     await page.unroute('**/shared/fixtures/characters.json');
     await mockCharacters(page, [
-      { id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' },
+      { id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' },
     ]);
     await clickNewGame(page);
     await waitForHangmanReady(page);
+    await expect(page.locator('#wordDisplay .word-group')).toHaveCount(1);
+  });
+
+  test('E17b: retries hung requests and loads on later attempt', { tag: '@edge' }, async ({ page }) => {
+    let attempts = 0;
+
+    await clearSessionStorage(page);
+    await setFetchTimeout(page, 100);
+    await page.route('**/api/characters', async (route) => {
+      attempts++;
+      if (attempts < 3) {
+        await new Promise(() => {});
+        return;
+      }
+      await route.fulfill({
+        json: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
+      });
+    });
+    await mockImages(page);
+    await page.goto('/guess-character-name/');
+
+    await waitForHangmanReady(page);
+    expect(attempts).toBe(3);
     await expect(page.locator('#wordDisplay .word-group')).toHaveCount(1);
   });
 });

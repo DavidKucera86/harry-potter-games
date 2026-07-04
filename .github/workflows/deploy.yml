@@ -20,7 +20,9 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npm ci
       - run: npx playwright install chromium --with-deps
-      - run: PLAYWRIGHT_TARGET=local npx playwright test
+      - run: npm run build:html
+      - run: npm run lint
+      - run: npm test
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

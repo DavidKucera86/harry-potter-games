@@ -18,7 +18,6 @@ test.describe('Accessibility @edge', () => {
       await game.ready(page);
 
       const results = await new AxeBuilder({ page })
-        .disableRules(['color-contrast'])
         .analyze();
 
       const serious = results.violations.filter(

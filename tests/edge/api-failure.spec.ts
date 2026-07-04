@@ -24,7 +24,7 @@ test.describe('API failure @edge', () => {
     await page.unroute('**/api/characters');
     await page.unroute('**/shared/fixtures/characters.json');
     await mockCharacters(page, [
-      { id: '1', name: 'Al', house: 'Gryffindor', image: 'https://hp-api.local/al.png' },
+      { id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' },
     ]);
     await clickNewGame(page);
     await waitForHangmanReady(page);
