@@ -19,8 +19,9 @@ export type Spell = {
 };
 
 export async function clearSessionStorage(page: Page) {
-  await page.goto('/');
-  await page.evaluate(() => sessionStorage.clear());
+  await page.addInitScript(() => {
+    sessionStorage.clear();
+  });
 }
 
 export async function setupGameMocks(page: Page, options: {
