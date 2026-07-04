@@ -39,6 +39,12 @@ export class HangmanGame extends BaseGame {
       this.letterInput.addEventListener('input', () => {
         this.letterInput.value = this.letterInput.value.slice(-1);
       });
+
+      this.letterInput.addEventListener('focus', () => {
+        if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          this.letterInput.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      });
     }
   }
 
@@ -113,6 +119,14 @@ export class HangmanGame extends BaseGame {
 
     this.wordDisplayEl.replaceChildren();
     let group = null;
+    let letterCount = 0;
+
+    const finalizeGroup = () => {
+      if (group && letterCount > 0) {
+        group.style.setProperty('--slot-count', String(letterCount));
+      }
+      letterCount = 0;
+    };
 
     for (const ch of this.currentWord) {
       if (ch === ' ') {
@@ -122,6 +136,7 @@ export class HangmanGame extends BaseGame {
           space.setAttribute('aria-hidden', 'true');
           group.appendChild(space);
         }
+        finalizeGroup();
         group = null;
         continue;
       }
@@ -138,7 +153,10 @@ export class HangmanGame extends BaseGame {
       slot.className = 'letter-slot' + (isRevealed ? ' revealed' : '');
       slot.textContent = isRevealed ? ch.toUpperCase() : '';
       group.appendChild(slot);
+      letterCount++;
     }
+
+    finalizeGroup();
   }
 
   renderWrongLetters() {
@@ -226,7 +244,9 @@ export class HangmanGame extends BaseGame {
     this.setControlsEnabled(true);
     if (this.letterInput) {
       this.letterInput.value = '';
-      this.letterInput.focus();
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        this.letterInput.focus({ preventScroll: true });
+      }
     }
     this.closeModal();
   }
