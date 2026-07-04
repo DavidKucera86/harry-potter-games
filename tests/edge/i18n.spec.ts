@@ -41,7 +41,7 @@ test.describe('Internationalization @edge', () => {
     }
   }
 
-  test('E44: ?lang=en loads page directly in English', { tag: '@edge' }, async ({ page }) => {
+  test('E50: ?lang=en loads page directly in English', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page);
     await page.goto('/guess-character-name/?lang=en');
     await waitForHangmanReady(page);
@@ -51,7 +51,7 @@ test.describe('Internationalization @edge', () => {
     await expect(page.locator('#message')).toHaveText(getLocaleString('en', 'hangman.guessCharacter'));
   });
 
-  test('E46: hangman feedback message updates after locale switch', { tag: '@edge' }, async ({ page }) => {
+  test('E51: hangman feedback message updates after locale switch', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { random: 0 });
     await page.goto('/guess-character-name/');
     await waitForHangmanReady(page);
@@ -65,7 +65,7 @@ test.describe('Internationalization @edge', () => {
     await expect(page.locator('#message')).toContainText('Z');
   });
 
-  test('E47: lose modal title updates after locale switch', { tag: '@edge' }, async ({ page }) => {
+  test('E52: lose modal title updates after locale switch', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/a.png' }],
       random: 0,

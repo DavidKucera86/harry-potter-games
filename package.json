@@ -8,7 +8,7 @@
     "build": "npm run build:html && npm run build:js",
     "verify:build": "node scripts/verify-build.mjs",
     "prepare": "simple-git-hooks",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.tests.json",
     "pretest": "npm run build && npm run lint && npm run typecheck",
     "test": "vitest run && playwright test",
     "test:e2e": "playwright test",
@@ -18,7 +18,7 @@
     "lint": "eslint src/ tests/"
   },
   "simple-git-hooks": {
-    "pre-commit": "npm run verify:build"
+    "pre-commit": "npm run verify:build && npm run lint && npm run typecheck"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
