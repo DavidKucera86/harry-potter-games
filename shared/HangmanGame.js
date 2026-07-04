@@ -120,10 +120,11 @@ export class HangmanGame extends BaseGame {
     this.wordDisplayEl.replaceChildren();
     let group = null;
     let letterCount = 0;
+    let maxLetterCount = 0;
 
     const finalizeGroup = () => {
-      if (group && letterCount > 0) {
-        group.style.setProperty('--slot-count', String(letterCount));
+      if (letterCount > 0) {
+        maxLetterCount = Math.max(maxLetterCount, letterCount);
       }
       letterCount = 0;
     };
@@ -157,6 +158,10 @@ export class HangmanGame extends BaseGame {
     }
 
     finalizeGroup();
+
+    if (maxLetterCount > 0) {
+      this.wordDisplayEl.style.setProperty('--slot-count', String(maxLetterCount));
+    }
   }
 
   renderWrongLetters() {
