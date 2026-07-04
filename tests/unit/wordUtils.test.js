@@ -3,7 +3,7 @@ import {
   dedupeWords,
   filterMinLength,
   prepareHangmanWords,
-} from '../../shared/wordUtils.js';
+} from '../../src/shared/wordUtils.ts';
 
 describe('dedupeWords', () => {
   it('removes case-insensitive duplicates', () => {

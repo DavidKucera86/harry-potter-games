@@ -36,7 +36,7 @@ async function winHangmanRound(page: import('@playwright/test').Page, letters: s
 }
 
 test.describe('Deck uniqueness @edge', () => {
-  test('E14: no duplicate characters within a deck cycle', { tag: '@edge' }, async ({ page }) => {
+  test('E15: no duplicate characters within a deck cycle', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { characters: quizCharacters, random: 0.1 });
     await page.goto('/guess-house/');
     await waitForQuizReady(page);
@@ -56,7 +56,7 @@ test.describe('Deck uniqueness @edge', () => {
     }
   });
 
-  test('E15: no duplicate hangman character names within a deck cycle', { tag: '@edge' }, async ({ page }) => {
+  test('E16: no duplicate hangman character names within a deck cycle', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { characters: deckCharacters, random: 0.1 });
     await page.goto('/guess-character-name/');
     await waitForHangmanReady(page);
@@ -76,7 +76,7 @@ test.describe('Deck uniqueness @edge', () => {
     }
   });
 
-  test('E16: no duplicate hangman spells within a deck cycle', { tag: '@edge' }, async ({ page }) => {
+  test('E17: no duplicate hangman spells within a deck cycle', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, { spells: deckSpells, random: 0.1 });
     await page.goto('/guess-spell/');
     await waitForHangmanReady(page);

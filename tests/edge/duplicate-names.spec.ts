@@ -4,7 +4,7 @@ import { waitForQuizReady } from '../helpers/hangman';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Duplicate character names @edge', () => {
-  test('E18: photo quiz matches by id not name', { tag: '@edge' }, async ({ page }) => {
+  test('E21: photo quiz matches by id not name', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         { id: '1', name: 'Tom Riddle', house: 'Slytherin', image: 'https://hp-api.local/tom1.png' },

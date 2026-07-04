@@ -4,7 +4,7 @@ import { waitForQuizReady } from '../helpers/hangman';
 import { selectors } from '../helpers/selectors';
 
 test.describe('Photo image error @edge', () => {
-  test('E13: broken image does not crash the game', { tag: '@edge' }, async ({ page }) => {
+  test('E14: broken image does not crash the game', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         { id: '4', name: 'Broken Photo', house: 'Slytherin', image: 'https://invalid.local/broken.jpg' },

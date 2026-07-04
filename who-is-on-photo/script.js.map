@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/who-is-on-photo/script.ts"],
+  "sourcesContent": ["import { WhoIsOnPhotoGame } from './WhoIsOnPhotoGame.js';\n\nnew WhoIsOnPhotoGame();\n"],
+  "mappings": "AAAA,SAAS,wBAAwB;AAEjC,IAAI,iBAAiB;",
+  "names": []
+}

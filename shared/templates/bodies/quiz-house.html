@@ -1,7 +1,7 @@
   <header>
-    <a class="back-link" href="../index.html">← Zpět na menu</a>
-    <h1>Hádej kolej postavy</h1>
-    <p>Ke jménu postavy vyber správnou Bradavickou kolej. Máš 10 životů.</p>
+    <a class="back-link" href="../index.html" data-i18n-ui="backToMenu">← Zpět na menu</a>
+    <h1 data-i18n-key="quizHouseTitle">Hádej kolej postavy</h1>
+    <p data-i18n-key="quizHouseDesc">Ke jménu postavy vyber správnou Bradavickou kolej.</p>
   </header>
 
   <div class="game-container" aria-busy="false">
@@ -9,11 +9,11 @@
 {{STATUS_BAR_QUIZ}}
     <div class="quiz-prompt" id="characterName"></div>
 
-    <div class="message info" id="message" aria-live="polite">Vyber kolej, do které postava patří…</div>
+    <div class="message info" id="message" aria-live="polite" data-i18n-key="quizHouseInitial">Vyber kolej, do které postava patří…</div>
 
     <div class="choices-grid" id="choices"></div>
 
     <div class="actions">
-      <button class="btn btn-secondary" id="newGameBtn">Nová hra</button>
+      <button class="btn btn-secondary" id="newGameBtn" data-i18n-ui="newGame">Nová hra</button>
     </div>
   </div>

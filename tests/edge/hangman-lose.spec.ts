@@ -4,7 +4,7 @@ import { waitForHangmanReady, guessLetters, expectModalOpen } from '../helpers/h
 import { selectors } from '../helpers/selectors';
 
 test.describe('Hangman lose @edge', () => {
-  test('E4: losing all lives shows defeat modal with answer', { tag: '@edge' }, async ({ page }) => {
+  test('E04: losing all lives shows defeat modal with answer', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
       random: 0,

@@ -14,7 +14,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await page.setViewportSize({ width: 375, height: 667 });
   });
 
-  test('E21: character long name fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E32: character long name fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         {
@@ -35,7 +35,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expectFullyInViewport(page, selectors.letterInput);
   });
 
-  test('E22: character long single word fits without overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E33: character long single word fits without overflow', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         {
@@ -55,7 +55,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expect(page.locator(selectors.wordGroup)).toHaveCount(2);
   });
 
-  test('E23: spell long word fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E34: spell long word fits without horizontal overflow', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       spells: [{ name: 'Expelliarmus' }],
       random: 0,
@@ -69,7 +69,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expect(page.locator(`${selectors.wordGroup} .letter-slot:not(.space)`)).toHaveCount(12);
   });
 
-  test('E24: input and guess button fully visible on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E35: input and guess button fully visible on mobile', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         {
@@ -91,7 +91,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test('E25: short viewport with focused input has no horizontal overflow', { tag: '@edge' }, async ({ page }) => {
+  test('E36: short viewport with focused input has no horizontal overflow', { tag: '@edge' }, async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 400 });
     await setupGameMocks(page, {
       spells: [{ name: 'Expelliarmus' }],
@@ -106,7 +106,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expectFullyInViewport(page, selectors.guessBtn);
   });
 
-  test('E26: short word has readable slot size on mobile', { tag: '@edge' }, async ({ page }) => {
+  test('E37: short word has readable slot size on mobile', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         {
@@ -126,7 +126,7 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expectLetterSlotsInViewport(page);
   });
 
-  test('E27: short word has larger slot size on desktop', { tag: '@edge' }, async ({ page }) => {
+  test('E38: short word has larger slot size on desktop', { tag: '@edge' }, async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await setupGameMocks(page, {
       characters: [

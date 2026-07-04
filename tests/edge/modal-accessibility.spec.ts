@@ -25,7 +25,7 @@ test.describe('Modal accessibility @edge', () => {
     await waitForHangmanReady(page);
   });
 
-  test('E14: modal has dialog semantics and traps focus', { tag: '@edge' }, async ({ page }) => {
+  test('E18: modal has dialog semantics and traps focus', { tag: '@edge' }, async ({ page }) => {
     await winAlbus(page);
     await expectModalOpen(page, 'Gratulujeme!');
 
@@ -35,7 +35,7 @@ test.describe('Modal accessibility @edge', () => {
     await expect(page.locator(selectors.modalBtn)).toBeFocused();
   });
 
-  test('E15: Escape closes modal and starts new game', { tag: '@edge' }, async ({ page }) => {
+  test('E19: Escape closes modal and starts new game', { tag: '@edge' }, async ({ page }) => {
     await winAlbus(page);
     await expectModalOpen(page, 'Gratulujeme!');
 
@@ -45,7 +45,7 @@ test.describe('Modal accessibility @edge', () => {
     await expect(page.locator('#wordDisplay .letter-slot.revealed')).toHaveCount(0);
   });
 
-  test('E16: modal button starts new game', { tag: '@edge' }, async ({ page }) => {
+  test('E20: modal button starts new game', { tag: '@edge' }, async ({ page }) => {
     await winAlbus(page);
     await expectModalOpen(page, 'Gratulujeme!');
 

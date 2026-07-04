@@ -3,7 +3,7 @@ import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, expectNoHorizontalOverflow, expectLetterSlotSizes, expectUniformLetterSlotSizes } from '../helpers/hangman';
 
 test.describe('Hangman word wrap @edge', () => {
-  test('E5: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
+  test('E05: words wrap as whole units with preserved spaces', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       characters: [
         {
@@ -46,7 +46,7 @@ test.describe('Hangman word wrap @edge', () => {
     expect(layout[2].hasSpace).toBe(false);
   });
 
-  test('E28: letter slots have uniform width across word groups', { tag: '@edge' }, async ({ page }) => {
+  test('E29: letter slots have uniform width across word groups', { tag: '@edge' }, async ({ page }) => {
     await setupGameMocks(page, {
       spells: [{ name: 'Expecto Patronum' }],
       random: 0,

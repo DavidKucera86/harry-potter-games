@@ -1,25 +1,33 @@
 const DIACRITIC_MAP = {
-  'á': 'a', 'č': 'c', 'ď': 'd', 'é': 'e', 'ě': 'e',
-  'í': 'i', 'ň': 'n', 'ó': 'o', 'ř': 'r', 'š': 's',
-  'ť': 't', 'ú': 'u', 'ů': 'u', 'ý': 'y', 'ž': 'z',
+  "\xE1": "a",
+  "\u010D": "c",
+  "\u010F": "d",
+  "\xE9": "e",
+  "\u011B": "e",
+  "\xED": "i",
+  "\u0148": "n",
+  "\xF3": "o",
+  "\u0159": "r",
+  "\u0161": "s",
+  "\u0165": "t",
+  "\xFA": "u",
+  "\u016F": "u",
+  "\xFD": "y",
+  "\u017E": "z"
 };
-
-export function normalizeLetter(char) {
+function normalizeLetter(char) {
   const lower = char.toLowerCase();
   return DIACRITIC_MAP[lower] || lower;
 }
-
-export function getWordLetters(word) {
-  return word.split('').filter(ch => ch !== ' ');
+function getWordLetters(word) {
+  return word.split("").filter((ch) => ch !== " ");
 }
-
-export function isGuessableLetter(char) {
+function isGuessableLetter(char) {
   const normalized = normalizeLetter(char);
   return /^[a-z]$/.test(normalized);
 }
-
-export function getAutoRevealedLetters(word) {
-  const revealed = new Set();
+function getAutoRevealedLetters(word) {
+  const revealed = /* @__PURE__ */ new Set();
   for (const ch of getWordLetters(word)) {
     if (!isGuessableLetter(ch)) {
       revealed.add(normalizeLetter(ch));
@@ -27,3 +35,10 @@ export function getAutoRevealedLetters(word) {
   }
   return revealed;
 }
+export {
+  getAutoRevealedLetters,
+  getWordLetters,
+  isGuessableLetter,
+  normalizeLetter
+};
+//# sourceMappingURL=hangmanUtils.js.map

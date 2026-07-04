@@ -3,7 +3,7 @@ import { clearSessionStorage } from '../helpers/api';
 import { waitForHangmanReady, clickNewGame } from '../helpers/hangman';
 
 test.describe('API retry @edge', () => {
-  test('E16: retries after server errors and eventually loads', { tag: '@edge' }, async ({ page }) => {
+  test('E26: retries after server errors and eventually loads', { tag: '@edge' }, async ({ page }) => {
     let attempts = 0;
 
     await clearSessionStorage(page);

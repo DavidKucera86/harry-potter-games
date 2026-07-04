@@ -4,7 +4,7 @@ import {
   getWordLetters,
   isGuessableLetter,
   normalizeLetter,
-} from '../../shared/hangmanUtils.js';
+} from '../../src/shared/hangmanUtils.ts';
 
 describe('normalizeLetter', () => {
   it('normalizes Czech diacritics', () => {

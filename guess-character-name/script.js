@@ -1,32 +1,33 @@
-import { HangmanGame } from '../shared/HangmanGame.js';
-import { getCharacters } from '../shared/dataProvider.js';
-import { STRINGS } from '../shared/strings.js';
-import { GAME_CONFIG } from '../shared/config.js';
-import { prepareHangmanWords } from '../shared/wordUtils.js';
-
+import { HangmanGame } from "../shared/HangmanGame.js";
+import { getCharacters } from "../shared/dataProvider.js";
+import { getStrings } from "../shared/i18n/index.js";
+import { GAME_CONFIG } from "../shared/config.js";
+import { prepareHangmanWords } from "../shared/wordUtils.js";
+const strings = getStrings();
 new HangmanGame({
   fetchFn: getCharacters,
-  transform: data => prepareHangmanWords(
-    data.map(character => character.name?.trim()).filter(name => name),
-    GAME_CONFIG.MIN_WORD_LENGTH,
+  transform: (data) => prepareHangmanWords(
+    data.map((character) => character.name?.trim()).filter((name) => Boolean(name)),
+    GAME_CONFIG.MIN_WORD_LENGTH
   ),
-  loadingText: STRINGS.loading.characters,
-  loadError: STRINGS.errors.loadCharacters,
-  fetchTimeoutError: STRINGS.errors.fetchTimeoutCharacters,
-  emptyError: STRINGS.errors.emptyCharacters,
-  logLabel: 'postav',
+  loadingText: strings.loading.characters,
+  loadError: strings.errors.loadCharacters,
+  fetchTimeoutError: strings.errors.fetchTimeoutCharacters,
+  emptyError: strings.errors.emptyCharacters,
+  logLabel: "postav",
   strings: {
-    guessPrompt: STRINGS.hangman.guessCharacter,
-    invalidLetter: STRINGS.hangman.invalidLetter,
-    letterAlreadyGuessed: STRINGS.hangman.letterAlreadyGuessed,
-    correct: STRINGS.hangman.correctInName,
-    wrong: STRINGS.hangman.wrongInName,
-    winTitle: STRINGS.hangman.winTitle,
-    loseTitle: STRINGS.hangman.loseTitle,
-    winLabel: STRINGS.hangman.winCharacter,
-    loseLabel: STRINGS.hangman.loseCharacter,
-    scoreLabel: STRINGS.quiz.scoreLabel,
-    noWrongLetters: STRINGS.hangman.noWrongLetters,
-    wrongLettersLabel: STRINGS.hangman.wrongLettersLabel,
-  },
+    guessPrompt: strings.hangman.guessCharacter,
+    invalidLetter: strings.hangman.invalidLetter,
+    letterAlreadyGuessed: strings.hangman.letterAlreadyGuessed,
+    correct: strings.hangman.correctInName,
+    wrong: strings.hangman.wrongInName,
+    winTitle: strings.hangman.winTitle,
+    loseTitle: strings.hangman.loseTitle,
+    winLabel: strings.hangman.winCharacter,
+    loseLabel: strings.hangman.loseCharacter,
+    scoreLabel: strings.quiz.scoreLabel,
+    noWrongLetters: strings.hangman.noWrongLetters,
+    wrongLettersLabel: strings.hangman.wrongLettersLabel
+  }
 });
+//# sourceMappingURL=script.js.map
