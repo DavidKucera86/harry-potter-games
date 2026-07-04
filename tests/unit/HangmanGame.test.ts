@@ -34,6 +34,12 @@ async function waitForReady(game: HangmanGame) {
   });
 }
 
+async function flushAnimationFrames(count = 2) {
+  for (let i = 0; i < count; i++) {
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+  }
+}
+
 describe('HangmanGame', () => {
   it('guessLetter rejects invalid input', async () => {
     const game = createHangmanGame();
@@ -49,6 +55,25 @@ describe('HangmanGame', () => {
     game.guessLetter('b');
     expect(game.gameOver).toBe(true);
     expect(document.getElementById('modalTitle')?.textContent).toBe('Win');
+  });
+
+  it('Enter on winning letter keeps modal visible', async () => {
+    const game = createHangmanGame(['ab']);
+    await waitForReady(game);
+    game.guessLetter('a');
+
+    const input = document.getElementById('letterInput') as HTMLInputElement;
+    input.value = 'b';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    input.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }));
+
+    await flushAnimationFrames();
+
+    expect(game.gameOver).toBe(true);
+    expect(game.score).toBe(1);
+    expect(document.getElementById('overlay')?.classList.contains('visible')).toBe(true);
+    expect(document.getElementById('modalTitle')?.textContent).toBe('Win');
+    expect(game.currentWord).toBe('ab');
   });
 
   it('auto-reveals special characters', async () => {
