@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { clearSessionStorage, mockApiFailure, mockCharacters, mockImages } from '../helpers/api';
+import { mockApiFailure, mockCharacters, mockImages } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady, clickNewGame } from '../helpers/hangman';
 import { quizCharacters } from '../helpers/quiz';
 
@@ -11,10 +11,11 @@ async function mockFallbackFailure(page: import('@playwright/test').Page) {
 
 test.describe('API failure @edge', () => {
   test('E10: hangman shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
-    await clearSessionStorage(page);
     await mockApiFailure(page, 'characters');
     await mockFallbackFailure(page);
     await mockImages(page);
+    await page.goto('/');
+    await page.evaluate(() => sessionStorage.clear());
     await page.goto('/guess-character-name/');
 
     await expect(page.locator('#message')).toHaveClass(/error/, { timeout: 10000 });
@@ -32,10 +33,11 @@ test.describe('API failure @edge', () => {
   });
 
   test('E11: guess-house shows error and recovers on new game', { tag: '@edge' }, async ({ page }) => {
-    await clearSessionStorage(page);
     await mockApiFailure(page, 'characters');
     await mockFallbackFailure(page);
     await mockImages(page);
+    await page.goto('/');
+    await page.evaluate(() => sessionStorage.clear());
     await page.goto('/guess-house/');
 
     await expect(page.locator('#message')).toHaveClass(/error/, { timeout: 10000 });

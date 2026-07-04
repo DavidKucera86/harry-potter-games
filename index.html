@@ -3,13 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <meta name="theme-color" content="#1a1025">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>Harry Potter Games</title>
   <link rel="stylesheet" href="shared/common.css">
 </head>
 <body>
+  <a href="#main-content" class="skip-link" data-i18n-ui="skipToContent">Přeskočit na obsah</a>
+  <div id="swUpdateBanner" class="sw-update-banner" role="status" aria-live="polite" hidden>
+    <p id="swUpdateMessage" data-i18n-ui="swUpdateMessage">Je dostupná nová verze.</p>
+    <button type="button" id="swUpdateReloadBtn" class="btn btn-primary" data-i18n-ui="swUpdateReload" data-i18n-ui-aria-label="swUpdateReload">Obnovit</button>
+  </div>
+  <main id="main-content">
   <header>
     <h1 data-i18n-key="menuTitle">Harry Potter Games</h1>
     <p data-i18n-key="menuSubtitle">Vyber si hru ze světa Harryho Pottera. Data z HP API.</p>
@@ -40,6 +46,7 @@
       <span data-i18n-key="menuPlay">Hrát →</span>
     </a>
   </div>
+  </main>
   <footer class="site-footer">
     <div class="locale-switcher">
       <label for="localeSelect" data-i18n-ui="localeLabel">Jazyk</label>

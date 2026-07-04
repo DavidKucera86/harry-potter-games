@@ -81,7 +81,10 @@ const cs = {
     livesLabel: "\u017Divoty",
     scoreLabel: "Sk\xF3re",
     letterPlaceholder: "Zadej p\xEDsmeno",
-    keyboardHint: "Tip: m\u016F\u017Ee\u0161 ps\xE1t p\u0159\xEDmo na kl\xE1vesnici a potvrdit Enterem"
+    keyboardHint: "Tip: m\u016F\u017Ee\u0161 ps\xE1t p\u0159\xEDmo na kl\xE1vesnici a potvrdit Enterem",
+    skipToContent: "P\u0159esko\u010Dit na obsah",
+    swUpdateMessage: "Je dostupn\xE1 nov\xE1 verze aplikace.",
+    swUpdateReload: "Obnovit"
   },
   pages: {
     menuTitle: "Harry Potter Games",
@@ -114,4 +117,3 @@ const cs = {
 export {
   cs
 };
-//# sourceMappingURL=cs.js.map

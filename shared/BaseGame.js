@@ -239,7 +239,7 @@ class BaseGame {
       this.isReady = true;
       return true;
     } catch (error) {
-      console.error(`Chyba p\u0159i na\u010D\xEDt\xE1n\xED ${logLabel}:`, error);
+      console.error(`Failed to load ${logLabel}:`, error);
       this.isReady = false;
       onError?.(error);
       return false;
@@ -249,4 +249,3 @@ class BaseGame {
 export {
   BaseGame
 };
-//# sourceMappingURL=BaseGame.js.map

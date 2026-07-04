@@ -1,7 +1,6 @@
 import { GAME_CONFIG } from '../shared/config.js';
 import { getStrings } from '../shared/i18n/index.js';
 import { QuizGame } from '../shared/QuizGame.js';
-import type { Character, QuizConfig } from '../shared/types.js';
 
 export class WhoIsOnPhotoGame extends QuizGame {
   failedImageIds = new Set<string>();
@@ -25,22 +24,24 @@ export class WhoIsOnPhotoGame extends QuizGame {
           { label: strings.quiz.lastCharacterLabel, value: lastAnswer.name, gap: true },
         ];
       },
-      bindExtraEvents(this: WhoIsOnPhotoGame) {
-        this.failedImageIds = new Set();
-        this.imageErrorCount = 0;
-        this.photoLoadTimeoutId = null;
-        this.photoEl = document.getElementById('characterPhoto') as HTMLImageElement | null;
-        if (this.photoEl) {
-          this.photoEl.addEventListener('error', () => this.handleImageError());
-          this.photoEl.addEventListener('load', () => this.clearPhotoLoadTimeout());
+      bindExtraEvents(this: QuizGame) {
+        const game = this as WhoIsOnPhotoGame;
+        game.failedImageIds = new Set();
+        game.imageErrorCount = 0;
+        game.photoLoadTimeoutId = null;
+        game.photoEl = document.getElementById('characterPhoto') as HTMLImageElement | null;
+        if (game.photoEl) {
+          game.photoEl.addEventListener('error', () => game.handleImageError());
+          game.photoEl.addEventListener('load', () => game.clearPhotoLoadTimeout());
         }
       },
-      onBeforeStartNewGame(this: WhoIsOnPhotoGame) {
-        this.clearPhotoLoadTimeout();
-        this.failedImageIds.clear();
-        this.imageErrorCount = 0;
+      onBeforeStartNewGame(this: QuizGame) {
+        const game = this as WhoIsOnPhotoGame;
+        game.clearPhotoLoadTimeout();
+        game.failedImageIds.clear();
+        game.imageErrorCount = 0;
       },
-    } satisfies QuizConfig<WhoIsOnPhotoGame>);
+    });
   }
 
   clearPhotoLoadTimeout() {
@@ -68,7 +69,7 @@ export class WhoIsOnPhotoGame extends QuizGame {
       return;
     }
 
-    this.currentCharacter = this.pickFromDeck<Character>(
+    this.currentCharacter = this.pickFromDeck(
       item => !this.failedImageIds.has(item.id)
     );
 

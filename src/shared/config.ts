@@ -1,5 +1,5 @@
 /** Bump to invalidate sessionStorage data cache and service worker cache. */
-export const APP_VERSION = '4';
+export const APP_VERSION = '5';
 
 export const GAME_CONFIG = {
   MAX_LIVES: 10,

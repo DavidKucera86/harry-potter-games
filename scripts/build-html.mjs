@@ -21,6 +21,8 @@ const partials = {
   STATUS_BAR_QUIZ: readPartial('status-bar-quiz.html'),
   STATUS_BAR_HANGMAN: readPartial('status-bar-hangman.html'),
   MODAL: readPartial('modal.html'),
+  SKIP_LINK: readPartial('skip-link.html'),
+  SW_UPDATE_BANNER: readPartial('sw-update-banner.html'),
 };
 
 function stylesToHtml(styles) {
@@ -71,7 +73,7 @@ function buildPage({
 <head>
 ${head}</head>
 <body>
-${body}${modal}${footer}${script}
+${partials.SKIP_LINK}${partials.SW_UPDATE_BANNER}${body}${modal}${footer}${script}
 </body>
 </html>${versionLine}
 `;

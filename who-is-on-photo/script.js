@@ -24,19 +24,21 @@ var WhoIsOnPhotoGame = class extends QuizGame {
         ];
       },
       bindExtraEvents() {
-        this.failedImageIds = /* @__PURE__ */ new Set();
-        this.imageErrorCount = 0;
-        this.photoLoadTimeoutId = null;
-        this.photoEl = document.getElementById("characterPhoto");
-        if (this.photoEl) {
-          this.photoEl.addEventListener("error", () => this.handleImageError());
-          this.photoEl.addEventListener("load", () => this.clearPhotoLoadTimeout());
+        const game = this;
+        game.failedImageIds = /* @__PURE__ */ new Set();
+        game.imageErrorCount = 0;
+        game.photoLoadTimeoutId = null;
+        game.photoEl = document.getElementById("characterPhoto");
+        if (game.photoEl) {
+          game.photoEl.addEventListener("error", () => game.handleImageError());
+          game.photoEl.addEventListener("load", () => game.clearPhotoLoadTimeout());
         }
       },
       onBeforeStartNewGame() {
-        this.clearPhotoLoadTimeout();
-        this.failedImageIds.clear();
-        this.imageErrorCount = 0;
+        const game = this;
+        game.clearPhotoLoadTimeout();
+        game.failedImageIds.clear();
+        game.imageErrorCount = 0;
       }
     });
   }
@@ -130,4 +132,3 @@ var WhoIsOnPhotoGame = class extends QuizGame {
 
 // src/who-is-on-photo/script.ts
 new WhoIsOnPhotoGame();
-//# sourceMappingURL=script.js.map

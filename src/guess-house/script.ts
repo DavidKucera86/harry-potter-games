@@ -1,6 +1,5 @@
 import { getStrings } from '../shared/i18n/index.js';
 import { QuizGame } from '../shared/QuizGame.js';
-import type { Character } from '../shared/types.js';
 
 export class GuessHouseGame extends QuizGame {
   static HOUSES = ['Gryffindor', 'Slytherin', 'Ravenclaw', 'Hufflepuff'] as const;
@@ -42,7 +41,7 @@ export class GuessHouseGame extends QuizGame {
   }
 
   renderRound() {
-    this.currentCharacter = this.pickFromDeck<Character>();
+    this.currentCharacter = this.pickFromDeck();
     if (!this.currentCharacter) {
       this.choicesEl?.replaceChildren();
       this.setMessage(getStrings().errors.notEnoughCharacters, 'error');

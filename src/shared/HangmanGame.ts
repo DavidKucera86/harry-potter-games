@@ -3,7 +3,7 @@ import { BaseGame } from './BaseGame.js';
 import { getAutoRevealedLetters, getWordLetters, normalizeLetter } from './hangmanUtils.js';
 import type { HangmanConfig } from './types.js';
 
-export class HangmanGame extends BaseGame {
+export class HangmanGame extends BaseGame<string> {
   config: HangmanConfig;
   words: string[] = [];
   currentWord = '';
@@ -249,7 +249,7 @@ export class HangmanGame extends BaseGame {
       this.resetDeck(this.words);
     }
 
-    this.currentWord = this.pickFromDeck<string>() ?? '';
+    this.currentWord = this.pickFromDeck() ?? '';
     if (!this.currentWord) {
       this.setMessage(this.config.resolveEmptyError(), 'error');
       this.setControlsEnabled(false);

@@ -1,6 +1,6 @@
 import type { LocaleStrings } from './cs.js';
 
-export const en: LocaleStrings = {
+export const en = {
   loading: {
     characters: 'Loading characters…',
     spells: 'Loading spells…',
@@ -84,6 +84,9 @@ export const en: LocaleStrings = {
     scoreLabel: 'Score',
     letterPlaceholder: 'Enter a letter',
     keyboardHint: 'Tip: you can type directly on the keyboard and press Enter',
+    skipToContent: 'Skip to content',
+    swUpdateMessage: 'A new version of the app is available.',
+    swUpdateReload: 'Reload',
   },
   pages: {
     menuTitle: 'Harry Potter Games',
@@ -112,4 +115,4 @@ export const en: LocaleStrings = {
     quizPhotoDesc: 'Look at the photo and pick the correct character name.',
     quizPhotoInitial: 'Who is in the photo?',
   },
-};
+} as unknown as LocaleStrings;

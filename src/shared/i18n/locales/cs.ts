@@ -82,6 +82,9 @@ export const cs = {
     scoreLabel: 'Skóre',
     letterPlaceholder: 'Zadej písmeno',
     keyboardHint: 'Tip: můžeš psát přímo na klávesnici a potvrdit Enterem',
+    skipToContent: 'Přeskočit na obsah',
+    swUpdateMessage: 'Je dostupná nová verze aplikace.',
+    swUpdateReload: 'Obnovit',
   },
   pages: {
     menuTitle: 'Harry Potter Games',

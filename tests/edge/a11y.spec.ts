@@ -11,6 +11,17 @@ const gamePages = [
 ];
 
 test.describe('Accessibility @edge', () => {
+  test('E49: menu page has no serious axe violations', { tag: '@edge' }, async ({ page }) => {
+    await page.goto('/');
+
+    const results = await new AxeBuilder({ page }).analyze();
+    const serious = results.violations.filter(
+      violation => violation.impact === 'serious' || violation.impact === 'critical'
+    );
+
+    expect(serious).toEqual([]);
+  });
+
   for (const game of gamePages) {
     test(`${game.id}: ${game.path} has no serious axe violations`, { tag: '@edge' }, async ({ page }) => {
       await setupGameMocks(page);

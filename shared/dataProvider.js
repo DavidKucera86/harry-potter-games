@@ -123,4 +123,3 @@ export {
   getCharacters,
   getSpells
 };
-//# sourceMappingURL=dataProvider.js.map

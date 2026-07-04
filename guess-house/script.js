@@ -71,4 +71,3 @@ new GuessHouseGame();
 export {
   GuessHouseGame
 };
-//# sourceMappingURL=script.js.map

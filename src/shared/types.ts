@@ -48,7 +48,7 @@ export type HangmanConfig = {
 
 export type QuizLastAnswer = Record<string, string>;
 
-export type QuizConfig<TGame extends QuizGame = QuizGame> = {
+export type QuizConfig = {
   transform: (data: Character[]) => Character[];
   minCount?: number;
   resolveEmptyError: () => string;
@@ -57,8 +57,8 @@ export type QuizConfig<TGame extends QuizGame = QuizGame> = {
   getCorrectMessage: (character: Character) => string;
   getWrongMessage: (character: Character) => string;
   buildModalLines: (lastAnswer: QuizLastAnswer, score: number) => ModalLine[];
-  bindExtraEvents?: (this: TGame) => void;
-  onBeforeStartNewGame?: (this: TGame) => void;
+  bindExtraEvents?: (this: QuizGame) => void;
+  onBeforeStartNewGame?: (this: QuizGame) => void;
 };
 
 export type LoadGameDataOptions<T, R> = {

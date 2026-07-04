@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <meta name="theme-color" content="#1a1025">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>Hádej postavu — Harry Potter Games</title>
@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="../shared/styles/hangman.css">
 </head>
 <body>
+  <a href="#main-content" class="skip-link" data-i18n-ui="skipToContent">Přeskočit na obsah</a>
+  <div id="swUpdateBanner" class="sw-update-banner" role="status" aria-live="polite" hidden>
+    <p id="swUpdateMessage" data-i18n-ui="swUpdateMessage">Je dostupná nová verze.</p>
+    <button type="button" id="swUpdateReloadBtn" class="btn btn-primary" data-i18n-ui="swUpdateReload" data-i18n-ui-aria-label="swUpdateReload">Obnovit</button>
+  </div>
+  <main id="main-content">
   <header>
     <a class="back-link" href="../index.html" data-i18n-ui="backToMenu">← Zpět na menu</a>
     <h1 data-i18n-key="hangmanCharacterTitle">Hádej postavu z Harryho Pottera</h1>
@@ -64,6 +70,7 @@
 
     <p class="keyboard-hint" data-i18n-ui="keyboardHint">Tip: můžeš psát přímo na klávesnici a potvrdit Enterem</p>
   </div>
+  </main>
   <div class="overlay" id="overlay" aria-hidden="true" inert>
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
       <div class="modal-icon" id="modalIcon" aria-hidden="true"></div>

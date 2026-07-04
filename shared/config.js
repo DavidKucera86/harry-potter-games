@@ -1,4 +1,4 @@
-const APP_VERSION = "4";
+const APP_VERSION = "5";
 const GAME_CONFIG = {
   MAX_LIVES: 10,
   ROUND_DELAY_MS: 1200,
@@ -28,4 +28,3 @@ export {
   APP_VERSION,
   GAME_CONFIG
 };
-//# sourceMappingURL=config.js.map

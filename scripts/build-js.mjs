@@ -38,6 +38,7 @@ const gameEntries = [
 ];
 
 const sharedEntries = collectTsFiles(sharedRoot);
+const sourcemap = process.env.SOURCEMAP === '1';
 
 await build({
   entryPoints: sharedEntries,
@@ -47,7 +48,7 @@ await build({
   format: 'esm',
   platform: 'browser',
   target: 'es2022',
-  sourcemap: true,
+  sourcemap,
   logLevel: 'info',
 });
 
@@ -60,7 +61,7 @@ for (const entry of gameEntries) {
     format: 'esm',
     platform: 'browser',
     target: 'es2022',
-    sourcemap: true,
+    sourcemap,
     logLevel: 'info',
     plugins: [sharedExternalPlugin],
   });

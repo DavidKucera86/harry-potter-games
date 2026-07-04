@@ -1,13 +1,11 @@
 import { test, expect } from '@playwright/test';
-import { clearSessionStorage, mockCharacters, mockImages, charactersFixture } from '../helpers/api';
+import { mockImages, charactersFixture } from '../helpers/api';
 import { waitForQuizReady } from '../helpers/hangman';
 
 test.describe('Session cache @edge', () => {
   test('E12: second game reuses cached characters without new API request', { tag: '@edge' }, async ({ page }) => {
     let apiCalls = 0;
 
-    await clearSessionStorage(page);
-    await mockCharacters(page, charactersFixture);
     await mockImages(page);
     await page.route('**/api/characters', (route) => {
       apiCalls++;

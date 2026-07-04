@@ -304,4 +304,3 @@ class HangmanGame extends BaseGame {
 export {
   HangmanGame
 };
-//# sourceMappingURL=HangmanGame.js.map

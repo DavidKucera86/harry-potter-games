@@ -249,3 +249,35 @@
     height: 18px;
   }
 }
+
+.sw-update-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.85rem 1rem;
+  background: rgba(26, 16, 37, 0.96);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.sw-update-banner[hidden] {
+  display: none;
+}
+
+.sw-update-banner p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.sw-update-banner .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
