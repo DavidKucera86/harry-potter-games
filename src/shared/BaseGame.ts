@@ -137,7 +137,9 @@ export class BaseGame {
     this.modalDialog?.setAttribute('aria-hidden', 'false');
     this.gameContainer?.setAttribute('aria-hidden', 'true');
     document.addEventListener('keydown', this._modalKeydownHandler);
-    this.modalBtn?.focus();
+    requestAnimationFrame(() => {
+      this.modalBtn?.focus();
+    });
   }
 
   closeModal() {

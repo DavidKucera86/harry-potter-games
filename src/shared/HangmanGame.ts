@@ -40,6 +40,7 @@ export class HangmanGame extends BaseGame {
     if (this.letterInput) {
       this.letterInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+          e.preventDefault();
           this.guessLetter(this.letterInput!.value);
         }
       });
