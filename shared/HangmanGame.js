@@ -164,14 +164,16 @@ export class HangmanGame extends BaseGame {
     }
   }
 
+  formatWrongLetters() {
+    if (this.wrongLetters.size === 0) {
+      return this.config.strings.noWrongLetters;
+    }
+    return [...this.wrongLetters].join(' ').toUpperCase();
+  }
+
   renderWrongLetters() {
     if (!this.wrongLettersEl) return;
-
-    if (this.wrongLetters.size === 0) {
-      this.wrongLettersEl.textContent = this.config.strings.noWrongLetters;
-    } else {
-      this.wrongLettersEl.textContent = [...this.wrongLetters].join(' ').toUpperCase();
-    }
+    this.wrongLettersEl.textContent = this.formatWrongLetters();
   }
 
   showModal(won) {
@@ -190,6 +192,7 @@ export class HangmanGame extends BaseGame {
       this.fillModalLines([
         { label: this.config.strings.loseLabel, value: this.currentWord },
         { label: this.config.strings.scoreLabel, value: this.score, gap: true },
+        { label: this.config.strings.wrongLettersLabel, value: this.formatWrongLetters(), gap: true },
       ]);
     }
     this.openModal();
