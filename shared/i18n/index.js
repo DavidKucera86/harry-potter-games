@@ -65,6 +65,36 @@ function applyPageTranslations() {
       el.textContent = text;
     }
   });
+  document.querySelectorAll("[data-i18n-ui-placeholder]").forEach((el) => {
+    const key = el.dataset.i18nUiPlaceholder;
+    if (!key) {
+      return;
+    }
+    const text = strings.ui[key];
+    if (text !== void 0) {
+      el.placeholder = text;
+    }
+  });
+  document.querySelectorAll("[data-i18n-a11y-label]").forEach((el) => {
+    const key = el.dataset.i18nA11yLabel;
+    if (!key) {
+      return;
+    }
+    const text = strings.a11y[key];
+    if (text !== void 0) {
+      el.setAttribute("aria-label", text);
+    }
+  });
+  document.querySelectorAll("[data-i18n-ui-aria-label]").forEach((el) => {
+    const key = el.dataset.i18nUiAriaLabel;
+    if (!key) {
+      return;
+    }
+    const text = strings.ui[key];
+    if (text !== void 0) {
+      el.setAttribute("aria-label", text);
+    }
+  });
 }
 function setLocale(locale) {
   currentLocale = locale;

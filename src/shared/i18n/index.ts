@@ -87,6 +87,42 @@ export function applyPageTranslations(): void {
       el.textContent = text;
     }
   });
+
+  document.querySelectorAll<HTMLInputElement>('[data-i18n-ui-placeholder]').forEach((el) => {
+    const key = el.dataset.i18nUiPlaceholder as keyof LocaleStrings['ui'] | undefined;
+    if (!key) {
+      return;
+    }
+
+    const text = strings.ui[key];
+    if (text !== undefined) {
+      el.placeholder = text;
+    }
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-i18n-a11y-label]').forEach((el) => {
+    const key = el.dataset.i18nA11yLabel as keyof LocaleStrings['a11y'] | undefined;
+    if (!key) {
+      return;
+    }
+
+    const text = strings.a11y[key];
+    if (text !== undefined) {
+      el.setAttribute('aria-label', text);
+    }
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-i18n-ui-aria-label]').forEach((el) => {
+    const key = el.dataset.i18nUiAriaLabel as keyof LocaleStrings['ui'] | undefined;
+    if (!key) {
+      return;
+    }
+
+    const text = strings.ui[key];
+    if (text !== undefined) {
+      el.setAttribute('aria-label', text);
+    }
+  });
 }
 
 export function setLocale(locale: Locale): void {

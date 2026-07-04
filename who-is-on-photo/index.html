@@ -18,17 +18,17 @@
 
   <div class="game-container" aria-busy="false">
     <div class="loading-overlay" id="loadingOverlay" hidden>
-      <div class="spinner" role="status" aria-label="Načítám data"></div>
-      <p>Načítám data…</p>
+      <div class="spinner" role="status" data-i18n-a11y-label="loadingBusy" aria-label="Načítám data"></div>
+      <p data-i18n-ui="loadingDefault">Načítám data…</p>
     </div>
 
     <div class="status-bar">
       <div class="lives">
-        <span class="lives-label">Životy</span>
+        <span class="lives-label" data-i18n-ui="livesLabel">Životy</span>
         <div class="hearts" id="hearts" role="img"></div>
       </div>
       <div>
-        <span class="score-label">Skóre </span>
+        <span class="score-label" data-i18n-ui="scoreLabel">Skóre </span>
         <span class="score" id="score">0</span>
       </div>
     </div>

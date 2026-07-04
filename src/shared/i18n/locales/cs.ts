@@ -19,6 +19,7 @@ export const cs = {
     livesLabel: 'Zbývající životy',
     photoAlt: 'Fotografie postavy — hádej jméno',
     loadingBusy: 'Načítám data hry',
+    wordDisplayLabel: 'Hádané slovo',
   },
   hangman: {
     guessCharacter: 'Hádej písmeno ve jménu postavy…',
@@ -77,6 +78,10 @@ export const cs = {
     footerText: 'Líbí se ti hry? Pošli autorovi kouzelný nápoj',
     buyMeCoffee: '☕ Buy Me a Coffee',
     loadingDefault: 'Načítám data…',
+    livesLabel: 'Životy',
+    scoreLabel: 'Skóre',
+    letterPlaceholder: 'Zadej písmeno',
+    keyboardHint: 'Tip: můžeš psát přímo na klávesnici a potvrdit Enterem',
   },
   pages: {
     menuTitle: 'Harry Potter Games',

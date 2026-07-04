@@ -18,7 +18,8 @@ const cs = {
   a11y: {
     livesLabel: "Zb\xFDvaj\xEDc\xED \u017Eivoty",
     photoAlt: "Fotografie postavy \u2014 h\xE1dej jm\xE9no",
-    loadingBusy: "Na\u010D\xEDt\xE1m data hry"
+    loadingBusy: "Na\u010D\xEDt\xE1m data hry",
+    wordDisplayLabel: "H\xE1dan\xE9 slovo"
   },
   hangman: {
     guessCharacter: "H\xE1dej p\xEDsmeno ve jm\xE9nu postavy\u2026",
@@ -76,7 +77,11 @@ const cs = {
     localeLabel: "Jazyk",
     footerText: "L\xEDb\xED se ti hry? Po\u0161li autorovi kouzeln\xFD n\xE1poj",
     buyMeCoffee: "\u2615 Buy Me a Coffee",
-    loadingDefault: "Na\u010D\xEDt\xE1m data\u2026"
+    loadingDefault: "Na\u010D\xEDt\xE1m data\u2026",
+    livesLabel: "\u017Divoty",
+    scoreLabel: "Sk\xF3re",
+    letterPlaceholder: "Zadej p\xEDsmeno",
+    keyboardHint: "Tip: m\u016F\u017Ee\u0161 ps\xE1t p\u0159\xEDmo na kl\xE1vesnici a potvrdit Enterem"
   },
   pages: {
     menuTitle: "Harry Potter Games",

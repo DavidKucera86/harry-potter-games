@@ -21,6 +21,7 @@ export const en: LocaleStrings = {
     livesLabel: 'Remaining lives',
     photoAlt: 'Character photo — guess the name',
     loadingBusy: 'Loading game data',
+    wordDisplayLabel: 'Word to guess',
   },
   hangman: {
     guessCharacter: 'Guess a letter in the character name…',
@@ -79,6 +80,10 @@ export const en: LocaleStrings = {
     footerText: 'Enjoying the games? Buy the author a butterbeer',
     buyMeCoffee: '☕ Buy Me a Coffee',
     loadingDefault: 'Loading data…',
+    livesLabel: 'Lives',
+    scoreLabel: 'Score',
+    letterPlaceholder: 'Enter a letter',
+    keyboardHint: 'Tip: you can type directly on the keyboard and press Enter',
   },
   pages: {
     menuTitle: 'Harry Potter Games',
