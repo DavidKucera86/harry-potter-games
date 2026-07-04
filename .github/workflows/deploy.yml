@@ -42,7 +42,7 @@ jobs:
           node-version: '22'
       - run: npm ci
       - run: npm run build
-      - run: npx netlify deploy --prod --dir=. --message="Deploy ${{ github.sha }}"
+      - run: npx --yes netlify-cli@20.0.0 deploy --prod --dir=. --message="Deploy ${{ github.sha }}"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
