@@ -5,6 +5,7 @@ import {
   expectNoHorizontalOverflow,
   expectFullyInViewport,
   expectLetterSlotsInViewport,
+  expectLetterSlotSizes,
 } from '../helpers/hangman';
 import { selectors } from '../helpers/selectors';
 
@@ -103,5 +104,45 @@ test.describe('Hangman mobile viewport @edge', () => {
     await expectNoHorizontalOverflow(page);
     await expectLetterSlotsInViewport(page);
     await expectFullyInViewport(page, selectors.guessBtn);
+  });
+
+  test('E26: short word has readable slot size on mobile', { tag: '@edge' }, async ({ page }) => {
+    await setupGameMocks(page, {
+      characters: [
+        {
+          id: '1',
+          name: 'Severus',
+          house: 'Slytherin',
+          image: 'https://hp-api.local/severus.png',
+        },
+      ],
+      random: 0,
+    });
+    await page.goto('/guess-character-name/');
+    await waitForHangmanReady(page);
+
+    await expectLetterSlotSizes(page, { min: 32 });
+    await expectNoHorizontalOverflow(page);
+    await expectLetterSlotsInViewport(page);
+  });
+
+  test('E27: short word has larger slot size on desktop', { tag: '@edge' }, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await setupGameMocks(page, {
+      characters: [
+        {
+          id: '1',
+          name: 'Severus',
+          house: 'Slytherin',
+          image: 'https://hp-api.local/severus.png',
+        },
+      ],
+      random: 0,
+    });
+    await page.goto('/guess-character-name/');
+    await waitForHangmanReady(page);
+
+    await expectLetterSlotSizes(page, { min: 40, max: 54 });
+    await expectNoHorizontalOverflow(page);
   });
 });

@@ -10,6 +10,9 @@
 }
 
 .word-display {
+  width: 100%;
+  container-type: inline-size;
+  container-name: word-display;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -21,9 +24,14 @@
 .word-group {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.6rem;
+  gap: var(--slot-gap, 0.6rem);
   max-width: 100%;
-  --slot-size: min(36px, calc((100% - (var(--slot-count, 1) - 1) * 0.6rem) / var(--slot-count, 1)));
+  --slot-gap: 0.6rem;
+  --slot-max: clamp(40px, 7cqw, 52px);
+  --slot-size: min(
+    var(--slot-max),
+    calc((100cqw - (var(--slot-count, 1) - 1) * var(--slot-gap)) / var(--slot-count, 1))
+  );
 }
 
 .letter-slot {
@@ -32,17 +40,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(0.85rem, calc(var(--slot-size) * 0.42), 1.5rem);
+  font-size: clamp(0.85rem, calc(var(--slot-size) * 0.42), 1.75rem);
   font-weight: 700;
   color: var(--gold-light);
-  border-bottom: 3px solid var(--gold);
+  border-bottom: max(2px, calc(var(--slot-size) * 0.07)) solid var(--gold);
   text-transform: uppercase;
   transition: color 0.3s, transform 0.2s;
   flex-shrink: 0;
 }
 
 .letter-slot.space {
-  width: 20px;
+  width: calc(var(--slot-size) * 0.55);
   border-bottom: none;
 }
 
@@ -95,8 +103,8 @@
   }
 
   .word-group {
-    gap: 0.3rem;
-    --slot-size: min(36px, calc((100% - (var(--slot-count, 1) - 1) * 0.3rem) / var(--slot-count, 1)));
+    --slot-gap: 0.35rem;
+    --slot-max: clamp(36px, 10cqw, 44px);
   }
 
   .input-area {
