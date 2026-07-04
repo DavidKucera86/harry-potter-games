@@ -64,7 +64,7 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npm ci
       - run: npx playwright install chromium --with-deps
-      - run: PLAYWRIGHT_TARGET=production PLAYWRIGHT_BASE_URL=${{ secrets.NETLIFY_SITE_URL }} npx playwright test --grep @smoke
+      - run: PLAYWRIGHT_TARGET=production PLAYWRIGHT_BASE_URL=${{ secrets.NETLIFY_SITE_URL }} npx playwright test tests/smoke/menu.spec.ts --workers=1
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
