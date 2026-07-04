@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
+import { given, when, then } from '../helpers/gwt';
 
 const gamePages = [
   { id: 'E39', path: '/guess-character-name/', ready: waitForHangmanReady },
@@ -12,30 +13,42 @@ const gamePages = [
 
 test.describe('Accessibility @edge', () => {
   test('E49: menu page has no serious axe violations', { tag: '@edge' }, async ({ page }) => {
-    await page.goto('/');
+    await given('uživatel otevře hlavní menu', async () => {
+      await page.goto('/');
+    });
 
-    const results = await new AxeBuilder({ page }).analyze();
-    const serious = results.violations.filter(
-      violation => violation.impact === 'serious' || violation.impact === 'critical'
-    );
+    let serious: Awaited<ReturnType<AxeBuilder['analyze']>>['violations'] = [];
+    await when('proběhne axe accessibility scan', async () => {
+      const results = await new AxeBuilder({ page }).analyze();
+      serious = results.violations.filter(
+        violation => violation.impact === 'serious' || violation.impact === 'critical'
+      );
+    });
 
-    expect(serious).toEqual([]);
+    await then('nejsou nalezeny serious ani critical porušení', async () => {
+      expect(serious).toEqual([]);
+    });
   });
 
   for (const game of gamePages) {
     test(`${game.id}: ${game.path} has no serious axe violations`, { tag: '@edge' }, async ({ page }) => {
-      await setupGameMocks(page);
-      await page.goto(game.path);
-      await game.ready(page);
+      await given(`hra na adrese ${game.path} je načtená`, async () => {
+        await setupGameMocks(page);
+        await page.goto(game.path);
+        await game.ready(page);
+      });
 
-      const results = await new AxeBuilder({ page })
-        .analyze();
+      let serious: Awaited<ReturnType<AxeBuilder['analyze']>>['violations'] = [];
+      await when('proběhne axe accessibility scan', async () => {
+        const results = await new AxeBuilder({ page }).analyze();
+        serious = results.violations.filter(
+          violation => violation.impact === 'serious' || violation.impact === 'critical'
+        );
+      });
 
-      const serious = results.violations.filter(
-        violation => violation.impact === 'serious' || violation.impact === 'critical'
-      );
-
-      expect(serious).toEqual([]);
+      await then('nejsou nalezeny serious ani critical porušení', async () => {
+        expect(serious).toEqual([]);
+      });
     });
   }
 });

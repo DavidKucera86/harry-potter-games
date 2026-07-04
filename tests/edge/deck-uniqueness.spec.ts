@@ -7,6 +7,7 @@ import {
   clickNewGame,
   expectModalOpen,
 } from '../helpers/hangman';
+import { given, when, then } from '../helpers/gwt';
 import { houseByName, quizCharacters } from '../helpers/quiz';
 import { selectors } from '../helpers/selectors';
 
@@ -37,62 +38,80 @@ async function winHangmanRound(page: import('@playwright/test').Page, letters: s
 
 test.describe('Deck uniqueness @edge', () => {
   test('E15: no duplicate characters within a deck cycle', { tag: '@edge' }, async ({ page }) => {
-    await setupGameMocks(page, { characters: quizCharacters, random: 0.1 });
-    await page.goto('/guess-house/');
-    await waitForQuizReady(page);
+    await given('hra Hádej kolej je načtená s náhodným balíčkem postav', async () => {
+      await setupGameMocks(page, { characters: quizCharacters, random: 0.1 });
+      await page.goto('/guess-house/');
+      await waitForQuizReady(page);
+    });
 
-    const seen = new Set<string>();
+    await when('uživatel odehraje tři kola', async () => {
+      const seen = new Set<string>();
 
-    for (let round = 0; round < 3; round++) {
-      const name = await page.locator(selectors.characterName).textContent();
-      expect(name).toBeTruthy();
-      expect(seen.has(name!)).toBe(false);
-      seen.add(name!);
+      for (let round = 0; round < 3; round++) {
+        const name = await page.locator(selectors.characterName).textContent();
+        expect(name).toBeTruthy();
+        expect(seen.has(name!)).toBe(false);
+        seen.add(name!);
 
-      await page.locator(selectors.choices).filter({ hasText: houseByName[name!] }).click();
-      if (round < 2) {
-        await expect(page.locator(selectors.choices).first()).toBeEnabled({ timeout: 2000 });
+        await page.locator(selectors.choices).filter({ hasText: houseByName[name!] }).click();
+        if (round < 2) {
+          await expect(page.locator(selectors.choices).first()).toBeEnabled({ timeout: 2000 });
+        }
       }
-    }
+    });
+
+    await then('v každém kole se objeví jiná postava', async () => {});
   });
 
   test('E16: no duplicate hangman character names within a deck cycle', { tag: '@edge' }, async ({ page }) => {
-    await setupGameMocks(page, { characters: deckCharacters, random: 0.1 });
-    await page.goto('/guess-character-name/');
-    await waitForHangmanReady(page);
+    await given('hra Hádej postavu je načtená s třemi unikátními jmény', async () => {
+      await setupGameMocks(page, { characters: deckCharacters, random: 0.1 });
+      await page.goto('/guess-character-name/');
+      await waitForHangmanReady(page);
+    });
 
-    const seen = new Set<string>();
+    await when('uživatel vyhraje tři kola hangmanu', async () => {
+      const seen = new Set<string>();
 
-    for (let round = 0; round < 3; round++) {
-      const word = await winHangmanRound(page, 'annbobcyd');
-      expect(word).toBeTruthy();
-      expect(seen.has(word!)).toBe(false);
-      seen.add(word!);
+      for (let round = 0; round < 3; round++) {
+        const word = await winHangmanRound(page, 'annbobcyd');
+        expect(word).toBeTruthy();
+        expect(seen.has(word!)).toBe(false);
+        seen.add(word!);
 
-      if (round < 2) {
-        await clickNewGame(page);
-        await waitForHangmanReady(page);
+        if (round < 2) {
+          await clickNewGame(page);
+          await waitForHangmanReady(page);
+        }
       }
-    }
+    });
+
+    await then('v každém kole se objeví jiné jméno', async () => {});
   });
 
   test('E17: no duplicate hangman spells within a deck cycle', { tag: '@edge' }, async ({ page }) => {
-    await setupGameMocks(page, { spells: deckSpells, random: 0.1 });
-    await page.goto('/guess-spell/');
-    await waitForHangmanReady(page);
+    await given('hra Hádej zaklínadlo je načtená se třemi unikátními zaklínadly', async () => {
+      await setupGameMocks(page, { spells: deckSpells, random: 0.1 });
+      await page.goto('/guess-spell/');
+      await waitForHangmanReady(page);
+    });
 
-    const seen = new Set<string>();
+    await when('uživatel vyhraje tři kola hangmanu', async () => {
+      const seen = new Set<string>();
 
-    for (let round = 0; round < 3; round++) {
-      const word = await winHangmanRound(page, 'xyzabcdef');
-      expect(word).toBeTruthy();
-      expect(seen.has(word!)).toBe(false);
-      seen.add(word!);
+      for (let round = 0; round < 3; round++) {
+        const word = await winHangmanRound(page, 'xyzabcdef');
+        expect(word).toBeTruthy();
+        expect(seen.has(word!)).toBe(false);
+        seen.add(word!);
 
-      if (round < 2) {
-        await clickNewGame(page);
-        await waitForHangmanReady(page);
+        if (round < 2) {
+          await clickNewGame(page);
+          await waitForHangmanReady(page);
+        }
       }
-    }
+    });
+
+    await then('v každém kole se objeví jiné zaklínadlo', async () => {});
   });
 });
