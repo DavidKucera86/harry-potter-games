@@ -7,13 +7,17 @@ function shuffle(array) {
   return copy;
 }
 function pickFromRemaining(remainingItems, filterFn) {
-  const pool = filterFn ? remainingItems.filter(filterFn) : remainingItems;
-  if (pool.length === 0) {
+  const eligibleIndices = [];
+  for (let i = 0; i < remainingItems.length; i++) {
+    if (!filterFn || filterFn(remainingItems[i])) {
+      eligibleIndices.push(i);
+    }
+  }
+  if (eligibleIndices.length === 0) {
     return { item: null, index: -1 };
   }
-  const picked = pool[Math.floor(Math.random() * pool.length)];
-  const index = remainingItems.indexOf(picked);
-  return { item: picked, index };
+  const index = eligibleIndices[Math.floor(Math.random() * eligibleIndices.length)];
+  return { item: remainingItems[index], index };
 }
 export {
   pickFromRemaining,
