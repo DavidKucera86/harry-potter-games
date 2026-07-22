@@ -20,6 +20,10 @@ test.describe('Menu @smoke', () => {
       );
       await expect(page.getByRole('heading', { name: 'Harry Potter Games' })).toBeVisible();
     });
+
+    await then('footer odkazuje na Klódo-Metr kartičku', async () => {
+      await expect(page.locator('.klodo-link')).toHaveAttribute('href', 'klodo-metr.png');
+    });
   });
 
   test('S02.01: navigation from menu to each game', { tag: '@smoke' }, async ({ page }) => {

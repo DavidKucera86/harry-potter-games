@@ -79,6 +79,7 @@ export const en = {
     localeLabel: 'Language',
     footerText: 'Enjoying the games? Buy the author a butterbeer',
     buyMeCoffee: '☕ Buy Me a Coffee',
+    klodoMetr: '🍆 Klódo-Metr',
     loadingDefault: 'Loading data…',
     livesLabel: 'Lives',
     scoreLabel: 'Score',

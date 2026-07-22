@@ -77,6 +77,7 @@ const en = {
     localeLabel: "Language",
     footerText: "Enjoying the games? Buy the author a butterbeer",
     buyMeCoffee: "\u2615 Buy Me a Coffee",
+    klodoMetr: "\u{1F346} Kl\xF3do-Metr",
     loadingDefault: "Loading data\u2026",
     livesLabel: "Lives",
     scoreLabel: "Score",

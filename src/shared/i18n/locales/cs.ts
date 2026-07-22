@@ -77,6 +77,7 @@ export const cs = {
     localeLabel: 'Jazyk',
     footerText: 'Líbí se ti hry? Pošli autorovi kouzelný nápoj',
     buyMeCoffee: '☕ Buy Me a Coffee',
+    klodoMetr: '🍆 Klódo-Metr',
     loadingDefault: 'Načítám data…',
     livesLabel: 'Životy',
     scoreLabel: 'Skóre',
