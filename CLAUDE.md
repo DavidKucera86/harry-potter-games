@@ -60,9 +60,10 @@ Vitest unit tests, and the full Playwright E2E suite (critical / edge / smoke / 
 / a11y). All of it must be green before the PR is created. If any part fails, fix it
 first — do not open the PR with a red or skipped suite.
 
-This is a local gate: the `Deploy` workflow only triggers on `push` to `main`, so the
-E2E suite does **not** run automatically on pull requests. Running `npm test` locally
-before every PR is what guarantees the branch is actually tested before review/merge.
+CI also gates this: the `Deploy` workflow runs `pre_deploy_tests` (which calls
+`npm test`) on every `pull_request` targeting `main`, and the deploy job is skipped for
+PR events. Running `npm test` locally first is still required — it catches failures
+before the PR exists instead of waiting on a red CI run.
 
 ## Common commands
 
