@@ -46,6 +46,26 @@ plus a thin `script.ts` bootstrap that instantiates it (e.g.
 put an instantiating `new …Game()` in the same module as the class, or importing it
 in a unit test triggers a real fetch at import time.
 
+## Adding new functionality — non-negotiable principles
+
+When adding any new feature, these principles always apply — no exceptions, no
+"just this once":
+
+- **Clean Code** — code must read like the surrounding code: small, single-purpose
+  classes and functions, descriptive names, no duplication. Shared behaviour belongs in
+  `BaseGame` / `QuizGame` / `HangmanGame`, not copy-pasted into a game. Dead code,
+  commented-out blocks, and speculative abstractions do not get committed.
+- **Test Driven Development (TDD)** — write a failing test first, then the minimum code
+  to make it pass, then refactor. Every new behaviour ships with tests (Vitest unit
+  and/or Playwright E2E). No feature is "done" without them, and the full suite must be
+  green (see the PR rule below).
+- **Zero Trust** — trust no input and no external data. Validate and sanitise all user
+  input and every API response before use; assume the HP API can be slow, wrong, or
+  offline (keep the timeout / retry / fixture-fallback path intact). Never build DOM
+  from untrusted strings via `innerHTML` — use `textContent` / `createElement` as the
+  rest of the code does. Handle errors explicitly rather than letting them surface to
+  the user.
+
 ## Before opening a pull request — always run the full E2E suite
 
 **Never open a pull request without first running the full test suite and seeing it
