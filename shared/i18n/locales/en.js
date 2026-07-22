@@ -69,6 +69,30 @@ const en = {
     lastCharacterLabel: "Last character:",
     correctHouseLabel: "Correct house:"
   },
+  rps: {
+    prompt: "Pick your move \u2014 rock, paper, or scissors?",
+    moves: {
+      rock: "\u{1FAA8} Rock",
+      paper: "\u{1F4C4} Paper",
+      scissors: "\u2702\uFE0F Scissors"
+    },
+    roundWin(playerLabel, opponentLabel) {
+      return `You won the round! ${playerLabel} beats ${opponentLabel}.`;
+    },
+    roundLose(playerLabel, opponentLabel) {
+      return `You lost the round! ${opponentLabel} beats ${playerLabel}.`;
+    },
+    roundTie(moveLabel) {
+      return `Tie! You both played ${moveLabel}.`;
+    },
+    matchWinTitle: "You won the match!",
+    matchLoseTitle: "You lost the match!",
+    yourWinsLabel: "Your wins:",
+    opponentWinsLabel: "Opponent wins:",
+    lastOpponentLabel: "Last opponent:",
+    opponentAlt: "Opponent photo",
+    noHouse: "No house"
+  },
   ui: {
     newGame: "New game",
     guessLetter: "Guess",
@@ -85,7 +109,9 @@ const en = {
     keyboardHint: "Tip: you can type directly on the keyboard and press Enter",
     skipToContent: "Skip to content",
     swUpdateMessage: "A new version of the app is available.",
-    swUpdateReload: "Reload"
+    swUpdateReload: "Reload",
+    rpsYou: "You",
+    rpsOpponent: "Opponent"
   },
   pages: {
     menuTitle: "Harry Potter Games",
@@ -98,6 +124,8 @@ const en = {
     menuSpellDesc: "Guess the spell letter by letter. You have 10 lives.",
     menuPhotoTitle: "Who is in the photo?",
     menuPhotoDesc: "Look at the photo and pick the correct name from four choices.",
+    menuRpsTitle: "Rock, paper, scissors",
+    menuRpsDesc: "Duel Hogwarts characters at rock\u2013paper\u2013scissors. First to five wins takes the match.",
     menuPlay: "Play \u2192",
     hangmanCharacterTitle: "Guess the Harry Potter character",
     hangmanCharacterDesc: "Guess the character name letter by letter. You have 10 lives.",
@@ -112,7 +140,10 @@ const en = {
     quizHouseInitial: "Pick the house this character belongs to\u2026",
     quizPhotoTitle: "Who is in the photo?",
     quizPhotoDesc: "Look at the photo and pick the correct character name.",
-    quizPhotoInitial: "Who is in the photo?"
+    quizPhotoInitial: "Who is in the photo?",
+    rpsTitle: "Rock, paper, scissors",
+    rpsDesc: "Duel Hogwarts characters at rock\u2013paper\u2013scissors. First to five wins takes the match.",
+    rpsInitial: "Pick your move \u2014 rock, paper, or scissors?"
   }
 };
 export {

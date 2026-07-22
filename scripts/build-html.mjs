@@ -115,6 +115,14 @@ const pages = [
     initLocaleScript: '../shared/initLocale.js',
   },
   {
+    output: 'rock-paper-scissors/index.html',
+    title: 'Kámen, nůžky, papír — Harry Potter Games',
+    styles: ['../shared/common.css'],
+    bodyTemplate: readBody('duel-rps.html'),
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
+  },
+  {
     output: 'guess-character-name/index.html',
     title: 'Hádej postavu — Harry Potter Games',
     styles: ['../shared/common.css', '../shared/styles/hangman.css'],

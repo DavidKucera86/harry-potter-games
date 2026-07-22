@@ -10,6 +10,7 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | [Hádej kolej postavy](guess-house/) | Vyber správnou Bradavickou kolej ke jménu postavy |
 | [Hádej zaklínadlo](guess-spell/) | Hangman — uhodni zaklínadlo |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
+| [Kámen, nůžky, papír](rock-paper-scissors/) | Utkej se v kámen–nůžky–papír proti postavám z Bradavic; kdo první získá pět výher, bere zápas |
 
 ## Spuštění lokálně — vždy přes Docker
 
@@ -66,7 +67,7 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
   - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
-  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js` — utility
+  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js` — utility
   - `i18n/index.js` — lokalizace UI textů
 - **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
@@ -113,7 +114,7 @@ Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných s
 
 ## Testování
 
-Playwright end-to-end testy a Vitest unit testy pokrývají všechny 4 hry. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
+Playwright end-to-end testy a Vitest unit testy pokrývají všech 5 her. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
 
 ### Požadavky
 

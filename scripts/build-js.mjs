@@ -35,6 +35,7 @@ const gameEntries = [
   join(srcRoot, 'guess-spell/script.ts'),
   join(srcRoot, 'guess-house/script.ts'),
   join(srcRoot, 'who-is-on-photo/script.ts'),
+  join(srcRoot, 'rock-paper-scissors/script.ts'),
 ];
 
 const sharedEntries = collectTsFiles(sharedRoot);

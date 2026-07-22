@@ -22,5 +22,6 @@ COPY --from=build /app/guess-character-name ./guess-character-name
 COPY --from=build /app/guess-house ./guess-house
 COPY --from=build /app/guess-spell ./guess-spell
 COPY --from=build /app/who-is-on-photo ./who-is-on-photo
+COPY --from=build /app/rock-paper-scissors ./rock-paper-scissors
 
 EXPOSE 4173

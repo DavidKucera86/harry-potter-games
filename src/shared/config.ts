@@ -4,6 +4,7 @@ export const APP_VERSION = '6';
 export const GAME_CONFIG = {
   MAX_LIVES: 10,
   ROUND_DELAY_MS: 1200,
+  RPS_ROUND_DELAY_MS: 2800,
   FETCH_TIMEOUT_MS: 15_000,
   API: {
     CHARACTERS: 'https://hp-api.onrender.com/api/characters',
@@ -19,6 +20,7 @@ export const GAME_CONFIG = {
   API_RETRIES: 3,
   API_RETRY_DELAY_MS: 1000,
   MIN_WORD_LENGTH: 3,
+  WINS_TO_MATCH: 5,
   PHOTO_LOAD_TIMEOUT_MS: 2000,
   MAX_IMAGE_ERRORS: 10,
   CACHE_KEYS: {

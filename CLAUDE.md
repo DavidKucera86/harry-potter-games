@@ -87,6 +87,13 @@ Vitest unit tests, and the full Playwright E2E suite (critical / edge / smoke / 
 / a11y). All of it must be green before the PR is created. If any part fails, fix it
 first — do not open the PR with a red or skipped suite.
 
+> **Stop Docker before running E2E.** Playwright's `webServer` uses
+> `reuseExistingServer: true`, so if a `docker compose up` container is still bound to
+> port 4173 it will test against the *old* image instead of your freshly built files —
+> silently producing stale, misleading results. Run `docker compose down` before
+> `npm test` / `npm run test:e2e` so Playwright starts its own server from the current
+> build.
+
 CI also gates this: the `Deploy` workflow runs `pre_deploy_tests` (which calls
 `npm test`) on every `pull_request` targeting `main`, and the deploy job is skipped for
 PR events. Running `npm test` locally first is still required — it catches failures

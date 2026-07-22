@@ -21,4 +21,10 @@ export const selectors = {
   characterPhoto: '#characterPhoto',
   backLink: '.back-link',
   gameCard: '.game-card',
+  moves: '#moves button',
+  playerScore: '#playerScore',
+  opponentScore: '#opponentScore',
+  opponentPhoto: '#opponentPhoto',
+  duelReveal: '#duelReveal',
+  opponentName: '#opponentName',
 };

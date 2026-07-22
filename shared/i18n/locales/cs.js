@@ -69,6 +69,30 @@ const cs = {
     lastCharacterLabel: "Posledn\xED postava:",
     correctHouseLabel: "Spr\xE1vn\xE1 kolej:"
   },
+  rps: {
+    prompt: "Vyber sv\u016Fj tah \u2014 k\xE1men, n\u016F\u017Eky, nebo pap\xEDr?",
+    moves: {
+      rock: "\u{1FAA8} K\xE1men",
+      paper: "\u{1F4C4} Pap\xEDr",
+      scissors: "\u2702\uFE0F N\u016F\u017Eky"
+    },
+    roundWin(playerLabel, opponentLabel) {
+      return `Vyhr\xE1ls kolo! ${playerLabel} por\xE1\u017E\xED ${opponentLabel}.`;
+    },
+    roundLose(playerLabel, opponentLabel) {
+      return `Prohr\xE1ls kolo! ${opponentLabel} por\xE1\u017E\xED ${playerLabel}.`;
+    },
+    roundTie(moveLabel) {
+      return `Rem\xEDza! Oba jste zvolili ${moveLabel}.`;
+    },
+    matchWinTitle: "Vyhr\xE1ls z\xE1pas!",
+    matchLoseTitle: "Prohr\xE1ls z\xE1pas!",
+    yourWinsLabel: "Tv\xE9 v\xFDhry:",
+    opponentWinsLabel: "V\xFDhry soupe\u0159e:",
+    lastOpponentLabel: "Posledn\xED soupe\u0159:",
+    opponentAlt: "Fotografie soupe\u0159e",
+    noHouse: "Bez koleje"
+  },
   ui: {
     newGame: "Nov\xE1 hra",
     guessLetter: "H\xE1dat",
@@ -85,7 +109,9 @@ const cs = {
     keyboardHint: "Tip: m\u016F\u017Ee\u0161 ps\xE1t p\u0159\xEDmo na kl\xE1vesnici a potvrdit Enterem",
     skipToContent: "P\u0159esko\u010Dit na obsah",
     swUpdateMessage: "Je dostupn\xE1 nov\xE1 verze aplikace.",
-    swUpdateReload: "Obnovit"
+    swUpdateReload: "Obnovit",
+    rpsYou: "Ty",
+    rpsOpponent: "Soupe\u0159"
   },
   pages: {
     menuTitle: "Harry Potter Games",
@@ -98,6 +124,8 @@ const cs = {
     menuSpellDesc: "Uhodni zakl\xEDnadlo p\xEDsmeno po p\xEDsmenu. M\xE1\u0161 10 \u017Eivot\u016F.",
     menuPhotoTitle: "Kdo je na fotce?",
     menuPhotoDesc: "Pod\xEDvej se na fotku postavy a vyber spr\xE1vn\xE9 jm\xE9no ze \u010Dty\u0159 mo\u017Enost\xED.",
+    menuRpsTitle: "K\xE1men, n\u016F\u017Eky, pap\xEDr",
+    menuRpsDesc: "Utkej se v k\xE1men\u2013n\u016F\u017Eky\u2013pap\xEDr proti postav\xE1m z Bradavic. Kdo prvn\xED z\xEDsk\xE1 p\u011Bt v\xFDher, bere z\xE1pas.",
     menuPlay: "Hr\xE1t \u2192",
     hangmanCharacterTitle: "H\xE1dej postavu z Harryho Pottera",
     hangmanCharacterDesc: "Uhodni jm\xE9no postavy p\xEDsmeno po p\xEDsmenu. M\xE1\u0161 10 \u017Eivot\u016F.",
@@ -112,7 +140,10 @@ const cs = {
     quizHouseInitial: "Vyber kolej, do kter\xE9 postava pat\u0159\xED\u2026",
     quizPhotoTitle: "Kdo je na fotce?",
     quizPhotoDesc: "Pod\xEDvej se na fotku a vyber spr\xE1vn\xE9 jm\xE9no postavy.",
-    quizPhotoInitial: "Kdo je na fotce?"
+    quizPhotoInitial: "Kdo je na fotce?",
+    rpsTitle: "K\xE1men, n\u016F\u017Eky, pap\xEDr",
+    rpsDesc: "Utkej se v k\xE1men\u2013n\u016F\u017Eky\u2013pap\xEDr proti postav\xE1m z Bradavic. Kdo prvn\xED z\xEDsk\xE1 p\u011Bt v\xFDher, bere z\xE1pas.",
+    rpsInitial: "Vyber sv\u016Fj tah \u2014 k\xE1men, n\u016F\u017Eky, nebo pap\xEDr?"
   }
 };
 export {
