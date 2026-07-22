@@ -11,9 +11,24 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | [Hádej zaklínadlo](guess-spell/) | Hangman — uhodni zaklínadlo |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
 
-## Spuštění lokálně
+## Spuštění lokálně — vždy přes Docker
 
-Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný statický server v kořeni repozitáře.
+App se spouští **výhradně v Dockeru** (žádné otevírání `index.html` napřímo ani ad-hoc
+statické servery). Multi-stage build ([Dockerfile](Dockerfile)) v prvním kroku spustí
+`npm run build` na `node:22-alpine`, ve druhém servíruje statický výstup přes nginx na
+portu **4173** ([docker/nginx.conf](docker/nginx.conf) zrcadlí produkční security headers
+z [netlify.toml](netlify.toml)):
+
+```bash
+docker compose up --build      # build + servírování na http://127.0.0.1:4173
+docker compose down            # stop
+```
+
+Port 4173 je zvolen záměrně — odpovídá base URL pro Playwright, takže E2E míří na stejnou
+adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
+
+> Toolchain (`build`, `lint`, `typecheck`) a unit testy (`vitest`) běží na hostu jako
+> obvykle — pravidlo o Dockeru se týká *spouštění appky*, ne nástrojů.
 
 ## Deploy na Netlify
 

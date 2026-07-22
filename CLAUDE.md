@@ -65,6 +65,13 @@ When adding any new feature, these principles always apply — no exceptions, no
   from untrusted strings via `innerHTML` — use `textContent` / `createElement` as the
   rest of the code does. Handle errors explicitly rather than letting them surface to
   the user.
+- **Keep the README current** — [README.md](README.md) is user-facing documentation and
+  must stay in sync with reality. Whenever a change alters something the README
+  describes — how to run/build/test the app, the list of games, the repo structure, the
+  tech stack, npm scripts, the E2E catalog, or the deploy pipeline — update the README in
+  the *same* change. A feature is not "done" if it leaves the README describing the old
+  behaviour. When in doubt, re-read the relevant README section and confirm it still
+  matches before opening the PR.
 
 ## Before opening a pull request — always run the full E2E suite
 
