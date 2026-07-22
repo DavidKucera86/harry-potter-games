@@ -46,6 +46,24 @@ plus a thin `script.ts` bootstrap that instantiates it (e.g.
 put an instantiating `new …Game()` in the same module as the class, or importing it
 in a unit test triggers a real fetch at import time.
 
+## Before opening a pull request — always run the full E2E suite
+
+**Never open a pull request without first running the full test suite and seeing it
+pass:**
+
+```bash
+npm test      # pretest (build + lint + typecheck) -> vitest unit -> Playwright E2E
+```
+
+`npm test` runs everything: the `pretest` hook (`build`, `lint`, `typecheck`), the
+Vitest unit tests, and the full Playwright E2E suite (critical / edge / smoke / visual
+/ a11y). All of it must be green before the PR is created. If any part fails, fix it
+first — do not open the PR with a red or skipped suite.
+
+This is a local gate: the `Deploy` workflow only triggers on `push` to `main`, so the
+E2E suite does **not** run automatically on pull requests. Running `npm test` locally
+before every PR is what guarantees the branch is actually tested before review/merge.
+
 ## Common commands
 
 ```bash
