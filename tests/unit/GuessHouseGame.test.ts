@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { GuessHouseGame } from '../../src/guess-house/script.ts';
+import { GuessHouseGame } from '../../src/guess-house/GuessHouseGame.ts';
 import { setupQuizDom } from './helpers/domFixture.ts';
 
 const mockFetch = (data: unknown) => vi.fn(async () => ({

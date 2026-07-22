@@ -1,0 +1,12 @@
+node_modules
+.git
+.github
+playwright-report
+test-results
+blob-report
+tests
+docs
+**/*.map
+Dockerfile
+docker-compose.yml
+.dockerignore
