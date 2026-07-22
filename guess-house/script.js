@@ -1,4 +1,4 @@
-// src/guess-house/script.ts
+// src/guess-house/GuessHouseGame.ts
 import { getStrings } from "../shared/i18n/index.js";
 import { QuizGame } from "../shared/QuizGame.js";
 var GuessHouseGame = class _GuessHouseGame extends QuizGame {
@@ -67,7 +67,6 @@ var GuessHouseGame = class _GuessHouseGame extends QuizGame {
     }
   }
 };
+
+// src/guess-house/script.ts
 new GuessHouseGame();
-export {
-  GuessHouseGame
-};
