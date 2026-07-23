@@ -124,3 +124,37 @@ describe('fetchWithRetry 5xx handling', () => {
     expect(data).toEqual([{ id: '1', name: 'Albus' }]);
   });
 });
+
+describe('fetchWithRetry 4xx handling', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockSessionStorage();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('does not retry client (4xx) errors and falls back immediately', async () => {
+    let apiAttempts = 0;
+    vi.stubGlobal('fetch', vi.fn(async (url: string | URL | Request) => {
+      if (String(url).includes('/api/characters')) {
+        apiAttempts++;
+        return { ok: false, status: 404 };
+      }
+      return {
+        ok: true,
+        json: async () => [{ id: '99', name: 'Fallback Hero' }],
+      };
+    }));
+
+    const promise = getCharacters();
+    await vi.runAllTimersAsync();
+    const data = await promise;
+
+    expect(apiAttempts).toBe(1);
+    expect(data).toEqual([{ id: '99', name: 'Fallback Hero' }]);
+  });
+});

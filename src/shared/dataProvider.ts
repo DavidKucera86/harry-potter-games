@@ -40,7 +40,8 @@ async function fetchWithRetry(url: string): Promise<Response> {
 
       lastError = new Error(`HTTP ${response.status}`);
       if (response.status < 500) {
-        throw lastError;
+        // Client error (4xx) — retrying won't help, stop and fall back.
+        break;
       }
     } catch (error) {
       clearTimeout(timeoutId);

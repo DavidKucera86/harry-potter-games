@@ -30,7 +30,7 @@ async function fetchWithRetry(url) {
       }
       lastError = new Error(`HTTP ${response.status}`);
       if (response.status < 500) {
-        throw lastError;
+        break;
       }
     } catch (error) {
       clearTimeout(timeoutId);
