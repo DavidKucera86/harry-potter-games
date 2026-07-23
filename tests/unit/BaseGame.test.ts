@@ -65,4 +65,54 @@ describe('BaseGame', () => {
     expect(result).toBe(false);
     expect(onError).toHaveBeenCalled();
   });
+
+  it('loadGameData de-duplicates concurrent loads (rate-limit guard)', async () => {
+    setupHangmanDom();
+    const game = new BaseGame<string>();
+    let calls = 0;
+    const options = {
+      fetchFn: async () => {
+        calls++;
+        await new Promise(resolve => setTimeout(resolve, 10));
+        return [{ name: 'Albus' }];
+      },
+      transform: (data: unknown) => (data as { name: string }[]).map(item => item.name),
+      emptyError: 'empty',
+      logLabel: 'test',
+      assign: () => {},
+    };
+
+    const [first, second] = await Promise.all([
+      game.loadGameData(options),
+      game.loadGameData(options),
+    ]);
+
+    // Both callers get the same result, but the network was hit only once.
+    expect(calls).toBe(1);
+    expect(first).toBe(true);
+    expect(second).toBe(true);
+  });
+
+  it('loadGameData throttles rapid repeat loads within the cooldown', async () => {
+    setupHangmanDom();
+    const game = new BaseGame<string>();
+    let calls = 0;
+    const options = {
+      fetchFn: async () => {
+        calls++;
+        return [{ name: 'Albus' }];
+      },
+      transform: (data: unknown) => (data as { name: string }[]).map(item => item.name),
+      emptyError: 'empty',
+      logLabel: 'test',
+      assign: () => {},
+    };
+
+    await game.loadGameData(options);
+    const throttled = await game.loadGameData(options);
+
+    // A second load fired right away is declined instead of hitting the API again.
+    expect(calls).toBe(1);
+    expect(throttled).toBe(false);
+  });
 });

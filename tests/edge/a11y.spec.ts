@@ -32,6 +32,21 @@ test.describe('Accessibility @edge', () => {
     });
   });
 
+  test('E56.01: honours prefers-reduced-motion by neutralising animations', { tag: '@edge' }, async ({ page }) => {
+    await given('uživatel má v systému zapnuté omezení pohybu', async () => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/guess-house/');
+    });
+
+    await then('nekonečná animace spinneru je potlačená', async () => {
+      const durationSeconds = await page.locator('.spinner').evaluate((el) => {
+        const value = getComputedStyle(el).animationDuration;
+        return value.endsWith('ms') ? parseFloat(value) / 1000 : parseFloat(value);
+      });
+      expect(durationSeconds).toBeLessThan(0.05);
+    });
+  });
+
   for (const game of gamePages) {
     test(`${game.id}: ${game.path} has no serious axe violations`, { tag: '@edge' }, async ({ page }) => {
       await given(`hra na adrese ${game.path} je načtená`, async () => {

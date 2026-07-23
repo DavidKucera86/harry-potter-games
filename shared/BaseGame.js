@@ -26,6 +26,8 @@ class BaseGame {
   _localeChangeHandler;
   _previousFocus = null;
   _onNewGame;
+  _loadInFlight = null;
+  _lastLoadStartedAt = 0;
   constructor() {
     this._modalKeydownHandler = this._handleModalKeydown.bind(this);
     this._localeChangeHandler = this._handleLocaleChange.bind(this);
@@ -220,7 +222,23 @@ class BaseGame {
     this.deckSource = this.deckSource.filter((entry) => !compareFn(entry, item));
     this.remainingItems = this.remainingItems.filter((entry) => !compareFn(entry, item));
   }
-  async loadGameData({
+  async loadGameData(options) {
+    if (this._loadInFlight) {
+      return this._loadInFlight;
+    }
+    const now = Date.now();
+    if (this._lastLoadStartedAt !== 0 && now - this._lastLoadStartedAt < GAME_CONFIG.NEW_GAME_COOLDOWN_MS) {
+      return false;
+    }
+    this._lastLoadStartedAt = now;
+    this._loadInFlight = this._runLoadGameData(options);
+    try {
+      return await this._loadInFlight;
+    } finally {
+      this._loadInFlight = null;
+    }
+  }
+  async _runLoadGameData({
     fetchFn,
     transform,
     minCount = 1,

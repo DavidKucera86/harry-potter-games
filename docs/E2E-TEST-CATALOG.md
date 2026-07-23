@@ -650,6 +650,82 @@
 - **Given** hra Chat s postavou je načtená
 - **Then** chybové pole není na úvodní obrazovce vidět
 
+### E55.01 — / exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka / je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.02 — /guess-character-name/ exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka /guess-character-name/ je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.03 — /guess-house/ exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka /guess-house/ je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.04 — /guess-spell/ exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka /guess-spell/ je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.05 — /who-is-on-photo/ exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka /who-is-on-photo/ je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.06 — /rock-paper-scissors/ exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka /rock-paper-scissors/ je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.07 — /chat-with-character/ exposes description, canonical, Open Graph and favicons
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Given** stránka /chat-with-character/ je načtená
+- **Then** má nezanedbatelný meta popisek
+- **Then** má absolutní canonical URL pro tuto stránku
+- **Then** má Open Graph a Twitter card tagy
+- **Then** má favicon i apple-touch ikonu
+
+### E55.08 — robots.txt, sitemap.xml and icon assets are served
+**Soubor:** `tests/edge/seo.spec.ts`
+
+- **Then** robots.txt odkazuje na sitemapu
+- **Then** sitemap.xml obsahuje všechny stránky
+- **Then** ikony a OG obrázek jsou dostupné
+
+### E56.01 — honours prefers-reduced-motion by neutralising animations
+**Soubor:** `tests/edge/a11y.spec.ts`
+
+- **Given** uživatel má v systému zapnuté omezení pohybu
+- **Then** nekonečná animace spinneru je potlačená
+
 ## Visual (@visual)
 
 ### V01.01 — menu page layout

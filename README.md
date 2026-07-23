@@ -45,6 +45,8 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
 | `src/` | **TypeScript zdroj** — edituj zde |
 | `shared/*.js`, `shared/i18n/` | **Generovaný JS** z `npm run build:js` — commituj po buildu |
 | `index.html`, `guess-*/index.html` | **Generované HTML** z `npm run build:html` — commituj po buildu |
+| `robots.txt`, `sitemap.xml` | **Generované** z `npm run build:html` (URL z `SITE_URL`) — commituj po buildu |
+| `favicon.ico`, `favicon-*.png`, `apple-touch-icon.png`, `shared/og-image.png` | Statické ikony a náhledový obrázek pro sdílení (SEO / PWA) |
 | `shared/templates/` | HTML šablony (vstup pro build:html) |
 | `shared/styles/`, `shared/fixtures/` | Statické assety (CSS, JSON fixtures) |
 | `tests/` | Vitest unit + Playwright E2E (+ visual snapshoty) |
@@ -70,6 +72,8 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
   - `i18n/index.js` — lokalizace UI textů
 - **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry, `chat.css` pro chat)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
+- **SEO:** každá stránka má unikátní popisek, canonical, Open Graph i Twitter card tagy (`shared/templates/partials/head.html` + `scripts/build-html.mjs`, absolutní URL z `SITE_URL`); `robots.txt` a `sitemap.xml` se generují buildem, náhledový obrázek je `shared/og-image.png`
+- **Bezpečnost:** přísné Content-Security-Policy a další security headers (`netlify.toml` ↔ `docker/nginx.conf`), zero-trust validace vstupů a odpovědí API, rate-limit guard proti záplavě požadavků — viz [CLAUDE.md](CLAUDE.md)
 - **Testování:** Vitest (unit) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`
 
 ## Build a úpravy kódu
