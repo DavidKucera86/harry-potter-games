@@ -101,7 +101,6 @@ const cs = {
     localeLabel: "Jazyk",
     footerText: "L\xEDb\xED se ti hry? Po\u0161li autorovi kouzeln\xFD n\xE1poj",
     buyMeCoffee: "\u2615 Buy Me a Coffee",
-    klodoMetr: "\u{1F346} Kl\xF3do-Metr",
     loadingDefault: "Na\u010D\xEDt\xE1m data\u2026",
     livesLabel: "\u017Divoty",
     scoreLabel: "Sk\xF3re",
