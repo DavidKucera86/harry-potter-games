@@ -87,6 +87,151 @@
   object-fit: cover;
 }
 
+/* Rock–paper–scissors duel */
+.move-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.move-btn {
+  font-size: 1rem;
+}
+
+@media (max-width: 480px) {
+  .move-grid {
+    gap: 0.5rem;
+  }
+
+  .move-btn {
+    padding: 0.85rem 0.4rem;
+    font-size: 0.9rem;
+  }
+}
+
+.duel-scoreboard {
+  justify-content: center;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.duel-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 4.5rem;
+}
+
+@media (max-width: 480px) {
+  /* Override the shared .status-bar mobile grid — the duel scoreboard must stay a
+     single flex row (Ty : Soupeř) instead of wrapping into a two-column grid. */
+  .duel-scoreboard {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.9rem;
+  }
+
+  .duel-side {
+    min-width: 3.25rem;
+  }
+}
+
+.duel-side-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.duel-side-score {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.duel-versus {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.duel-photo {
+  position: relative;
+}
+
+.photo-fallback {
+  display: none;
+  font-size: 4rem;
+}
+
+.photo-frame.photo-broken img {
+  display: none;
+}
+
+.photo-frame.photo-broken .photo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 220px;
+  border-radius: 16px;
+  border: 3px dashed var(--border);
+  background: var(--bg-deep);
+}
+
+.duel-reveal {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.duel-hands {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height: 1;
+}
+
+.duel-gesture-vs {
+  font-size: 1.4rem;
+}
+
+.duel-opponent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.house-badge {
+  display: inline-block;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+/*
+ * Duel end-of-match modal: instead of dimming the whole screen and centring, it
+ * overlays the lower half of the opponent photo so the face stays visible. The
+ * top edge is anchored to the photo's vertical midpoint in JS (marginTop); the
+ * overlay stays position:fixed so nothing in the page flow shifts.
+ */
+.overlay.duel-overlay {
+  align-items: flex-start;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.overlay.duel-overlay .modal {
+  max-width: 340px;
+  padding: 1.75rem 2rem;
+}
+
 .game-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -187,4 +332,20 @@
   border-color: var(--gold);
   background: rgba(212, 168, 67, 0.15);
   box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.klodo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.klodo-link:hover {
+  color: var(--text);
+  text-decoration: underline;
 }

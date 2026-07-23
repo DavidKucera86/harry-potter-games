@@ -6,6 +6,7 @@ import {
   guessLetters,
   expectModalOpen,
 } from '../helpers/hangman';
+import { waitForRpsReady } from '../helpers/duel';
 import { given, then } from '../helpers/gwt';
 
 const isProduction = (process.env.PLAYWRIGHT_TARGET ?? 'local') === 'production';
@@ -99,6 +100,19 @@ test.describe('Visual regression @visual', () => {
 
     await then('screenshot herního kontejneru odpovídá baseline', async () => {
       await expect(page.locator('.game-container')).toHaveScreenshot('photo-quiz-ready.png');
+    });
+  });
+
+  test('V06.01: rock-paper-scissors ready state', { tag: '@visual' }, async ({ page }) => {
+    await given('hra Kámen–nůžky–papír je ve stavu připraveno ke hře', async () => {
+      await setupGameMocks(page, { random: 0 });
+      await page.goto('/rock-paper-scissors/');
+      await waitForRpsReady(page);
+      await stabilizeVisualRendering(page);
+    });
+
+    await then('screenshot herního kontejneru odpovídá baseline', async () => {
+      await expect(page.locator('.game-container')).toHaveScreenshot('rps-ready.png');
     });
   });
 

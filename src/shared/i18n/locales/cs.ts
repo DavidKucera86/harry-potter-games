@@ -69,6 +69,30 @@ export const cs = {
     lastCharacterLabel: 'Poslední postava:',
     correctHouseLabel: 'Správná kolej:',
   },
+  rps: {
+    prompt: 'Vyber svůj tah — kámen, nůžky, nebo papír?',
+    moves: {
+      rock: '🪨 Kámen',
+      paper: '📄 Papír',
+      scissors: '✂️ Nůžky',
+    },
+    roundWin(playerLabel: string, opponentLabel: string) {
+      return `Vyhráls kolo! ${playerLabel} poráží ${opponentLabel}.`;
+    },
+    roundLose(playerLabel: string, opponentLabel: string) {
+      return `Prohráls kolo! ${opponentLabel} poráží ${playerLabel}.`;
+    },
+    roundTie(moveLabel: string) {
+      return `Remíza! Oba jste zvolili ${moveLabel}.`;
+    },
+    matchWinTitle: 'Vyhráls zápas!',
+    matchLoseTitle: 'Prohráls zápas!',
+    yourWinsLabel: 'Tvé výhry:',
+    opponentWinsLabel: 'Výhry soupeře:',
+    lastOpponentLabel: 'Poslední soupeř:',
+    opponentAlt: 'Fotografie soupeře',
+    noHouse: 'Bez koleje',
+  },
   ui: {
     newGame: 'Nová hra',
     guessLetter: 'Hádat',
@@ -77,6 +101,7 @@ export const cs = {
     localeLabel: 'Jazyk',
     footerText: 'Líbí se ti hry? Pošli autorovi kouzelný nápoj',
     buyMeCoffee: '☕ Buy Me a Coffee',
+    klodoMetr: '🍆 Klódo-Metr',
     loadingDefault: 'Načítám data…',
     livesLabel: 'Životy',
     scoreLabel: 'Skóre',
@@ -85,6 +110,8 @@ export const cs = {
     skipToContent: 'Přeskočit na obsah',
     swUpdateMessage: 'Je dostupná nová verze aplikace.',
     swUpdateReload: 'Obnovit',
+    rpsYou: 'Ty',
+    rpsOpponent: 'Soupeř',
   },
   pages: {
     menuTitle: 'Harry Potter Games',
@@ -97,6 +124,8 @@ export const cs = {
     menuSpellDesc: 'Uhodni zaklínadlo písmeno po písmenu. Máš 10 životů.',
     menuPhotoTitle: 'Kdo je na fotce?',
     menuPhotoDesc: 'Podívej se na fotku postavy a vyber správné jméno ze čtyř možností.',
+    menuRpsTitle: 'Kámen, nůžky, papír',
+    menuRpsDesc: 'Utkej se v kámen–nůžky–papír proti postavám z Bradavic. Kdo první získá pět výher, bere zápas.',
     menuPlay: 'Hrát →',
     hangmanCharacterTitle: 'Hádej postavu z Harryho Pottera',
     hangmanCharacterDesc: 'Uhodni jméno postavy písmeno po písmenu. Máš 10 životů.',
@@ -112,6 +141,9 @@ export const cs = {
     quizPhotoTitle: 'Kdo je na fotce?',
     quizPhotoDesc: 'Podívej se na fotku a vyber správné jméno postavy.',
     quizPhotoInitial: 'Kdo je na fotce?',
+    rpsTitle: 'Kámen, nůžky, papír',
+    rpsDesc: 'Utkej se v kámen–nůžky–papír proti postavám z Bradavic. Kdo první získá pět výher, bere zápas.',
+    rpsInitial: 'Vyber svůj tah — kámen, nůžky, nebo papír?',
   },
 } as const;
 

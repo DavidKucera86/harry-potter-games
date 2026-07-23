@@ -10,10 +10,26 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | [Hádej kolej postavy](guess-house/) | Vyber správnou Bradavickou kolej ke jménu postavy |
 | [Hádej zaklínadlo](guess-spell/) | Hangman — uhodni zaklínadlo |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
+| [Kámen, nůžky, papír](rock-paper-scissors/) | Utkej se v kámen–nůžky–papír proti postavám z Bradavic; kdo první získá pět výher, bere zápas |
 
-## Spuštění lokálně
+## Spuštění lokálně — vždy přes Docker
 
-Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný statický server v kořeni repozitáře.
+App se spouští **výhradně v Dockeru** (žádné otevírání `index.html` napřímo ani ad-hoc
+statické servery). Multi-stage build ([Dockerfile](Dockerfile)) v prvním kroku spustí
+`npm run build` na `node:22-alpine`, ve druhém servíruje statický výstup přes nginx na
+portu **4173** ([docker/nginx.conf](docker/nginx.conf) zrcadlí produkční security headers
+z [netlify.toml](netlify.toml)):
+
+```bash
+docker compose up --build      # build + servírování na http://127.0.0.1:4173
+docker compose down            # stop
+```
+
+Port 4173 je zvolen záměrně — odpovídá base URL pro Playwright, takže E2E míří na stejnou
+adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
+
+> Toolchain (`build`, `lint`, `typecheck`) a unit testy (`vitest`) běží na hostu jako
+> obvykle — pravidlo o Dockeru se týká *spouštění appky*, ne nástrojů.
 
 ## Deploy na Netlify
 
@@ -30,6 +46,8 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 | `index.html`, `guess-*/index.html` | **Generované HTML** z `npm run build:html` — commituj po buildu |
 | `shared/templates/` | HTML šablony (vstup pro build:html) |
 | `shared/styles/`, `shared/fixtures/` | Statické assety (CSS, JSON fixtures) |
+| `scripts/build-klodo-card.mjs` | Generátor Klódo-Metr kartičky do patičky (viz níže) |
+| `klodo-metr.png` | **Generovaná** Klódo-Metr kartička — přegeneruje se před každým commitem |
 | `tests/` | Vitest unit + Playwright E2E (+ visual snapshoty) |
 
 **Poznámka:** Složka `shared/` obsahuje jak statické soubory (CSS, fixtures, templates), tak generované `.js` moduly. Generované soubory odpovídají `src/shared/` a `src/guess-*/`.
@@ -40,6 +58,7 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
 - **Build:** `npm run build` = HTML ze šablon + kompilace TS → JS (esbuild)
 - **Deploy artefakty:** generované `*.js` a `index.html` soubory v kořeni (commitované)
 - **i18n:** čeština + angličtina (`src/shared/i18n/`), přepínač ve footeru, `?lang=en|cs`
+- **Klódo-Metr kartička:** patička odkazuje na `klodo-metr.png` — sdílenou kartičku z [Klódo-Metr](https://github.com/vibecoding-akademie/klodo-metr). Přegeneruje se před každým commitem (`npm run klodo:card`); publikují se **jen agregátní sekce** (hero s délkou v cm a levelem, žebříček levelů, „co to je v reálu" a odznaky) — panel s projekty a útratou se vynechává, takže názvy projektů ani útrata ven nejdou. Generace je fail-soft — když ccusage není dostupné, ponechá poslední kartičku a commit nezablokuje.
 - **PWA:** service worker (`shared/sw.js`) s network-first pro HTML a cache-first pro assety, update banner, offline cache
 - **Prefetch:** menu stránka na pozadí stáhne postavy a kouzla do session cache (`prefetchGameData.js`)
 - **Sdílené moduly** (kompilované do `shared/`):
@@ -48,7 +67,7 @@ Otevři [`index.html`](index.html) v prohlížeči, nebo spusť libovolný stati
   - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
-  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js` — utility
+  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js` — utility
   - `i18n/index.js` — lokalizace UI textů
 - **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
@@ -85,7 +104,7 @@ Vygenerované soubory (`index.html`, `guess-*/index.html`, …) commituj do repo
 npm run verify:build
 ```
 
-Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) spouští `verify:build`, `lint`, `typecheck` a regeneraci [E2E test katalogu](docs/E2E-TEST-CATALOG.md) automaticky.
+Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) automaticky spouští `verify:build`, `lint`, `typecheck`, regeneraci [E2E test katalogu](docs/E2E-TEST-CATALOG.md) a regeneraci + re-stage Klódo-Metr kartičky (`klodo-metr.png`).
 
 ## Sdílená cache dat
 
@@ -95,7 +114,7 @@ Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných s
 
 ## Testování
 
-Playwright end-to-end testy a Vitest unit testy pokrývají všechny 4 hry. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
+Playwright end-to-end testy a Vitest unit testy pokrývají všech 5 her. Pro běžný vývoj stačí spouštět testy **lokálně a ručně před pushem** do gitu. GitHub Actions a Netlify secrets jsou **volitelné** — potřebuješ je jen pro plně automatický deploy pipeline.
 
 ### Požadavky
 
@@ -139,6 +158,7 @@ Co se stane:
 | `npm run test:e2e` | Jen Playwright E2E testy |
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
 | `npm run docs:test-catalog` | Vygeneruje [E2E test katalog](docs/E2E-TEST-CATALOG.md) ve stylu Given-When-Then |
+| `npm run klodo:card` | Přegeneruje Klódo-Metr kartičku v patičce (`klodo-metr.png`) |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
 | `npx playwright test --grep @visual` | Visual regression screenshoty |

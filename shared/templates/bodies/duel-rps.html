@@ -1,0 +1,47 @@
+  <main id="main-content">
+  <header>
+    <a class="back-link" href="../index.html" data-i18n-ui="backToMenu">← Zpět na menu</a>
+    <h1 data-i18n-key="rpsTitle">Kámen, nůžky, papír</h1>
+    <p data-i18n-key="rpsDesc">Utkej se v kámen–nůžky–papír proti postavám z Bradavic. Kdo první získá pět výher, bere zápas.</p>
+  </header>
+
+  <div class="game-container" aria-busy="false">
+{{LOADING_OVERLAY}}
+    <div class="status-bar duel-scoreboard">
+      <div class="duel-side">
+        <span class="duel-side-label" data-i18n-ui="rpsYou">Ty</span>
+        <span class="duel-side-score" id="playerScore">0</span>
+      </div>
+      <span class="duel-versus" aria-hidden="true">:</span>
+      <div class="duel-side">
+        <span class="duel-side-label" data-i18n-ui="rpsOpponent">Soupeř</span>
+        <span class="duel-side-score" id="opponentScore">0</span>
+      </div>
+    </div>
+
+    <div class="photo-frame duel-photo">
+      <img id="opponentPhoto" src="" alt="Fotografie soupeře" loading="lazy">
+      <span class="photo-fallback" aria-hidden="true">🧙</span>
+    </div>
+
+    <div class="duel-reveal" id="duelReveal" hidden>
+      <div class="duel-hands">
+        <span class="duel-gesture" id="playerMove" aria-hidden="true"></span>
+        <span class="duel-gesture-vs" aria-hidden="true">⚔️</span>
+        <span class="duel-gesture" id="opponentMove" aria-hidden="true"></span>
+      </div>
+      <div class="duel-opponent">
+        <span id="opponentName"></span>
+        <span class="house-badge" id="opponentHouse"></span>
+      </div>
+    </div>
+
+    <div class="message info" id="message" aria-live="polite" data-i18n-key="rpsInitial">Vyber svůj tah — kámen, nůžky, nebo papír?</div>
+
+    <div class="choices-grid move-grid" id="moves"></div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" id="newGameBtn" data-i18n-ui="newGame">Nová hra</button>
+    </div>
+  </div>
+  </main>

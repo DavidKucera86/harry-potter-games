@@ -46,3 +46,36 @@ export function setupQuizDom(withPhoto = false): void {
     </div>
   `;
 }
+
+export function setupRpsDom(): void {
+  document.body.innerHTML = `
+    <div class="game-container">
+      <div id="loadingOverlay" hidden><p>Loading</p></div>
+      <div class="status-bar duel-scoreboard">
+        <span class="duel-side-score" id="playerScore">0</span>
+        <span class="duel-side-score" id="opponentScore">0</span>
+      </div>
+      <div class="photo-frame duel-photo">
+        <img id="opponentPhoto" src="" />
+        <span class="photo-fallback">🧙</span>
+      </div>
+      <div class="duel-reveal" id="duelReveal" hidden>
+        <span id="playerMove"></span>
+        <span id="opponentMove"></span>
+        <span id="opponentName"></span>
+        <span class="house-badge" id="opponentHouse"></span>
+      </div>
+      <div class="message info" id="message"></div>
+      <div class="choices-grid move-grid" id="moves"></div>
+      <button id="newGameBtn">New</button>
+    </div>
+    <div class="overlay" id="overlay" aria-hidden="true" inert>
+      <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+        <div id="modalIcon"></div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalText"></p>
+        <button id="modalBtn">Again</button>
+      </div>
+    </div>
+  `;
+}

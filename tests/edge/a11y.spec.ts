@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
+import { waitForRpsReady } from '../helpers/duel';
 import { given, when, then } from '../helpers/gwt';
 
 const gamePages = [
@@ -9,6 +10,7 @@ const gamePages = [
   { id: 'E40.01', path: '/guess-spell/', ready: waitForHangmanReady },
   { id: 'E41.01', path: '/guess-house/', ready: waitForQuizReady },
   { id: 'E42.01', path: '/who-is-on-photo/', ready: waitForQuizReady },
+  { id: 'E53.01', path: '/rock-paper-scissors/', ready: waitForRpsReady },
 ];
 
 test.describe('Accessibility @edge', () => {

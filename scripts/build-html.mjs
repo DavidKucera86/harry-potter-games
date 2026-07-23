@@ -60,8 +60,12 @@ function buildPage({
     ...bodyVars,
   });
 
+  // Sub-pages live one directory below the root; mirror the initLocale prefix
+  // so the footer link resolves to the root-level Klódo-Metr share card.
+  const rootPrefix = initLocaleScript.startsWith('../') ? '../' : '';
   const footer = replacePlaceholders(readPartial('footer.html'), {
     INIT_LOCALE_SCRIPT: initLocaleScript,
+    KLODO_CARD_HREF: `${rootPrefix}klodo-metr.png`,
   });
 
   const modal = includeModal ? partials.MODAL : '';
@@ -107,6 +111,14 @@ const pages = [
     title: 'Kdo je na fotce? — Harry Potter Games',
     styles: ['../shared/common.css'],
     bodyTemplate: readBody('quiz-photo.html'),
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
+  },
+  {
+    output: 'rock-paper-scissors/index.html',
+    title: 'Kámen, nůžky, papír — Harry Potter Games',
+    styles: ['../shared/common.css'],
+    bodyTemplate: readBody('duel-rps.html'),
     manifestHref: '/manifest.webmanifest',
     initLocaleScript: '../shared/initLocale.js',
   },

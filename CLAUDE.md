@@ -65,6 +65,13 @@ When adding any new feature, these principles always apply — no exceptions, no
   from untrusted strings via `innerHTML` — use `textContent` / `createElement` as the
   rest of the code does. Handle errors explicitly rather than letting them surface to
   the user.
+- **Keep the README current** — [README.md](README.md) is user-facing documentation and
+  must stay in sync with reality. Whenever a change alters something the README
+  describes — how to run/build/test the app, the list of games, the repo structure, the
+  tech stack, npm scripts, the E2E catalog, or the deploy pipeline — update the README in
+  the *same* change. A feature is not "done" if it leaves the README describing the old
+  behaviour. When in doubt, re-read the relevant README section and confirm it still
+  matches before opening the PR.
 
 ## Before opening a pull request — always run the full E2E suite
 
@@ -80,10 +87,39 @@ Vitest unit tests, and the full Playwright E2E suite (critical / edge / smoke / 
 / a11y). All of it must be green before the PR is created. If any part fails, fix it
 first — do not open the PR with a red or skipped suite.
 
+> **Stop Docker before running E2E.** Playwright's `webServer` uses
+> `reuseExistingServer: true`, so if a `docker compose up` container is still bound to
+> port 4173 it will test against the *old* image instead of your freshly built files —
+> silently producing stale, misleading results. Run `docker compose down` before
+> `npm test` / `npm run test:e2e` so Playwright starts its own server from the current
+> build.
+
 CI also gates this: the `Deploy` workflow runs `pre_deploy_tests` (which calls
 `npm test`) on every `pull_request` targeting `main`, and the deploy job is skipped for
 PR events. Running `npm test` locally first is still required — it catches failures
 before the PR exists instead of waiting on a red CI run.
+
+## Klódo-Metr footer card
+
+The footer (on every page) links to `klodo-metr.png` — the shareable "kartička"
+(share card) from the community [Klódo-Metr](https://github.com/vibecoding-akademie/klodo-metr).
+The card is **regenerated before every commit** and re-staged by the pre-commit hook,
+so the published image always reflects current Claude Code usage.
+
+- Only the **aggregate sections** are published — the hero (length in cm, tier,
+  progress to next level), the level ladder, the real-world conversions and the badges.
+  The per-project battleground (which names projects) and the explicit spend tiles are
+  dropped, so project names and itemised spend are **never** committed or deployed —
+  they stay on the local machine.
+- Generation ([scripts/build-klodo-card.mjs](scripts/build-klodo-card.mjs), run via
+  `npm run klodo:card`) downloads the upstream generator, runs it against the local
+  `~/.claude` transcripts, then curates the "Souboj klódů" view down to those sections
+  and screenshots it to PNG headlessly with Playwright.
+- It is **fail-soft (Zero Trust)**: the generator needs the network (ccusage) and local
+  usage data. On any failure the script keeps the already-committed `klodo-metr.png` and
+  exits 0, so a commit is never blocked (e.g. offline).
+- The footer link path is per-page (`klodo-metr.png` at the root, `../klodo-metr.png` on
+  game sub-pages); the label lives in i18n under `ui.klodoMetr` (cs + en).
 
 ## Common commands
 
@@ -94,8 +130,9 @@ npm run typecheck    # tsc for src + tests
 npm run test:unit    # vitest
 npm test             # vitest + playwright (E2E needs a served app / webServer)
 npm run verify:build # fail if generated files are out of sync with src/
+npm run klodo:card   # regenerate the footer Klódo-Metr share card (klodo-metr.png)
 ```
 
-The pre-commit hook runs `verify:build`, `lint`, `typecheck`, and regenerates the E2E
-test catalog. Always `npm run build` and commit the generated artifacts alongside `src/`
-changes.
+The pre-commit hook runs `verify:build`, `lint`, `typecheck`, regenerates the E2E
+test catalog, and regenerates + re-stages the Klódo-Metr share card (`klodo-metr.png`).
+Always `npm run build` and commit the generated artifacts alongside `src/` changes.
