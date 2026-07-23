@@ -1,6 +1,7 @@
 import { GAME_CONFIG } from './config.js';
 import { BaseGame } from './BaseGame.js';
 import { getAutoRevealedLetters, getWordLetters, normalizeLetter } from './hangmanUtils.js';
+import { prefersReducedMotion } from './motion.js';
 import type { HangmanConfig } from './types.js';
 
 export class HangmanGame extends BaseGame<string> {
@@ -57,7 +58,10 @@ export class HangmanGame extends BaseGame<string> {
 
       this.letterInput.addEventListener('focus', () => {
         if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-          this.letterInput!.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          this.letterInput!.scrollIntoView({
+            block: 'nearest',
+            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+          });
         }
       });
     }
