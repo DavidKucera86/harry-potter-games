@@ -9,6 +9,7 @@ on:
 jobs:
   pre_deploy_tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -21,6 +22,17 @@ jobs:
             ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npm ci
+      # Make apt resilient to flaky Ubuntu mirrors: bounded timeouts + retries +
+      # IPv4 so a bad mirror fails fast instead of hanging the job. (PR #13 stalled
+      # ~1h on azure.archive.ubuntu.com during `playwright install --with-deps`.)
+      - name: Harden apt against flaky mirrors
+        run: |
+          sudo tee /etc/apt/apt.conf.d/99-ci-resilience >/dev/null <<'CONF'
+          Acquire::Retries "3";
+          Acquire::http::Timeout "30";
+          Acquire::https::Timeout "30";
+          Acquire::ForceIPv4 "true";
+          CONF
       - run: npx playwright install chromium --with-deps
       - run: sudo apt-get update && sudo apt-get install -y fonts-dejavu-core fonts-liberation
       - run: npm run verify:build
@@ -39,6 +51,7 @@ jobs:
     needs: pre_deploy_tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -55,6 +68,7 @@ jobs:
     needs: deploy
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -67,6 +81,15 @@ jobs:
             ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npm ci
+      # Same apt hardening as pre_deploy_tests (see the comment there).
+      - name: Harden apt against flaky mirrors
+        run: |
+          sudo tee /etc/apt/apt.conf.d/99-ci-resilience >/dev/null <<'CONF'
+          Acquire::Retries "3";
+          Acquire::http::Timeout "30";
+          Acquire::https::Timeout "30";
+          Acquire::ForceIPv4 "true";
+          CONF
       - run: npx playwright install chromium --with-deps
       - run: PLAYWRIGHT_TARGET=production PLAYWRIGHT_BASE_URL=${{ secrets.NETLIFY_SITE_URL }} npx playwright test tests/smoke/menu.spec.ts --workers=1
       - uses: actions/upload-artifact@v7
