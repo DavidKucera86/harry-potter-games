@@ -486,12 +486,6 @@
 - **When** proběhne axe accessibility scan
 - **Then** nejsou nalezeny serious ani critical porušení
 
-### E43.01 — honours prefers-reduced-motion by neutralising animations
-**Soubor:** `tests/edge/a11y.spec.ts`
-
-- **Given** uživatel má v systému zapnuté omezení pohybu
-- **Then** nekonečná animace spinneru je potlačená
-
 ### E43.01 — / — po přepnutí na cs jsou všechny statické texty konzistentní
 **Soubor:** `tests/edge/i18n.spec.ts`
 
@@ -725,6 +719,12 @@
 - **Then** robots.txt odkazuje na sitemapu
 - **Then** sitemap.xml obsahuje všechny stránky
 - **Then** ikony a OG obrázek jsou dostupné
+
+### E56.01 — honours prefers-reduced-motion by neutralising animations
+**Soubor:** `tests/edge/a11y.spec.ts`
+
+- **Given** uživatel má v systému zapnuté omezení pohybu
+- **Then** nekonečná animace spinneru je potlačená
 
 ## Visual (@visual)
 

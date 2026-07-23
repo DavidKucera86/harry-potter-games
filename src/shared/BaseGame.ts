@@ -30,6 +30,8 @@ export class BaseGame<TItem = unknown> {
   _localeChangeHandler: () => void;
   _previousFocus: HTMLElement | null = null;
   _onNewGame?: () => void;
+  _loadInFlight: Promise<boolean> | null = null;
+  _lastLoadStartedAt = 0;
 
   constructor() {
     this._modalKeydownHandler = this._handleModalKeydown.bind(this);
@@ -270,7 +272,29 @@ export class BaseGame<TItem = unknown> {
     this.remainingItems = this.remainingItems.filter(entry => !compareFn(entry, item));
   }
 
-  async loadGameData<T, R>({
+  async loadGameData<T, R>(options: LoadGameDataOptions<T, R>): Promise<boolean> {
+    // Rate-limit guard: rapid "New game" / retry clicks must not flood the API.
+    // While a load is running, later calls await the same promise instead of
+    // firing another request; a fresh load fired within the cooldown is declined.
+    if (this._loadInFlight) {
+      return this._loadInFlight;
+    }
+
+    const now = Date.now();
+    if (this._lastLoadStartedAt !== 0 && now - this._lastLoadStartedAt < GAME_CONFIG.NEW_GAME_COOLDOWN_MS) {
+      return false;
+    }
+    this._lastLoadStartedAt = now;
+
+    this._loadInFlight = this._runLoadGameData(options);
+    try {
+      return await this._loadInFlight;
+    } finally {
+      this._loadInFlight = null;
+    }
+  }
+
+  async _runLoadGameData<T, R>({
     fetchFn,
     transform,
     minCount = 1,
@@ -278,7 +302,7 @@ export class BaseGame<TItem = unknown> {
     logLabel,
     assign,
     onError,
-  }: LoadGameDataOptions<T, R>) {
+  }: LoadGameDataOptions<T, R>): Promise<boolean> {
     try {
       const data = await fetchFn();
       const items = transform(data);
