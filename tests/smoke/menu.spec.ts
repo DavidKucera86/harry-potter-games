@@ -8,9 +8,9 @@ test.describe('Menu @smoke', () => {
       await page.goto('/');
     });
 
-    await then('stránka je v češtině a zobrazí pět herních karet', async () => {
+    await then('stránka je v češtině a zobrazí šest herních karet', async () => {
       await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
-      await expect(page.locator(selectors.gameCard)).toHaveCount(5);
+      await expect(page.locator(selectors.gameCard)).toHaveCount(6);
     });
 
     await then('footer obsahuje odkaz Buy Me a Coffee a nadpis stránky', async () => {
@@ -29,6 +29,7 @@ test.describe('Menu @smoke', () => {
       { href: 'guess-spell/', title: /Hádej zaklínadlo/ },
       { href: 'who-is-on-photo/', title: /Kdo je na fotce/ },
       { href: 'rock-paper-scissors/', title: /Kámen, nůžky, papír/ },
+      { href: 'chat-with-character/', title: /Chat s postavou/ },
     ];
 
     for (const game of games) {

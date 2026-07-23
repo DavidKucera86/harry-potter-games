@@ -101,6 +101,27 @@ CI also gates this: the `Deploy` workflow runs `pre_deploy_tests` (which calls
 PR events. Running `npm test` locally first is still required — it catches failures
 before the PR exists instead of waiting on a red CI run.
 
+### Also run the full E2E against the Docker image before a feature is "done"
+
+`npm test` runs Playwright against `npx serve .` (the repo root) — that does **not**
+exercise the real deployed artifact. So before declaring a feature done / before a PR,
+also run the suite against the actual nginx image:
+
+```bash
+npm run test:docker   # docker compose up --build -d -> wait -> test:production -> down
+```
+
+This is the authoritative "does the real artifact work" gate. It catches
+packaging/serving bugs `serve` can't — e.g. a game dir missing from the Dockerfile
+`COPY` list (a real bug the chat game hit: the page 404'd in the container while every
+serve-based test passed), or nginx routing/header differences.
+
+> `test:docker` builds the image from the **committed** working tree, so `npm run build`
+> and commit generated artifacts first. It tears the container down at the end.
+> **Caveat:** `@visual` snapshots are skipped in production mode — keep covering those
+> with the serve-based `npm test`. When adding a new game/page, remember both the
+> Dockerfile `COPY` list and the `sw.ts` precache list enumerate routes and must be updated.
+
 ## Common commands
 
 ```bash
@@ -108,7 +129,8 @@ npm run build        # regenerate JS + HTML (run after editing src/, then commit
 npm run lint         # eslint src/ tests/
 npm run typecheck    # tsc for src + tests
 npm run test:unit    # vitest
-npm test             # vitest + playwright (E2E needs a served app / webServer)
+npm test             # vitest + playwright (E2E against `npx serve`, incl. @visual)
+npm run test:docker  # full E2E against the built Docker image (nginx); @visual skipped
 npm run verify:build # fail if generated files are out of sync with src/
 ```
 

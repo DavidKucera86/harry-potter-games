@@ -95,6 +95,14 @@ export const en = {
     opponentAlt: 'Opponent photo',
     noHouse: 'No house',
   },
+  chat: {
+    greeting(nickname: string) {
+      return `Welcome, ${nickname}. Do sit down and have a sherbet lemon. Ask me anything — I speak most gladly of love, death, wisdom, and the secrets of Hogwarts.`;
+    },
+    errorEmptyNickname: 'Please enter your nickname.',
+    errorTooLongNickname: 'The nickname may be at most 32 characters long.',
+    errorNoCharacter: 'Please choose a character to chat with.',
+  },
   ui: {
     newGame: 'New game',
     guessLetter: 'Guess',
@@ -113,6 +121,13 @@ export const en = {
     swUpdateReload: 'Reload',
     rpsYou: 'You',
     rpsOpponent: 'Opponent',
+    chatStart: 'Start chat',
+    chatSend: 'Send',
+    chatBack: '← Change character',
+    chatYou: 'You',
+    chatNicknamePlaceholder: 'Enter a nickname (max. 32 characters)',
+    chatMessagePlaceholder: 'Type a message…',
+    chatLogLabel: 'Conversation log',
   },
   pages: {
     menuTitle: 'Harry Potter Games',
@@ -127,6 +142,8 @@ export const en = {
     menuPhotoDesc: 'Look at the photo and pick the correct name from four choices.',
     menuRpsTitle: 'Rock, paper, scissors',
     menuRpsDesc: 'Duel Hogwarts characters at rock–paper–scissors. First to five wins takes the match.',
+    menuChatTitle: 'Chat with a character',
+    menuChatDesc: 'Pick a character from the wizarding world and strike up a conversation. For now you can chat with Dumbledore.',
     menuPlay: 'Play →',
     hangmanCharacterTitle: 'Guess the Harry Potter character',
     hangmanCharacterDesc: 'Guess the character name letter by letter. You have 10 lives.',
@@ -145,5 +162,10 @@ export const en = {
     rpsTitle: 'Rock, paper, scissors',
     rpsDesc: 'Duel Hogwarts characters at rock–paper–scissors. First to five wins takes the match.',
     rpsInitial: 'Pick your move — rock, paper, or scissors?',
+    chatTitle: 'Chat with a Harry Potter character',
+    chatDesc: 'Pick a character and strike up a conversation. They reply with canned lines based on what you write.',
+    chatSetupHeading: 'Before we begin',
+    chatNicknameLabel: 'Your nickname',
+    chatCharacterLabel: 'Who would you like to talk to?',
   },
 } as unknown as LocaleStrings;

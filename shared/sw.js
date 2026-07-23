@@ -22,6 +22,7 @@ const PRECACHE_URLS = [
   "/shared/deckUtils.js",
   "/shared/wordUtils.js",
   "/shared/hangmanUtils.js",
+  "/shared/chatEngine.js",
   "/shared/prefetchGameData.js",
   "/shared/i18n/index.js",
   "/shared/i18n/locales/cs.js",
@@ -35,7 +36,9 @@ const PRECACHE_URLS = [
   "/guess-house/index.html",
   "/guess-house/script.js",
   "/who-is-on-photo/index.html",
-  "/who-is-on-photo/script.js"
+  "/who-is-on-photo/script.js",
+  "/chat-with-character/index.html",
+  "/chat-with-character/script.js"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(

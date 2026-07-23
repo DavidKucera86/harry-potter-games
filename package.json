@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "test:unit": "vitest run",
     "test:production": "PLAYWRIGHT_TARGET=production playwright test",
+    "test:docker": "node scripts/test-docker.mjs",
     "test:ui": "playwright test --ui",
     "docs:test-catalog": "npm run build && playwright test --reporter=./scripts/gwt-catalog-reporter.ts",
     "lint": "eslint src/ tests/"

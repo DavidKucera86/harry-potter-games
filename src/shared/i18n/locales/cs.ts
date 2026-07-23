@@ -93,6 +93,14 @@ export const cs = {
     opponentAlt: 'Fotografie soupeře',
     noHouse: 'Bez koleje',
   },
+  chat: {
+    greeting(nickname: string) {
+      return `Vítej, ${nickname}. Posaď se a dej si šerbetový citrónek. Ptej se na cokoli — nejraději hovořím o lásce, smrti, moudrosti a tajemstvích Bradavic.`;
+    },
+    errorEmptyNickname: 'Zadej prosím svou přezdívku.',
+    errorTooLongNickname: 'Přezdívka smí mít nejvýš 32 znaků.',
+    errorNoCharacter: 'Vyber prosím postavu, se kterou si chceš povídat.',
+  },
   ui: {
     newGame: 'Nová hra',
     guessLetter: 'Hádat',
@@ -111,6 +119,13 @@ export const cs = {
     swUpdateReload: 'Obnovit',
     rpsYou: 'Ty',
     rpsOpponent: 'Soupeř',
+    chatStart: 'Začít chat',
+    chatSend: 'Odeslat',
+    chatBack: '← Změnit postavu',
+    chatYou: 'Ty',
+    chatNicknamePlaceholder: 'Zadej přezdívku (max. 32 znaků)',
+    chatMessagePlaceholder: 'Napiš zprávu…',
+    chatLogLabel: 'Průběh konverzace',
   },
   pages: {
     menuTitle: 'Harry Potter Games',
@@ -125,6 +140,8 @@ export const cs = {
     menuPhotoDesc: 'Podívej se na fotku postavy a vyber správné jméno ze čtyř možností.',
     menuRpsTitle: 'Kámen, nůžky, papír',
     menuRpsDesc: 'Utkej se v kámen–nůžky–papír proti postavám z Bradavic. Kdo první získá pět výher, bere zápas.',
+    menuChatTitle: 'Chat s postavou',
+    menuChatDesc: 'Vyber si postavu ze světa Harryho Pottera a dej se s ní do řeči. Zatím si můžeš popovídat s Brumbálem.',
     menuPlay: 'Hrát →',
     hangmanCharacterTitle: 'Hádej postavu z Harryho Pottera',
     hangmanCharacterDesc: 'Uhodni jméno postavy písmeno po písmenu. Máš 10 životů.',
@@ -143,6 +160,11 @@ export const cs = {
     rpsTitle: 'Kámen, nůžky, papír',
     rpsDesc: 'Utkej se v kámen–nůžky–papír proti postavám z Bradavic. Kdo první získá pět výher, bere zápas.',
     rpsInitial: 'Vyber svůj tah — kámen, nůžky, nebo papír?',
+    chatTitle: 'Chat s postavou z Harryho Pottera',
+    chatDesc: 'Vyber si postavu a dej se s ní do řeči. Odpovídá připravenými hláškami podle toho, o čem píšeš.',
+    chatSetupHeading: 'Než začneme',
+    chatNicknameLabel: 'Tvá přezdívka',
+    chatCharacterLabel: 'S kým si chceš povídat?',
   },
 } as const;
 

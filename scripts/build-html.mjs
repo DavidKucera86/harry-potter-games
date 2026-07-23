@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -78,7 +78,9 @@ ${partials.SKIP_LINK}${partials.SW_UPDATE_BANNER}${body}${modal}${footer}${scrip
 </html>${versionLine}
 `;
 
-  writeFileSync(join(root, output), html);
+  const outputPath = join(root, output);
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, html);
   console.log(`Built ${output}`);
 }
 
@@ -115,6 +117,15 @@ const pages = [
     title: 'Kámen, nůžky, papír — Harry Potter Games',
     styles: ['../shared/common.css'],
     bodyTemplate: readBody('duel-rps.html'),
+    manifestHref: '/manifest.webmanifest',
+    initLocaleScript: '../shared/initLocale.js',
+  },
+  {
+    output: 'chat-with-character/index.html',
+    title: 'Chat s postavou — Harry Potter Games',
+    styles: ['../shared/common.css', '../shared/styles/chat.css'],
+    bodyTemplate: readBody('chat.html'),
+    includeModal: false,
     manifestHref: '/manifest.webmanifest',
     initLocaleScript: '../shared/initLocale.js',
   },

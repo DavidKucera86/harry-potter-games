@@ -8,7 +8,7 @@
 **Soubor:** `tests/smoke/menu.spec.ts`
 
 - **Given** uživatel otevře hlavní menu
-- **Then** stránka je v češtině a zobrazí pět herních karet
+- **Then** stránka je v češtině a zobrazí šest herních karet
 - **Then** footer obsahuje odkaz Buy Me a Coffee a nadpis stránky
 
 ### S02.01 — navigation from menu to each game
@@ -28,6 +28,9 @@
 - **Then** otevře se správná hra s viditelným nadpisem
 - **Given** uživatel je na hlavním menu
 - **When** uživatel klikne na kartu hry rock-paper-scissors/
+- **Then** otevře se správná hra s viditelným nadpisem
+- **Given** uživatel je na hlavním menu
+- **When** uživatel klikne na kartu hry chat-with-character/
 - **Then** otevře se správná hra s viditelným nadpisem
 
 ### S03.01 — /guess-character-name/ loads and becomes playable
@@ -65,7 +68,7 @@
 
 - **Given** hra Hádej postavu je načtená
 - **When** uživatel klikne na odkaz zpět do menu
-- **Then** zobrazí se hlavní menu s pěti kartami her
+- **Then** zobrazí se hlavní menu se šesti kartami her
 
 ### S06.01 — /rock-paper-scissors/ loads with a fresh scoreboard and three moves
 **Soubor:** `tests/smoke/games-load.spec.ts`
@@ -105,7 +108,7 @@
 - **Given** API je mockované a uživatel je na hlavním menu
 - **When** uživatel přejde do hry Hádej postavu
 - **When** uživatel se vrátí zpět do menu
-- **Then** zobrazí se menu s pěti kartami
+- **Then** zobrazí se menu se šesti kartami
 - **When** uživatel přejde do hry Hádej kolej
 - **Then** hra Hádej kolej se načte a je hratelná
 
@@ -156,6 +159,20 @@
 
 - **Given** hra je načtená na úzkém mobilním viewportu
 - **Then** obě strany skóre jsou na stejném řádku
+
+### Q06.01 — entering a nickname and picking Dumbledore opens the chat with a greeting
+**Soubor:** `tests/critical/chat-with-character.spec.ts`
+
+- **Given** hra Chat s postavou je načtená
+- **When** hráč zadá přezdívku a vybere Brumbála
+- **Then** otevře se chat s Brumbálem a uvítací hláškou obsahující přezdívku
+
+### Q06.02 — a message with a known keyword gets a themed reply
+**Soubor:** `tests/critical/chat-with-character.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem
+- **When** hráč napíše zprávu o smrti
+- **Then** jeho zpráva i odpověď Brumbála se objeví v konverzaci
 
 ## Edge (@edge)
 
@@ -606,6 +623,32 @@
 - **Given** hra na adrese /rock-paper-scissors/ je načtená
 - **When** proběhne axe accessibility scan
 - **Then** nejsou nalezeny serious ani critical porušení
+
+### E54.01 — an empty nickname shows an error and stays on setup
+**Soubor:** `tests/edge/chat-setup.spec.ts`
+
+- **Given** hra Chat s postavou je načtená
+- **When** hráč klikne na Začít chat bez přezdívky
+- **Then** zobrazí se chybová hláška a hráč zůstane na úvodní obrazovce
+
+### E54.02 — the nickname input is capped at 32 characters
+**Soubor:** `tests/edge/chat-setup.spec.ts`
+
+- **Given** hra Chat s postavou je načtená
+- **Then** input nedovolí zadat víc než 32 znaků
+
+### E54.03 — an HTML payload in a message is rendered as literal text, not executed
+**Soubor:** `tests/edge/chat-setup.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem
+- **When** hráč pošle zprávu s XSS payloadem
+- **Then** payload je vykreslen jako text a nespustí se žádný skript
+
+### E54.04 — the error field is hidden until validation fails
+**Soubor:** `tests/edge/chat-setup.spec.ts`
+
+- **Given** hra Chat s postavou je načtená
+- **Then** chybové pole není na úvodní obrazovce vidět
 
 ## Visual (@visual)
 

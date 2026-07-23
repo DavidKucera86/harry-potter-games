@@ -1,0 +1,56 @@
+  <main id="main-content">
+  <header>
+    <a class="back-link" href="../index.html" data-i18n-ui="backToMenu">← Zpět na menu</a>
+    <h1 data-i18n-key="chatTitle">Chat s postavou z Harryho Pottera</h1>
+    <p data-i18n-key="chatDesc">Vyber si postavu a dej se s ní do řeči. Odpovídá připravenými hláškami podle toho, o čem píšeš.</p>
+  </header>
+
+  <div class="game-container" aria-busy="false">
+{{LOADING_OVERLAY}}
+
+    <section class="chat-setup" id="chatSetup" aria-labelledby="chatSetupHeading">
+      <h2 id="chatSetupHeading" data-i18n-key="chatSetupHeading">Než začneme</h2>
+      <form id="setupForm" novalidate>
+        <div class="chat-field">
+          <label for="nickname" data-i18n-key="chatNicknameLabel">Tvá přezdívka</label>
+          <input type="text" id="nickname" name="nickname" maxlength="32" required
+            autocomplete="off" spellcheck="false"
+            data-i18n-ui-placeholder="chatNicknamePlaceholder"
+            placeholder="Zadej přezdívku (max. 32 znaků)">
+        </div>
+        <div class="chat-field">
+          <label for="characterSelect" data-i18n-key="chatCharacterLabel">S kým si chceš povídat?</label>
+          <select id="characterSelect" name="character"></select>
+        </div>
+        <p class="message error" id="setupError" role="alert" aria-live="assertive" hidden></p>
+        <button type="submit" class="btn btn-primary" id="startChatBtn" data-i18n-ui="chatStart">Začít chat</button>
+      </form>
+    </section>
+
+    <section class="chat-room" id="chatRoom" hidden aria-labelledby="partnerName">
+      <div class="chat-partner">
+        <span class="chat-avatar" aria-hidden="true">🧙</span>
+        <span class="chat-partner-info">
+          <span class="chat-partner-name" id="partnerName"></span>
+          <span class="chat-partner-title" id="partnerTitle"></span>
+        </span>
+      </div>
+
+      <div class="chat-log" id="chatLog" role="log" aria-live="polite"
+        data-i18n-ui-aria-label="chatLogLabel"></div>
+
+      <form class="chat-input" id="chatForm">
+        <input type="text" id="messageInput" name="message" maxlength="500"
+          autocomplete="off"
+          data-i18n-ui-placeholder="chatMessagePlaceholder"
+          data-i18n-ui-aria-label="chatMessagePlaceholder"
+          placeholder="Napiš zprávu…">
+        <button type="submit" class="btn btn-primary" id="sendBtn" data-i18n-ui="chatSend">Odeslat</button>
+      </form>
+
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" id="backToSetupBtn" data-i18n-ui="chatBack">← Změnit postavu</button>
+      </div>
+    </section>
+  </div>
+  </main>
