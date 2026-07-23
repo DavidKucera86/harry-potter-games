@@ -32,16 +32,18 @@ Data comes from the [HP API](https://hp-api.onrender.com/) with offline fixtures
 fallback. PWA with a service worker; deployed to Netlify via GitHub Actions.
 
 - `src/` — **TypeScript source; edit here.**
-- `shared/*.js`, `guess-*/script.js`, `who-is-on-photo/script.js`, `*/index.html` —
-  **generated** by `npm run build`. Never hand-edit; rebuild and commit the output.
+- `shared/*.js`, `guess-*/script.js`, `who-is-on-photo/script.js`,
+  `rock-paper-scissors/script.js`, `*/index.html` — **generated** by `npm run build`.
+  Never hand-edit; rebuild and commit the output.
 - `shared/templates/`, `shared/styles/`, `shared/fixtures/` — static assets (build inputs).
 - `tests/` — Vitest unit + Playwright E2E (critical/edge/smoke/visual/a11y).
 
 ### Architecture
 
 `BaseGame` (shared modal, lives, deck, focus-trap, i18n) →
-`QuizGame` / `HangmanGame` → per-game subclasses. Each game page has a class module
-plus a thin `script.ts` bootstrap that instantiates it (e.g.
+`QuizGame` / `HangmanGame` → per-game subclasses. Games that don't fit the quiz/hangman
+shape (e.g. `rock-paper-scissors`) extend `BaseGame` directly. Each game page has a class
+module plus a thin `script.ts` bootstrap that instantiates it (e.g.
 `guess-house/GuessHouseGame.ts` + `guess-house/script.ts`). Keep this split — never
 put an instantiating `new …Game()` in the same module as the class, or importing it
 in a unit test triggers a real fetch at import time.
