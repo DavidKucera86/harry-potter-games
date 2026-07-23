@@ -12,6 +12,8 @@ const generatedPaths = [
   'rock-paper-scissors',
   'chat-with-character',
   'index.html',
+  'robots.txt',
+  'sitemap.xml',
 ];
 
 execSync('npm run build', { cwd: root, stdio: 'inherit' });

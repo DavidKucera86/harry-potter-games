@@ -16,7 +16,8 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 WORKDIR /usr/share/nginx/html
 
 # Copy only the static payload that gets published (mirrors netlify publish dir).
-COPY --from=build /app/index.html /app/manifest.webmanifest ./
+COPY --from=build /app/index.html /app/manifest.webmanifest /app/robots.txt /app/sitemap.xml ./
+COPY --from=build /app/favicon.ico /app/favicon-16x16.png /app/favicon-32x32.png /app/apple-touch-icon.png ./
 COPY --from=build /app/shared ./shared
 COPY --from=build /app/guess-character-name ./guess-character-name
 COPY --from=build /app/guess-house ./guess-house
