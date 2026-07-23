@@ -6,9 +6,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https: data:; connect-src 'self' https://hp-api.onrender.com; style-src 'self'; script-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
   <meta name="theme-color" content="#1a1025">
   <link rel="manifest" href="/manifest.webmanifest">
-  <title>Hádej postavu — Harry Potter Games</title>
+  <title>Kámen, nůžky, papír — Harry Potter Games</title>
   <link rel="stylesheet" href="../shared/common.css">
-  <link rel="stylesheet" href="../shared/styles/hangman.css">
 </head>
 <body>
   <a href="#main-content" class="skip-link" data-i18n-ui="skipToContent">Přeskočit na obsah</a>
@@ -19,8 +18,8 @@
   <main id="main-content">
   <header>
     <a class="back-link" href="../index.html" data-i18n-ui="backToMenu">← Zpět na menu</a>
-    <h1 data-i18n-key="hangmanCharacterTitle">Hádej postavu z Harryho Pottera</h1>
-    <p data-i18n-key="hangmanCharacterDesc">Uhodni jméno postavy písmeno po písmenu. Máš 10 životů.</p>
+    <h1 data-i18n-key="rpsTitle">Kámen, nůžky, papír</h1>
+    <p data-i18n-key="rpsDesc">Utkej se v kámen–nůžky–papír proti postavám z Bradavic. Kdo první získá pět výher, bere zápas.</p>
   </header>
 
   <div class="game-container" aria-busy="false">
@@ -29,46 +28,42 @@
       <p data-i18n-ui="loadingDefault">Načítám data…</p>
     </div>
 
-    <div class="status-bar">
-      <div class="lives">
-        <span class="lives-label" data-i18n-ui="livesLabel">Životy</span>
-        <div class="hearts" id="hearts" role="img"></div>
+    <div class="status-bar duel-scoreboard">
+      <div class="duel-side">
+        <span class="duel-side-label" data-i18n-ui="rpsYou">Ty</span>
+        <span class="duel-side-score" id="playerScore">0</span>
       </div>
-      <div>
-        <span class="score-label" data-i18n-ui="scoreLabel">Skóre </span>
-        <span class="score" id="score">0</span>
-      </div>
-      <div class="wrong-letters">
-        <span data-i18n-key="hangmanWrongLetters">Špatná písmena:</span>
-        <span id="wrongLetters">—</span>
+      <span class="duel-versus" aria-hidden="true">:</span>
+      <div class="duel-side">
+        <span class="duel-side-label" data-i18n-ui="rpsOpponent">Soupeř</span>
+        <span class="duel-side-score" id="opponentScore">0</span>
       </div>
     </div>
 
-    <div class="word-display" id="wordDisplay" role="group" data-i18n-a11y-label="wordDisplayLabel" aria-label="Hádané slovo"></div>
-
-    <div class="message info" id="message" aria-live="polite" data-i18n-key="hangmanCharacterInitial">Hádej písmeno ve jménu postavy…</div>
-
-    <div class="input-area">
-      <input
-        type="text"
-        id="letterInput"
-        maxlength="1"
-        data-i18n-ui-placeholder="letterPlaceholder"
-        placeholder="Zadej písmeno"
-        autocomplete="off"
-        inputmode="text"
-        enterkeyhint="done"
-        data-i18n-ui-aria-label="letterPlaceholder"
-        aria-label="Zadej písmeno"
-      >
-      <button class="btn btn-primary" id="guessBtn" data-i18n-ui="guessLetter">Hádat</button>
+    <div class="photo-frame duel-photo">
+      <img id="opponentPhoto" src="" alt="Fotografie soupeře" loading="lazy">
+      <span class="photo-fallback" aria-hidden="true">🧙</span>
     </div>
+
+    <div class="duel-reveal" id="duelReveal" hidden>
+      <div class="duel-hands">
+        <span class="duel-gesture" id="playerMove" aria-hidden="true"></span>
+        <span class="duel-gesture-vs" aria-hidden="true">⚔️</span>
+        <span class="duel-gesture" id="opponentMove" aria-hidden="true"></span>
+      </div>
+      <div class="duel-opponent">
+        <span id="opponentName"></span>
+        <span class="house-badge" id="opponentHouse"></span>
+      </div>
+    </div>
+
+    <div class="message info" id="message" aria-live="polite" data-i18n-key="rpsInitial">Vyber svůj tah — kámen, nůžky, nebo papír?</div>
+
+    <div class="choices-grid move-grid" id="moves"></div>
 
     <div class="actions">
       <button class="btn btn-secondary" id="newGameBtn" data-i18n-ui="newGame">Nová hra</button>
     </div>
-
-    <p class="keyboard-hint" data-i18n-ui="keyboardHint">Tip: můžeš psát přímo na klávesnici a potvrdit Enterem</p>
   </div>
   </main>
   <div class="overlay" id="overlay" aria-hidden="true" inert>

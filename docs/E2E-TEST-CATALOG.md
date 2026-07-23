@@ -8,8 +8,9 @@
 **Soubor:** `tests/smoke/menu.spec.ts`
 
 - **Given** uživatel otevře hlavní menu
-- **Then** stránka je v češtině a zobrazí čtyři herní karty
+- **Then** stránka je v češtině a zobrazí pět herních karet
 - **Then** footer obsahuje odkaz Buy Me a Coffee a nadpis stránky
+- **Then** footer odkazuje na Klódo-Metr kartičku
 
 ### S02.01 — navigation from menu to each game
 **Soubor:** `tests/smoke/menu.spec.ts`
@@ -25,6 +26,9 @@
 - **Then** otevře se správná hra s viditelným nadpisem
 - **Given** uživatel je na hlavním menu
 - **When** uživatel klikne na kartu hry who-is-on-photo/
+- **Then** otevře se správná hra s viditelným nadpisem
+- **Given** uživatel je na hlavním menu
+- **When** uživatel klikne na kartu hry rock-paper-scissors/
 - **Then** otevře se správná hra s viditelným nadpisem
 
 ### S03.01 — /guess-character-name/ loads and becomes playable
@@ -54,7 +58,7 @@
 ### S04.01 — shared scripts load without critical console errors
 **Soubor:** `tests/smoke/games-load.spec.ts`
 
-- **Given** uživatel postupně navštíví všechny čtyři hry
+- **Given** uživatel postupně navštíví všechny hry
 - **Then** v konzoli se neobjeví kritické chyby
 
 ### S05.01 — back link returns to menu
@@ -62,7 +66,13 @@
 
 - **Given** hra Hádej postavu je načtená
 - **When** uživatel klikne na odkaz zpět do menu
-- **Then** zobrazí se hlavní menu se čtyřmi kartami her
+- **Then** zobrazí se hlavní menu s pěti kartami her
+
+### S06.01 — /rock-paper-scissors/ loads with a fresh scoreboard and three moves
+**Soubor:** `tests/smoke/games-load.spec.ts`
+
+- **Given** hra Kámen–nůžky–papír je načtená s mockovanými daty
+- **Then** hra nabízí tři tahy a skóre je 0:0
 
 ## Critical (@critical)
 
@@ -96,7 +106,7 @@
 - **Given** API je mockované a uživatel je na hlavním menu
 - **When** uživatel přejde do hry Hádej postavu
 - **When** uživatel se vrátí zpět do menu
-- **Then** zobrazí se menu se čtyřmi kartami
+- **Then** zobrazí se menu s pěti kartami
 - **When** uživatel přejde do hry Hádej kolej
 - **Then** hra Hádej kolej se načte a je hratelná
 
@@ -113,6 +123,40 @@
 - **Given** hra Kdo je na fotce je načtená s mockovanými postavami
 - **When** uživatel vybere správné jméno postavy na fotce
 - **Then** skóre se zvýší na 1
+
+### Q03.01 — winning a round increases the player score
+**Soubor:** `tests/critical/rock-paper-scissors.spec.ts`
+
+- **Given** hra Kámen–nůžky–papír je načtená a soupeř hází kámen
+- **When** hráč zahraje papír
+- **Then** skóre hráče se zvýší na 1 a odhalí se souboj
+
+### Q03.02 — losing a round increases the opponent score
+**Soubor:** `tests/critical/rock-paper-scissors.spec.ts`
+
+- **Given** hra Kámen–nůžky–papír je načtená a soupeř hází kámen
+- **When** hráč zahraje nůžky
+- **Then** skóre soupeře se zvýší na 1
+
+### Q03.03 — first to the win target wins the match
+**Soubor:** `tests/critical/rock-paper-scissors.spec.ts`
+
+- **Given** hra Kámen–nůžky–papír je načtená a soupeř hází kámen
+- **When** hráč vyhraje potřebný počet kol
+- **Then** otevře se vítězný modal zápasu odkotvený nad dolní polovinou fotky
+
+### Q03.04 — the same opponent stays until the match is decided
+**Soubor:** `tests/critical/rock-paper-scissors.spec.ts`
+
+- **Given** hra Kámen–nůžky–papír je načtená a soupeř hází kámen
+- **When** hráč odehraje první kolo
+- **Then** druhé kolo má stále stejného soupeře i fotku
+
+### Q03.05 — the scoreboard stays on a single row on a narrow viewport
+**Soubor:** `tests/critical/rock-paper-scissors.spec.ts`
+
+- **Given** hra je načtená na úzkém mobilním viewportu
+- **Then** obě strany skóre jsou na stejném řádku
 
 ## Edge (@edge)
 
@@ -557,6 +601,13 @@
 - **When** uživatel přepne jazyk na angličtinu
 - **Then** titulek modalu se přepne do angličtiny
 
+### E53.01 — /rock-paper-scissors/ has no serious axe violations
+**Soubor:** `tests/edge/a11y.spec.ts`
+
+- **Given** hra na adrese /rock-paper-scissors/ je načtená
+- **When** proběhne axe accessibility scan
+- **Then** nejsou nalezeny serious ani critical porušení
+
 ## Visual (@visual)
 
 ### V01.01 — menu page layout
@@ -593,3 +644,10 @@
 - **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
 - **Given** uživatel prohraje hangman hru
 - **Then** screenshot proherního modalu odpovídá baseline
+
+### V06.01 — rock-paper-scissors ready state
+**Soubor:** `tests/visual/screenshots.spec.ts`
+
+- **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
+- **Given** hra Kámen–nůžky–papír je ve stavu připraveno ke hře
+- **Then** screenshot herního kontejneru odpovídá baseline

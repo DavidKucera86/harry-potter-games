@@ -8,9 +8,9 @@ test.describe('Menu @smoke', () => {
       await page.goto('/');
     });
 
-    await then('stránka je v češtině a zobrazí čtyři herní karty', async () => {
+    await then('stránka je v češtině a zobrazí pět herních karet', async () => {
       await expect(page.locator('html')).toHaveAttribute('lang', 'cs');
-      await expect(page.locator(selectors.gameCard)).toHaveCount(4);
+      await expect(page.locator(selectors.gameCard)).toHaveCount(5);
     });
 
     await then('footer obsahuje odkaz Buy Me a Coffee a nadpis stránky', async () => {
@@ -20,6 +20,10 @@ test.describe('Menu @smoke', () => {
       );
       await expect(page.getByRole('heading', { name: 'Harry Potter Games' })).toBeVisible();
     });
+
+    await then('footer odkazuje na Klódo-Metr kartičku', async () => {
+      await expect(page.locator('.klodo-link')).toHaveAttribute('href', 'klodo-metr.png');
+    });
   });
 
   test('S02.01: navigation from menu to each game', { tag: '@smoke' }, async ({ page }) => {
@@ -28,6 +32,7 @@ test.describe('Menu @smoke', () => {
       { href: 'guess-house/', title: /Hádej kolej/ },
       { href: 'guess-spell/', title: /Hádej zaklínadlo/ },
       { href: 'who-is-on-photo/', title: /Kdo je na fotce/ },
+      { href: 'rock-paper-scissors/', title: /Kámen, nůžky, papír/ },
     ];
 
     for (const game of games) {

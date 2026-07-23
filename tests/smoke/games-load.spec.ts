@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
+import { waitForRpsReady } from '../helpers/duel';
 import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 import { testId } from '../helpers/testId';
@@ -10,6 +11,11 @@ const gamePages = [
   { path: '/guess-spell/', wait: waitForHangmanReady },
   { path: '/guess-house/', wait: waitForQuizReady },
   { path: '/who-is-on-photo/', wait: waitForQuizReady },
+];
+
+const allGamePages = [
+  ...gamePages,
+  { path: '/rock-paper-scissors/', wait: waitForRpsReady },
 ];
 
 test.describe('Games load @smoke', () => {
@@ -48,10 +54,10 @@ test.describe('Games load @smoke', () => {
       }
     });
 
-    await given('uživatel postupně navštíví všechny čtyři hry', async () => {
+    await given('uživatel postupně navštíví všechny hry', async () => {
       await setupGameMocks(page);
 
-      for (const game of gamePages) {
+      for (const game of allGamePages) {
         await page.goto(game.path);
         await game.wait(page);
       }
@@ -73,9 +79,25 @@ test.describe('Games load @smoke', () => {
       await page.locator(selectors.backLink).click();
     });
 
-    await then('zobrazí se hlavní menu se čtyřmi kartami her', async () => {
+    await then('zobrazí se hlavní menu s pěti kartami her', async () => {
       await expect(page).toHaveURL(/\/index\.html?$|\/$/);
-      await expect(page.locator(selectors.gameCard)).toHaveCount(4);
+      await expect(page.locator(selectors.gameCard)).toHaveCount(5);
+    });
+  });
+
+  test('S06.01: /rock-paper-scissors/ loads with a fresh scoreboard and three moves', { tag: '@smoke' }, async ({ page }) => {
+    await given('hra Kámen–nůžky–papír je načtená s mockovanými daty', async () => {
+      await setupGameMocks(page, { random: 0 });
+      await page.goto('/rock-paper-scissors/');
+      await waitForRpsReady(page);
+    });
+
+    await then('hra nabízí tři tahy a skóre je 0:0', async () => {
+      await expect(page.locator(selectors.loadingOverlay)).toBeHidden();
+      await expect(page.locator(selectors.moves)).toHaveCount(3);
+      await expect(page.locator(selectors.playerScore)).toHaveText('0');
+      await expect(page.locator(selectors.opponentScore)).toHaveText('0');
+      await expect(page.locator(selectors.newGameBtn)).toBeEnabled();
     });
   });
 });

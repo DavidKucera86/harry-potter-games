@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 import { charactersFixture, setupGameMocks } from '../helpers/api';
 import { waitForQuizReady } from '../helpers/hangman';
 import { given, when, then } from '../helpers/gwt';
+import { GAME_CONFIG } from '../../src/shared/config';
+
+const CHARACTERS_CACHE_KEY = `${GAME_CONFIG.CACHE_KEYS.CHARACTERS}-v${GAME_CONFIG.CACHE_VERSION}`;
 
 async function waitForServiceWorker(page: import('@playwright/test').Page) {
   await page.waitForFunction(async () => {
@@ -76,9 +79,10 @@ test.describe('Prefetch cache @edge', () => {
       });
 
       await page.goto('/');
-      await page.waitForFunction(() => {
-        return sessionStorage.getItem('hp-games-characters-v5') !== null;
-      });
+      await page.waitForFunction(
+        (key) => sessionStorage.getItem(key) !== null,
+        CHARACTERS_CACHE_KEY,
+      );
       callsAfterPrefetch = charactersApiCalls;
     });
 
