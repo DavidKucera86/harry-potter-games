@@ -17,6 +17,8 @@ const GAME_CONFIG = {
   SW_CACHE_NAME: `hp-games-v${APP_VERSION}`,
   API_RETRIES: 3,
   API_RETRY_DELAY_MS: 1e3,
+  /** Min gap between data-load attempts, so hammering "New game" can't flood the API. */
+  NEW_GAME_COOLDOWN_MS: 1e3,
   MIN_WORD_LENGTH: 3,
   WINS_TO_MATCH: 5,
   PHOTO_LOAD_TIMEOUT_MS: 2e3,
