@@ -10,7 +10,6 @@
 - **Given** uživatel otevře hlavní menu
 - **Then** stránka je v češtině a zobrazí pět herních karet
 - **Then** footer obsahuje odkaz Buy Me a Coffee a nadpis stránky
-- **Then** footer odkazuje na Klódo-Metr kartičku
 
 ### S02.01 — navigation from menu to each game
 **Soubor:** `tests/smoke/menu.spec.ts`

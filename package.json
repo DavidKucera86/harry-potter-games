@@ -16,11 +16,10 @@
     "test:production": "PLAYWRIGHT_TARGET=production playwright test",
     "test:ui": "playwright test --ui",
     "docs:test-catalog": "npm run build && playwright test --reporter=./scripts/gwt-catalog-reporter.ts",
-    "klodo:card": "node scripts/build-klodo-card.mjs",
     "lint": "eslint src/ tests/"
   },
   "simple-git-hooks": {
-    "pre-commit": "npm run verify:build && npm run lint && npm run typecheck && npm run docs:test-catalog && git add docs/E2E-TEST-CATALOG.md && npm run klodo:card && (git add klodo-metr.png || true)"
+    "pre-commit": "npm run verify:build && npm run lint && npm run typecheck && npm run docs:test-catalog && git add docs/E2E-TEST-CATALOG.md"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

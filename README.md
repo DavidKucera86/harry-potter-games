@@ -46,8 +46,6 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
 | `index.html`, `guess-*/index.html` | **Generované HTML** z `npm run build:html` — commituj po buildu |
 | `shared/templates/` | HTML šablony (vstup pro build:html) |
 | `shared/styles/`, `shared/fixtures/` | Statické assety (CSS, JSON fixtures) |
-| `scripts/build-klodo-card.mjs` | Generátor Klódo-Metr kartičky do patičky (viz níže) |
-| `klodo-metr.png` | **Generovaná** Klódo-Metr kartička — přegeneruje se před každým commitem |
 | `tests/` | Vitest unit + Playwright E2E (+ visual snapshoty) |
 
 **Poznámka:** Složka `shared/` obsahuje jak statické soubory (CSS, fixtures, templates), tak generované `.js` moduly. Generované soubory odpovídají `src/shared/` a `src/guess-*/`.
@@ -58,7 +56,6 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
 - **Build:** `npm run build` = HTML ze šablon + kompilace TS → JS (esbuild)
 - **Deploy artefakty:** generované `*.js` a `index.html` soubory v kořeni (commitované)
 - **i18n:** čeština + angličtina (`src/shared/i18n/`), přepínač ve footeru, `?lang=en|cs`
-- **Klódo-Metr kartička:** patička odkazuje na `klodo-metr.png` — sdílenou kartičku z [Klódo-Metr](https://github.com/vibecoding-akademie/klodo-metr). Přegeneruje se před každým commitem (`npm run klodo:card`); publikují se **jen agregátní sekce** (hero s délkou v cm a levelem, žebříček levelů, „co to je v reálu" a odznaky) — panel s projekty a útratou se vynechává, takže názvy projektů ani útrata ven nejdou. Generace je fail-soft — když ccusage není dostupné, ponechá poslední kartičku a commit nezablokuje.
 - **PWA:** service worker (`shared/sw.js`) s network-first pro HTML a cache-first pro assety, update banner, offline cache
 - **Prefetch:** menu stránka na pozadí stáhne postavy a kouzla do session cache (`prefetchGameData.js`)
 - **Sdílené moduly** (kompilované do `shared/`):
@@ -104,7 +101,7 @@ Vygenerované soubory (`index.html`, `guess-*/index.html`, …) commituj do repo
 npm run verify:build
 ```
 
-Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) automaticky spouští `verify:build`, `lint`, `typecheck`, regeneraci [E2E test katalogu](docs/E2E-TEST-CATALOG.md) a regeneraci + re-stage Klódo-Metr kartičky (`klodo-metr.png`).
+Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) automaticky spouští `verify:build`, `lint`, `typecheck`, regeneraci [E2E test katalogu](docs/E2E-TEST-CATALOG.md).
 
 ## Sdílená cache dat
 
@@ -158,7 +155,6 @@ Co se stane:
 | `npm run test:e2e` | Jen Playwright E2E testy |
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
 | `npm run docs:test-catalog` | Vygeneruje [E2E test katalog](docs/E2E-TEST-CATALOG.md) ve stylu Given-When-Then |
-| `npm run klodo:card` | Přegeneruje Klódo-Metr kartičku v patičce (`klodo-metr.png`) |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
 | `npx playwright test --grep @visual` | Visual regression screenshoty |
