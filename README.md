@@ -11,6 +11,7 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | [Hádej zaklínadlo](guess-spell/) | Hangman — uhodni zaklínadlo |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
 | [Kámen, nůžky, papír](rock-paper-scissors/) | Utkej se v kámen–nůžky–papír proti postavám z Bradavic; kdo první získá pět výher, bere zápas |
+| [Chat s postavou](chat-with-character/) | Zadej přezdívku, vyber postavu a dej se s ní do řeči; odpovídá připravenými hláškami podle klíčových slov (zatím Brumbál) |
 
 ## Spuštění lokálně — vždy přes Docker
 
@@ -65,8 +66,9 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
   - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js` — utility
+  - `chatEngine.js` — pravidlový chat engine (normalizace, matching klíčových slov, výběr hlášek, validace přezdívky); klíčová slova žijí ve sdíleném registru témat (`chat-with-character/data/topics.js`), hlášky u postav — postava umí u „sdílitelných" témat převzít odpověď od jiné (`resolveReply` + deferral)
   - `i18n/index.js` — lokalizace UI textů
-- **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry)
+- **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry, `chat.css` pro chat)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
 - **Testování:** Vitest (unit) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`
 
@@ -192,8 +194,8 @@ Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-T
 | ID | Soubor | Popis |
 |---|---|---|
 | S01.01–S02.01, S04.01–S05.01 | smoke/ | Smoke testy menu, navigace, skripty, zpět |
-| S03.01–S03.04, S06.01 | smoke/games-load | Načtení každé z 5 her (S06.01 = Kámen–nůžky–papír) |
-| G01.01, H01.01–H02.01, N01.01, Q01.01–Q02.01, Q03.01–Q03.05 | critical/ | Happy-path scénáře (Q03 = Kámen–nůžky–papír) |
+| S03.01–S03.04, S06.01 | smoke/games-load | Načtení každé z 6 her (S06.01 = Kámen–nůžky–papír, Chat je pokryt v S04.01) |
+| G01.01, H01.01–H02.01, N01.01, Q01.01–Q02.01, Q03.01–Q03.05, Q06.01–Q06.02 | critical/ | Happy-path scénáře (Q03 = Kámen–nůžky–papír, Q06 = Chat s postavou) |
 | E01.01–E03.01 | hangman-input | Validace vstupu hangmanu |
 | E04.01–E04.02 | hangman-input, hangman-lose | Enter win / prohra hangmanu |
 | E05.01–E05.02, E29.01 | hangman-input, hangman-word-wrap | Enter lose / zalamování slov |
@@ -220,6 +222,7 @@ Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-T
 | E46.01–E48.01 | sw-update | Update banner, network-first HTML, prefetch |
 | E49.01 | a11y | Axe scan menu stránky |
 | E50.01–E52.01 | i18n | `?lang=en`, dynamický feedback a modal po přepnutí jazyka |
+| E54.01–E54.04 | chat-setup | Validace přezdívky, limit 32 znaků, XSS bezpečnost a skrytí chybového pole |
 | V01.01–V06.01 | visual/screenshots | Visual regression snapshoty |
 
 ### Visual regression

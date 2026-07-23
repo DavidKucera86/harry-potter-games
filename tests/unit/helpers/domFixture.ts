@@ -47,6 +47,38 @@ export function setupQuizDom(withPhoto = false): void {
   `;
 }
 
+export function setupChatDom(): void {
+  document.body.innerHTML = `
+    <div class="game-container" aria-busy="false">
+      <div id="loadingOverlay" hidden><p>Loading</p></div>
+      <section class="chat-setup" id="chatSetup">
+        <h2 id="chatSetupHeading">Before we begin</h2>
+        <form id="setupForm" novalidate>
+          <label for="nickname">Nickname</label>
+          <input type="text" id="nickname" name="nickname" maxlength="32" />
+          <label for="characterSelect">Character</label>
+          <select id="characterSelect" name="character"></select>
+          <p class="message error" id="setupError" role="alert" hidden></p>
+          <button type="submit" id="startChatBtn">Start</button>
+        </form>
+      </section>
+      <section class="chat-room" id="chatRoom" hidden>
+        <div class="chat-partner">
+          <span class="chat-avatar">🧙</span>
+          <span class="chat-partner-name" id="partnerName"></span>
+          <span class="chat-partner-title" id="partnerTitle"></span>
+        </div>
+        <div class="chat-log" id="chatLog" role="log"></div>
+        <form class="chat-input" id="chatForm">
+          <input type="text" id="messageInput" name="message" maxlength="500" />
+          <button type="submit" id="sendBtn">Send</button>
+        </form>
+        <button type="button" id="backToSetupBtn">Back</button>
+      </section>
+    </div>
+  `;
+}
+
 export function setupRpsDom(): void {
   document.body.innerHTML = `
     <div class="game-container">

@@ -93,6 +93,14 @@ const en = {
     opponentAlt: "Opponent photo",
     noHouse: "No house"
   },
+  chat: {
+    greeting(nickname) {
+      return `Welcome, ${nickname}. Do sit down and have a sherbet lemon. Ask me anything \u2014 I speak most gladly of love, death, wisdom, and the secrets of Hogwarts.`;
+    },
+    errorEmptyNickname: "Please enter your nickname.",
+    errorTooLongNickname: "The nickname may be at most 32 characters long.",
+    errorNoCharacter: "Please choose a character to chat with."
+  },
   ui: {
     newGame: "New game",
     guessLetter: "Guess",
@@ -110,7 +118,14 @@ const en = {
     swUpdateMessage: "A new version of the app is available.",
     swUpdateReload: "Reload",
     rpsYou: "You",
-    rpsOpponent: "Opponent"
+    rpsOpponent: "Opponent",
+    chatStart: "Start chat",
+    chatSend: "Send",
+    chatBack: "\u2190 Change character",
+    chatYou: "You",
+    chatNicknamePlaceholder: "Enter a nickname (max. 32 characters)",
+    chatMessagePlaceholder: "Type a message\u2026",
+    chatLogLabel: "Conversation log"
   },
   pages: {
     menuTitle: "Harry Potter Games",
@@ -125,6 +140,8 @@ const en = {
     menuPhotoDesc: "Look at the photo and pick the correct name from four choices.",
     menuRpsTitle: "Rock, paper, scissors",
     menuRpsDesc: "Duel Hogwarts characters at rock\u2013paper\u2013scissors. First to five wins takes the match.",
+    menuChatTitle: "Chat with a character",
+    menuChatDesc: "Pick a character from the wizarding world and strike up a conversation. For now you can chat with Dumbledore.",
     menuPlay: "Play \u2192",
     hangmanCharacterTitle: "Guess the Harry Potter character",
     hangmanCharacterDesc: "Guess the character name letter by letter. You have 10 lives.",
@@ -142,7 +159,12 @@ const en = {
     quizPhotoInitial: "Who is in the photo?",
     rpsTitle: "Rock, paper, scissors",
     rpsDesc: "Duel Hogwarts characters at rock\u2013paper\u2013scissors. First to five wins takes the match.",
-    rpsInitial: "Pick your move \u2014 rock, paper, or scissors?"
+    rpsInitial: "Pick your move \u2014 rock, paper, or scissors?",
+    chatTitle: "Chat with a Harry Potter character",
+    chatDesc: "Pick a character and strike up a conversation. They reply with canned lines based on what you write.",
+    chatSetupHeading: "Before we begin",
+    chatNicknameLabel: "Your nickname",
+    chatCharacterLabel: "Who would you like to talk to?"
   }
 };
 export {

@@ -93,6 +93,14 @@ const cs = {
     opponentAlt: "Fotografie soupe\u0159e",
     noHouse: "Bez koleje"
   },
+  chat: {
+    greeting(nickname) {
+      return `V\xEDtej, ${nickname}. Posa\u010F se a dej si \u0161erbetov\xFD citr\xF3nek. Ptej se na cokoli \u2014 nejrad\u011Bji hovo\u0159\xEDm o l\xE1sce, smrti, moudrosti a tajemstv\xEDch Bradavic.`;
+    },
+    errorEmptyNickname: "Zadej pros\xEDm svou p\u0159ezd\xEDvku.",
+    errorTooLongNickname: "P\u0159ezd\xEDvka sm\xED m\xEDt nejv\xFD\u0161 32 znak\u016F.",
+    errorNoCharacter: "Vyber pros\xEDm postavu, se kterou si chce\u0161 pov\xEDdat."
+  },
   ui: {
     newGame: "Nov\xE1 hra",
     guessLetter: "H\xE1dat",
@@ -110,7 +118,14 @@ const cs = {
     swUpdateMessage: "Je dostupn\xE1 nov\xE1 verze aplikace.",
     swUpdateReload: "Obnovit",
     rpsYou: "Ty",
-    rpsOpponent: "Soupe\u0159"
+    rpsOpponent: "Soupe\u0159",
+    chatStart: "Za\u010D\xEDt chat",
+    chatSend: "Odeslat",
+    chatBack: "\u2190 Zm\u011Bnit postavu",
+    chatYou: "Ty",
+    chatNicknamePlaceholder: "Zadej p\u0159ezd\xEDvku (max. 32 znak\u016F)",
+    chatMessagePlaceholder: "Napi\u0161 zpr\xE1vu\u2026",
+    chatLogLabel: "Pr\u016Fb\u011Bh konverzace"
   },
   pages: {
     menuTitle: "Harry Potter Games",
@@ -125,6 +140,8 @@ const cs = {
     menuPhotoDesc: "Pod\xEDvej se na fotku postavy a vyber spr\xE1vn\xE9 jm\xE9no ze \u010Dty\u0159 mo\u017Enost\xED.",
     menuRpsTitle: "K\xE1men, n\u016F\u017Eky, pap\xEDr",
     menuRpsDesc: "Utkej se v k\xE1men\u2013n\u016F\u017Eky\u2013pap\xEDr proti postav\xE1m z Bradavic. Kdo prvn\xED z\xEDsk\xE1 p\u011Bt v\xFDher, bere z\xE1pas.",
+    menuChatTitle: "Chat s postavou",
+    menuChatDesc: "Vyber si postavu ze sv\u011Bta Harryho Pottera a dej se s n\xED do \u0159e\u010Di. Zat\xEDm si m\u016F\u017Ee\u0161 popov\xEDdat s Brumb\xE1lem.",
     menuPlay: "Hr\xE1t \u2192",
     hangmanCharacterTitle: "H\xE1dej postavu z Harryho Pottera",
     hangmanCharacterDesc: "Uhodni jm\xE9no postavy p\xEDsmeno po p\xEDsmenu. M\xE1\u0161 10 \u017Eivot\u016F.",
@@ -142,7 +159,12 @@ const cs = {
     quizPhotoInitial: "Kdo je na fotce?",
     rpsTitle: "K\xE1men, n\u016F\u017Eky, pap\xEDr",
     rpsDesc: "Utkej se v k\xE1men\u2013n\u016F\u017Eky\u2013pap\xEDr proti postav\xE1m z Bradavic. Kdo prvn\xED z\xEDsk\xE1 p\u011Bt v\xFDher, bere z\xE1pas.",
-    rpsInitial: "Vyber sv\u016Fj tah \u2014 k\xE1men, n\u016F\u017Eky, nebo pap\xEDr?"
+    rpsInitial: "Vyber sv\u016Fj tah \u2014 k\xE1men, n\u016F\u017Eky, nebo pap\xEDr?",
+    chatTitle: "Chat s postavou z Harryho Pottera",
+    chatDesc: "Vyber si postavu a dej se s n\xED do \u0159e\u010Di. Odpov\xEDd\xE1 p\u0159ipraven\xFDmi hl\xE1\u0161kami podle toho, o \u010Dem p\xED\u0161e\u0161.",
+    chatSetupHeading: "Ne\u017E za\u010Dneme",
+    chatNicknameLabel: "Tv\xE1 p\u0159ezd\xEDvka",
+    chatCharacterLabel: "S k\xFDm si chce\u0161 pov\xEDdat?"
   }
 };
 export {

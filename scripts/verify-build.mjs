@@ -9,6 +9,8 @@ const generatedPaths = [
   'guess-spell',
   'guess-house',
   'who-is-on-photo',
+  'rock-paper-scissors',
+  'chat-with-character',
   'index.html',
 ];
 

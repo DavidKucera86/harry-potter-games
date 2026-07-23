@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
 import { waitForRpsReady } from '../helpers/duel';
+import { waitForChatReady } from '../helpers/chat';
 import { given, when, then } from '../helpers/gwt';
 import { selectors } from '../helpers/selectors';
 import { testId } from '../helpers/testId';
@@ -16,6 +17,7 @@ const gamePages = [
 const allGamePages = [
   ...gamePages,
   { path: '/rock-paper-scissors/', wait: waitForRpsReady },
+  { path: '/chat-with-character/', wait: waitForChatReady },
 ];
 
 test.describe('Games load @smoke', () => {
@@ -79,9 +81,9 @@ test.describe('Games load @smoke', () => {
       await page.locator(selectors.backLink).click();
     });
 
-    await then('zobrazí se hlavní menu s pěti kartami her', async () => {
+    await then('zobrazí se hlavní menu se šesti kartami her', async () => {
       await expect(page).toHaveURL(/\/index\.html?$|\/$/);
-      await expect(page.locator(selectors.gameCard)).toHaveCount(5);
+      await expect(page.locator(selectors.gameCard)).toHaveCount(6);
     });
   });
 

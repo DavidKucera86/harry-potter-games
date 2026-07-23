@@ -21,8 +21,8 @@ test.describe('Navigation @critical', () => {
       await page.locator(selectors.backLink).click();
     });
 
-    await then('zobrazí se menu s pěti kartami', async () => {
-      await expect(page.locator(selectors.gameCard)).toHaveCount(5);
+    await then('zobrazí se menu se šesti kartami', async () => {
+      await expect(page.locator(selectors.gameCard)).toHaveCount(6);
     });
 
     await when('uživatel přejde do hry Hádej kolej', async () => {
