@@ -48,6 +48,15 @@ module plus a thin `script.ts` bootstrap that instantiates it (e.g.
 put an instantiating `new …Game()` in the same module as the class, or importing it
 in a unit test triggers a real fetch at import time.
 
+The chat game keeps its *engine* in `src/shared/chatEngine.ts` (keyword matching, topic
+priority, reply selection, follow-up suggestions) and its *content* in
+`src/chat-with-character/data/` — `topics.ts` holds matching data only (keyword stems,
+`deferrable`, `priority`), `dumbledore.ts` the per-character replies, `followUps.ts` the
+questions offered back to the player. Keep that split: keywords are matched as plain
+substrings on a diacritics-stripped form, so a stem short enough to hide inside an
+unrelated word (`kod` in "škoda", `ai` in "afraid") will fire on innocent messages —
+add a false-positive test whenever you add one.
+
 ## Adding new functionality — non-negotiable principles
 
 When adding any new feature, these principles always apply — no exceptions, no

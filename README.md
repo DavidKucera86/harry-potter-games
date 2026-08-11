@@ -11,7 +11,7 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | [Hádej zaklínadlo](guess-spell/) | Hangman — uhodni zaklínadlo |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
 | [Kámen, nůžky, papír](rock-paper-scissors/) | Utkej se v kámen–nůžky–papír proti postavám z Bradavic; kdo první získá pět výher, bere zápas |
-| [Chat s postavou](chat-with-character/) | Zadej přezdívku, vyber postavu a dej se s ní do řeči; odpovídá připravenými hláškami podle klíčových slov (zatím Brumbál) |
+| [Chat s postavou](chat-with-character/) | Zadej přezdívku, vyber postavu a dej se s ní do řeči; odpovídá připravenými hláškami podle klíčových slov a po každé odpovědi nabídne tři navazující otázky (zatím Brumbál) |
 
 ## Spuštění lokálně — vždy přes Docker
 
@@ -68,7 +68,7 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
   - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js` — utility
-  - `chatEngine.js` — pravidlový chat engine (normalizace, matching klíčových slov, výběr hlášek, validace přezdívky); klíčová slova žijí ve sdíleném registru témat (`chat-with-character/data/topics.js`), hlášky u postav — postava umí u „sdílitelných" témat převzít odpověď od jiné (`resolveReply` + deferral)
+  - `chatEngine.js` — pravidlový chat engine (normalizace, matching klíčových slov, výběr hlášek, návrhy navazujících otázek, validace přezdívky); klíčová slova žijí ve sdíleném registru témat (`chat-with-character/data/topics.js`), hlášky u postav — postava umí u „sdílitelných" témat převzít odpověď od jiné (`resolveReply` + deferral). `resolveReply` vrací i téma, ze kterého odpověď pochází, a `suggestFollowUps` z něj složí tři návrhy (data v `chat-with-character/data/followUps.js`). Priorita témat (`TOPIC_PRIORITY`) zajistí, že pozdrav nepřebije věcnou otázku ve stejné zprávě
   - `i18n/index.js` — lokalizace UI textů
 - **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry, `chat.css` pro chat)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
@@ -187,7 +187,7 @@ npx playwright show-trace test-results/.../trace.zip
 | `@smoke` | Základní dostupnost stránek a her |
 | `@critical` | Hlavní happy-path scénáře |
 | `@edge` | Edge cases (validace, prohra, cache, XSS, speciální znaky, a11y, API retry, i18n, PWA, …) |
-| `@visual` | Visual regression screenshoty (V01.01–V06.01) |
+| `@visual` | Visual regression screenshoty (V01.01–V07.01) |
 
 ### Test catalog (E2E ID)
 
@@ -199,7 +199,7 @@ Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-T
 |---|---|---|
 | S01.01–S02.01, S04.01–S05.01 | smoke/ | Smoke testy menu, navigace, skripty, zpět |
 | S03.01–S03.04, S06.01 | smoke/games-load | Načtení každé z 6 her (S06.01 = Kámen–nůžky–papír, Chat je pokryt v S04.01) |
-| G01.01, H01.01–H02.01, N01.01, Q01.01–Q02.01, Q03.01–Q03.05, Q06.01–Q06.02 | critical/ | Happy-path scénáře (Q03 = Kámen–nůžky–papír, Q06 = Chat s postavou) |
+| G01.01, H01.01–H02.01, N01.01, Q01.01–Q02.01, Q03.01–Q03.05, Q06.01–Q06.04 | critical/ | Happy-path scénáře (Q03 = Kámen–nůžky–papír, Q06 = Chat s postavou) |
 | E01.01–E03.01 | hangman-input | Validace vstupu hangmanu |
 | E04.01–E04.02 | hangman-input, hangman-lose | Enter win / prohra hangmanu |
 | E05.01–E05.02, E29.01 | hangman-input, hangman-word-wrap | Enter lose / zalamování slov |
@@ -220,14 +220,16 @@ Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-T
 | E28.01 | offline-fallback | Fallback fixtures |
 | E30.01–E31.01 | quiz-mobile | Mobilní kvízy |
 | E32.01–E38.01 | hangman-mobile | Mobilní hangman |
-| E39.01–E42.01 | a11y | Axe accessibility her |
-| E43.01–E43.10 | i18n | Konzistence statických textů po přepnutí jazyka |
+| E39.01–E42.01, E53.01, E59.01 | a11y | Axe accessibility her (E59.01 = chat s návrhy otázek) |
+| E43.01–E43.12 | i18n | Konzistence statických textů po přepnutí jazyka |
 | E44.01–E45.01 | pwa-offline | Service worker a offline hra |
 | E46.01–E48.01 | sw-update | Update banner, network-first HTML, prefetch |
 | E49.01 | a11y | Axe scan menu stránky |
 | E50.01–E52.01 | i18n | `?lang=en`, dynamický feedback a modal po přepnutí jazyka |
 | E54.01–E54.04 | chat-setup | Validace přezdívky, limit 32 znaků, XSS bezpečnost a skrytí chybového pole |
-| V01.01–V06.01 | visual/screenshots | Visual regression snapshoty |
+| E57.01–E57.04 | chat-suggestions | Navazující otázky: tři návrhy, žádné opakování, ovládání klávesnicí |
+| E58.01–E58.02 | chat-mobile | Návrhy otázek na mobilu (dotyková plocha 44 px, žádné vodorovné rolování) |
+| V01.01–V07.01 | visual/screenshots | Visual regression snapshoty |
 
 ### Visual regression
 
