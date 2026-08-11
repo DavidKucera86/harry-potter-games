@@ -42,6 +42,17 @@ export interface ChatCharacter {
   deferral: DeferralTemplate;
 }
 
+/**
+ * A resolved reply together with the topic that produced it. `topic` is null
+ * whenever the general/fallback pool answered — including when a topic matched
+ * but the speaker had nothing to say about it — so follow-up suggestions never
+ * promise depth the character cannot deliver.
+ */
+export interface ChatResponse {
+  text: string;
+  topic: string | null;
+}
+
 export type NicknameValidation =
   | { ok: true; value: string }
   | { ok: false; reason: 'empty' | 'tooLong' };
@@ -150,7 +161,7 @@ export function resolveReply(
   registry: TopicRegistry,
   locale: Locale,
   options: PickOptions = {},
-): string {
+): ChatResponse {
   const random = options.random ?? Math.random;
   const excluded = toExcludeSet(options.exclude);
   const haystack = normalizeText(text);
@@ -159,7 +170,7 @@ export function resolveReply(
   if (topic) {
     const own = speaker.quotes[topic]?.[locale];
     if (own && own.length > 0) {
-      return pickFrom(own, excluded, random);
+      return { text: pickFrom(own, excluded, random), topic };
     }
 
     if (registry[topic].deferrable) {
@@ -169,7 +180,7 @@ export function resolveReply(
       );
       if (source) {
         const quote = pickFrom(source.quotes[topic][locale], excluded, random);
-        return speaker.deferral[locale](source.name[locale], quote);
+        return { text: speaker.deferral[locale](source.name[locale], quote), topic };
       }
     }
   }
@@ -178,7 +189,7 @@ export function resolveReply(
     ...(speaker.quotes.general?.[locale] ?? []),
     ...speaker.fallback[locale],
   ];
-  return pickFrom(fallbackPool, excluded, random);
+  return { text: pickFrom(fallbackPool, excluded, random), topic: null };
 }
 
 /** Validates and trims a nickname. Rendering is always via textContent, so

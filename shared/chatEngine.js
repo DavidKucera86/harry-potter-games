@@ -46,7 +46,7 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
   if (topic) {
     const own = speaker.quotes[topic]?.[locale];
     if (own && own.length > 0) {
-      return pickFrom(own, excluded, random);
+      return { text: pickFrom(own, excluded, random), topic };
     }
     if (registry[topic].deferrable) {
       const source = roster.find(
@@ -54,7 +54,7 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
       );
       if (source) {
         const quote = pickFrom(source.quotes[topic][locale], excluded, random);
-        return speaker.deferral[locale](source.name[locale], quote);
+        return { text: speaker.deferral[locale](source.name[locale], quote), topic };
       }
     }
   }
@@ -62,7 +62,7 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
     ...speaker.quotes.general?.[locale] ?? [],
     ...speaker.fallback[locale]
   ];
-  return pickFrom(fallbackPool, excluded, random);
+  return { text: pickFrom(fallbackPool, excluded, random), topic: null };
 }
 function validateNickname(raw) {
   const value = raw.trim();

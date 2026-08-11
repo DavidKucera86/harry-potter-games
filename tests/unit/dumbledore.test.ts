@@ -138,52 +138,52 @@ describe('dumbledore small talk', () => {
 
   it('resolves "oblíbené kouzlo" to the favourite-spell topic, not generic magic or likes', () => {
     const reply = resolveReply('Jaké je tvé oblíbené kouzlo?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.oblibenekouzlo.cs).toContain(reply);
+    expect(dumbledore.quotes.oblibenekouzlo.cs).toContain(reply.text);
   });
 
   it('resolves "relikvie smrti" to the Hallows topic, not the generic death topic', () => {
     const reply = resolveReply('Pověz mi o relikviích smrti', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.relikvie.cs).toContain(reply);
+    expect(dumbledore.quotes.relikvie.cs).toContain(reply.text);
   });
 
   it('resolves "souboj s Grindelwaldem" to the duel topic, not the romance topic', () => {
     const reply = resolveReply('Jaký byl souboj s Grindelwaldem?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.grindelwald_souboj.cs).toContain(reply);
+    expect(dumbledore.quotes.grindelwald_souboj.cs).toContain(reply.text);
   });
 
   it('resolves "Řád fénixe" to the Order topic, not the Fawkes topic', () => {
     const reply = resolveReply('Co je Řád fénixe?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply);
+    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply.text);
   });
 
   it('resolves "jak zničit viteál" to the destruction topic, not the general Horcrux topic', () => {
     const reply = resolveReply('Jak se ničí viteály?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.viteal_zniceni.cs).toContain(reply);
+    expect(dumbledore.quotes.viteal_zniceni.cs).toContain(reply.text);
   });
 
   it('resolves "Mnoholičný lektvar" to the specific-potions topic, not generic magic', () => {
     const reply = resolveReply('Co je Mnoholičný lektvar?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.lektvary.cs).toContain(reply);
+    expect(dumbledore.quotes.lektvary.cs).toContain(reply.text);
   });
 
   it('resolves "Salazar Zmijozel" to the founders topic, not the generic Hogwarts topic', () => {
     const reply = resolveReply('Kdo byl Salazar Zmijozel?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.zakladatele.cs).toContain(reply);
+    expect(dumbledore.quotes.zakladatele.cs).toContain(reply.text);
   });
 
   it('resolves "temné časy" to the dark-times topic, not the generic fear topic', () => {
     const reply = resolveReply('temné časy', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.temne_casy.cs).toContain(reply);
+    expect(dumbledore.quotes.temne_casy.cs).toContain(reply.text);
   });
 
   it('resolves "kdo se postavil temnotě" to the Order topic, not the generic fear topic', () => {
     const reply = resolveReply('Kdo se postavili temnotě?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply);
+    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply.text);
   });
 
   it('answers small talk from the topic bucket, not from the generic fallback', () => {
     const reply = resolveReply('Jak se máš?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.jaksemas.cs).toContain(reply);
-    expect(dumbledore.fallback.cs).not.toContain(reply);
+    expect(dumbledore.quotes.jaksemas.cs).toContain(reply.text);
+    expect(dumbledore.fallback.cs).not.toContain(reply.text);
   });
 });

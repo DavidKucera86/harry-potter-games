@@ -85,15 +85,23 @@ describe('detectTopics', () => {
 });
 
 describe('resolveReply — own quotes', () => {
-  it('returns a quote from the matched topic bucket', () => {
+  it('returns a quote from the matched topic bucket, with the topic it came from', () => {
     const reply = resolveReply('Řekni mi o smrti', sage, roster, topics, 'cs', { random: () => 0 });
-    expect(reply).toBe('Smrt je dobrodružství.');
+    expect(reply).toEqual({ text: 'Smrt je dobrodružství.', topic: 'smrt' });
   });
 
-  it('falls back to general or fallback when no topic matches', () => {
+  it('falls back to general or fallback when no topic matches, reporting a null topic', () => {
     const pool = [...sage.quotes.general.cs, ...sage.fallback.cs];
     const reply = resolveReply('Nic konkrétního', sage, roster, topics, 'cs', { random: () => 0 });
-    expect(pool).toContain(reply);
+    expect(pool).toContain(reply.text);
+    expect(reply.topic).toBeNull();
+  });
+
+  it('reports a null topic when the matched topic has no quote to answer with', () => {
+    // Pupil knows no `rodina` quote and rodina is not deferrable — the fallback
+    // pool answers, so suggestions must not promise depth on that topic.
+    const reply = resolveReply('Máš rodinu?', pupil, roster, topics, 'cs', { random: () => 0 });
+    expect(reply.topic).toBeNull();
   });
 
   it('avoids repeating the excluded (previous) reply when alternatives exist', () => {
@@ -101,7 +109,7 @@ describe('resolveReply — own quotes', () => {
       random: () => 0,
       exclude: 'Láska je mocná.',
     });
-    expect(reply).toBe('Cit rozhoduje.');
+    expect(reply.text).toBe('Cit rozhoduje.');
   });
 
   it('avoids repeating any of several recent replies passed as an array', () => {
@@ -109,7 +117,7 @@ describe('resolveReply — own quotes', () => {
       random: () => 0,
       exclude: ['Láska je mocná.', 'something else'],
     });
-    expect(reply).toBe('Cit rozhoduje.');
+    expect(reply.text).toBe('Cit rozhoduje.');
   });
 
   it('still returns a reply when the only candidate equals the excluded one', () => {
@@ -117,19 +125,19 @@ describe('resolveReply — own quotes', () => {
       random: () => 0,
       exclude: 'Smrt je dobrodružství.',
     });
-    expect(reply).toBe('Smrt je dobrodružství.');
+    expect(reply.text).toBe('Smrt je dobrodružství.');
   });
 
   it('uses the requested locale', () => {
     const reply = resolveReply('Tell me about death', sage, roster, topics, 'en', { random: () => 0 });
-    expect(reply).toBe('Death is an adventure.');
+    expect(reply.text).toBe('Death is an adventure.');
   });
 
   it('prefers the topic matched by the most specific (longest) keyword', () => {
     // "láska je oběť" matches both `laska` (lásk) and `deepLove`; the longer
     // keyword wins, so the deepLove bucket is used.
     const reply = resolveReply('řekni mi: láska je oběť', sage, roster, topics, 'cs', { random: () => 0 });
-    expect(reply).toBe('Nejhlubší pravda.');
+    expect(reply).toEqual({ text: 'Nejhlubší pravda.', topic: 'deepLove' });
   });
 });
 
@@ -137,27 +145,27 @@ describe('resolveReply — cross-character deferral', () => {
   it('answers a deferrable topic from another character, framed in the speaker’s voice', () => {
     // Pupil has no `smrt` quote; smrt is deferrable, so it relays Sage's.
     const reply = resolveReply('Řekni mi o smrti', pupil, roster, topics, 'cs', { random: () => 0 });
-    expect(reply).toBe('To nevím, ale Mudrc říká: „Smrt je dobrodružství."');
+    expect(reply).toEqual({ text: 'To nevím, ale Mudrc říká: „Smrt je dobrodružství."', topic: 'smrt' });
   });
 
   it('answers a deferrable topic in the speaker’s own voice when they know it', () => {
     const reply = resolveReply('Mluvme o lásky', pupil, roster, topics, 'cs', { random: () => 0 });
-    expect(reply).toBe('Láska? Netuším.');
+    expect(reply.text).toBe('Láska? Netuším.');
   });
 
   it('never relays a non-deferrable (personal) topic — falls back instead', () => {
     // Pupil has no `rodina` quote and rodina is NOT deferrable; must not borrow Sage's family.
     const reply = resolveReply('Máš rodinu nebo bratra?', pupil, roster, topics, 'cs', { random: () => 0 });
     const pool = [...pupil.quotes.general.cs, ...pupil.fallback.cs];
-    expect(pool).toContain(reply);
-    expect(reply).not.toContain('Mudrc');
-    expect(reply).not.toContain('rodina je má');
+    expect(pool).toContain(reply.text);
+    expect(reply.text).not.toContain('Mudrc');
+    expect(reply.text).not.toContain('rodina je má');
   });
 
   it('does not defer to itself — a lone character falls back', () => {
     const reply = resolveReply('Řekni mi o smrti', pupil, [pupil], topics, 'cs', { random: () => 0 });
     const pool = [...pupil.quotes.general.cs, ...pupil.fallback.cs];
-    expect(pool).toContain(reply);
+    expect(pool).toContain(reply.text);
   });
 });
 

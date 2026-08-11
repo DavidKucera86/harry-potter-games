@@ -130,7 +130,7 @@ export class ChatGame extends BaseGame {
     const locale = getLocale();
     this.appendMessage('user', this.nickname, text);
 
-    const reply = resolveReply(text, this.character, CHAT_CHARACTERS, TOPICS, locale, {
+    const { text: reply } = resolveReply(text, this.character, CHAT_CHARACTERS, TOPICS, locale, {
       exclude: this.recentReplies,
     });
     this.rememberReply(reply);
