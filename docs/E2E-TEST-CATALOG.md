@@ -174,6 +174,20 @@
 - **When** hráč napíše zprávu o smrti
 - **Then** jeho zpráva i odpověď Brumbála se objeví v konverzaci
 
+### Q06.03 — clicking a suggested question asks it and offers three new ones
+**Soubor:** `tests/critical/chat-with-character.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem a vidí tři návrhy otázek
+- **When** hráč klikne na první návrh
+- **Then** otázka se odešle jako zpráva hráče a nabídnou se tři nové návrhy
+
+### Q06.04 — a greeting with a real question is answered on the question
+**Soubor:** `tests/critical/chat-with-character.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem
+- **When** hráč pozdraví a zeptá se, v čem Brumbál programuje
+- **Then** Brumbál odpoví o technologii, nikoli pozdravem
+
 ## Edge (@edge)
 
 ### E01.01 — invalid input shows error message
@@ -521,38 +535,52 @@
 - **When** uživatel přepne jazyk na cs
 - **Then** všechny statické texty odpovídají zvolenému jazyku
 
-### E43.06 — / — po přepnutí na en jsou všechny statické texty konzistentní
+### E43.06 — /chat-with-character/ — po přepnutí na cs jsou všechny statické texty konzistentní
+**Soubor:** `tests/edge/i18n.spec.ts`
+
+- **Given** stránka /chat-with-character/ je načtená s mockovanými daty
+- **When** uživatel přepne jazyk na cs
+- **Then** všechny statické texty odpovídají zvolenému jazyku
+
+### E43.07 — / — po přepnutí na en jsou všechny statické texty konzistentní
 **Soubor:** `tests/edge/i18n.spec.ts`
 
 - **Given** stránka / je načtená s mockovanými daty
 - **When** uživatel přepne jazyk na en
 - **Then** všechny statické texty odpovídají zvolenému jazyku
 
-### E43.07 — /guess-character-name/ — po přepnutí na en jsou všechny statické texty konzistentní
+### E43.08 — /guess-character-name/ — po přepnutí na en jsou všechny statické texty konzistentní
 **Soubor:** `tests/edge/i18n.spec.ts`
 
 - **Given** stránka /guess-character-name/ je načtená s mockovanými daty
 - **When** uživatel přepne jazyk na en
 - **Then** všechny statické texty odpovídají zvolenému jazyku
 
-### E43.08 — /guess-spell/ — po přepnutí na en jsou všechny statické texty konzistentní
+### E43.09 — /guess-spell/ — po přepnutí na en jsou všechny statické texty konzistentní
 **Soubor:** `tests/edge/i18n.spec.ts`
 
 - **Given** stránka /guess-spell/ je načtená s mockovanými daty
 - **When** uživatel přepne jazyk na en
 - **Then** všechny statické texty odpovídají zvolenému jazyku
 
-### E43.09 — /guess-house/ — po přepnutí na en jsou všechny statické texty konzistentní
+### E43.10 — /guess-house/ — po přepnutí na en jsou všechny statické texty konzistentní
 **Soubor:** `tests/edge/i18n.spec.ts`
 
 - **Given** stránka /guess-house/ je načtená s mockovanými daty
 - **When** uživatel přepne jazyk na en
 - **Then** všechny statické texty odpovídají zvolenému jazyku
 
-### E43.10 — /who-is-on-photo/ — po přepnutí na en jsou všechny statické texty konzistentní
+### E43.11 — /who-is-on-photo/ — po přepnutí na en jsou všechny statické texty konzistentní
 **Soubor:** `tests/edge/i18n.spec.ts`
 
 - **Given** stránka /who-is-on-photo/ je načtená s mockovanými daty
+- **When** uživatel přepne jazyk na en
+- **Then** všechny statické texty odpovídají zvolenému jazyku
+
+### E43.12 — /chat-with-character/ — po přepnutí na en jsou všechny statické texty konzistentní
+**Soubor:** `tests/edge/i18n.spec.ts`
+
+- **Given** stránka /chat-with-character/ je načtená s mockovanými daty
 - **When** uživatel přepne jazyk na en
 - **Then** všechny statické texty odpovídají zvolenému jazyku
 
@@ -726,6 +754,55 @@
 - **Given** uživatel má v systému zapnuté omezení pohybu
 - **Then** nekonečná animace spinneru je potlačená
 
+### E57.01 — the suggestion row is hidden until the chat starts
+**Soubor:** `tests/edge/chat-suggestions.spec.ts`
+
+- **Then** na úvodní obrazovce nejsou žádné návrhy
+- **When** hráč vstoupí do chatu
+- **Then** nabídnou se přesně tři otázky
+
+### E57.02 — a question the player typed is not suggested back
+**Soubor:** `tests/edge/chat-suggestions.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem
+- **When** hráč sám napíše otázku z nabídky
+- **Then** tato otázka se mezi návrhy neobjeví
+
+### E57.03 — a suggestion can be reached and asked with the keyboard
+**Soubor:** `tests/edge/chat-suggestions.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem
+- **When** hráč se klávesnicí přesune na první návrh a stiskne Enter
+- **Then** otázka se odešle a fokus se vrátí do pole zprávy
+
+### E57.04 — returning to the setup screen clears the suggestions
+**Soubor:** `tests/edge/chat-suggestions.spec.ts`
+
+- **Given** hráč je v chatu a klikl na návrh
+- **When** hráč se vrátí na výběr postavy
+- **Then** řádek s návrhy je prázdný a skrytý
+
+### E58.01 — suggestion chips are tappable on a phone viewport
+**Soubor:** `tests/edge/chat-mobile.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem na mobilním viewportu
+- **Then** každý návrh má dostatečně velkou dotykovou plochu
+- **When** hráč na návrh klepne
+- **Then** otázka se odešle
+
+### E58.02 — the chat does not scroll horizontally on a narrow screen
+**Soubor:** `tests/edge/chat-mobile.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem na úzkém viewportu
+- **Then** stránka se nedá posouvat do stran
+
+### E59.01 — the chat room with suggestion chips has no serious axe violations
+**Soubor:** `tests/edge/a11y.spec.ts`
+
+- **Given** hráč je v chatu s Brumbálem a vidí návrhy otázek
+- **When** proběhne axe accessibility scan
+- **Then** nejsou nalezeny serious ani critical porušení
+
 ## Visual (@visual)
 
 ### V01.01 — menu page layout
@@ -769,3 +846,10 @@
 - **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
 - **Given** hra Kámen–nůžky–papír je ve stavu připraveno ke hře
 - **Then** screenshot herního kontejneru odpovídá baseline
+
+### V07.01 — chat room with suggestion chips
+**Soubor:** `tests/visual/screenshots.spec.ts`
+
+- **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
+- **Given** hráč je v chatu s Brumbálem a vidí návrhy otázek
+- **Then** screenshot chatu odpovídá baseline
