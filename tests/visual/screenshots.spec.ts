@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { setupGameMocks } from '../helpers/api';
+import { seedRandom, setupGameMocks } from '../helpers/api';
 import {
   waitForHangmanReady,
   waitForQuizReady,
@@ -7,6 +7,7 @@ import {
   expectModalOpen,
 } from '../helpers/hangman';
 import { waitForRpsReady } from '../helpers/duel';
+import { startChat, suggestions, waitForChatReady } from '../helpers/chat';
 import { given, then } from '../helpers/gwt';
 
 const isProduction = (process.env.PLAYWRIGHT_TARGET ?? 'local') === 'production';
@@ -113,6 +114,22 @@ test.describe('Visual regression @visual', () => {
 
     await then('screenshot herního kontejneru odpovídá baseline', async () => {
       await expect(page.locator('.game-container')).toHaveScreenshot('rps-ready.png');
+    });
+  });
+
+  test('V07.01: chat room with suggestion chips', { tag: '@visual' }, async ({ page }) => {
+    await given('hráč je v chatu s Brumbálem a vidí návrhy otázek', async () => {
+      // Suggestions are picked at random; seed it so the baseline is stable.
+      await seedRandom(page, 0);
+      await page.goto('/chat-with-character/');
+      await waitForChatReady(page);
+      await startChat(page, 'Harry');
+      await expect(suggestions(page)).toHaveCount(3);
+      await stabilizeVisualRendering(page);
+    });
+
+    await then('screenshot chatu odpovídá baseline', async () => {
+      await expect(page.locator('#chatRoom')).toHaveScreenshot('chat-room-suggestions.png');
     });
   });
 

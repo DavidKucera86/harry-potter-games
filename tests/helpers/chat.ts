@@ -21,3 +21,15 @@ export async function sendMessage(page: Page, text: string) {
   await page.fill(selectors.messageInput, text);
   await page.locator(selectors.sendBtn).click();
 }
+
+export function suggestions(page: Page) {
+  return page.locator(selectors.chatSuggestion);
+}
+
+/** Clicks a suggestion chip and returns the question it asked. */
+export async function clickSuggestion(page: Page, index = 0): Promise<string> {
+  const chip = suggestions(page).nth(index);
+  const question = (await chip.textContent()) ?? '';
+  await chip.click();
+  return question;
+}

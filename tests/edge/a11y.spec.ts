@@ -3,6 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
 import { waitForRpsReady } from '../helpers/duel';
+import { sendMessage, startChat, suggestions, waitForChatReady } from '../helpers/chat';
 import { given, when, then } from '../helpers/gwt';
 
 const gamePages = [
@@ -44,6 +45,30 @@ test.describe('Accessibility @edge', () => {
         return value.endsWith('ms') ? parseFloat(value) / 1000 : parseFloat(value);
       });
       expect(durationSeconds).toBeLessThan(0.05);
+    });
+  });
+
+  // The chat page needs a nickname and a message before its interesting parts
+  // exist, so it cannot be driven from the `gamePages` table above.
+  test('E59.01: the chat room with suggestion chips has no serious axe violations', { tag: '@edge' }, async ({ page }) => {
+    await given('hráč je v chatu s Brumbálem a vidí návrhy otázek', async () => {
+      await page.goto('/chat-with-character/');
+      await waitForChatReady(page);
+      await startChat(page, 'Harry');
+      await sendMessage(page, 'Co je viteál?');
+      await expect(suggestions(page)).toHaveCount(3);
+    });
+
+    let serious: Awaited<ReturnType<AxeBuilder['analyze']>>['violations'] = [];
+    await when('proběhne axe accessibility scan', async () => {
+      const results = await new AxeBuilder({ page }).analyze();
+      serious = results.violations.filter(
+        violation => violation.impact === 'serious' || violation.impact === 'critical'
+      );
+    });
+
+    await then('nejsou nalezeny serious ani critical porušení', async () => {
+      expect(serious).toEqual([]);
     });
   });
 
