@@ -7,6 +7,7 @@ const TOPIC_PRIORITY = {
   /** Implicit default for every topic that does not declare one. */
   NORMAL: 0
 };
+const FOLLOW_UP_COUNT = 3;
 const COMBINING_MARKS = /[̀-ͯ]/g;
 function normalizeText(text) {
   return text.normalize("NFD").replace(COMBINING_MARKS, "").toLowerCase().trim();
@@ -78,6 +79,23 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
   ];
   return { text: pickFrom(fallbackPool, excluded, random), topic: null };
 }
+function suggestFollowUps(topic, followUps, locale, options = {}) {
+  const count = options.count ?? FOLLOW_UP_COUNT;
+  const random = options.random ?? Math.random;
+  const excluded = new Set([...toExcludeSet(options.exclude)].map(normalizeText));
+  const bespoke = (topic !== null ? followUps.byTopic[topic]?.[locale] : void 0) ?? [];
+  const pool = [...bespoke, ...followUps.default[locale]];
+  const picked = [];
+  const take = (candidates) => {
+    const remaining = candidates.filter((question) => !picked.includes(question));
+    while (picked.length < count && remaining.length > 0) {
+      picked.push(...remaining.splice(Math.floor(random() * remaining.length), 1));
+    }
+  };
+  take(pool.filter((question) => !excluded.has(normalizeText(question))));
+  take(pool);
+  return picked;
+}
 function validateNickname(raw) {
   const value = raw.trim();
   if (value.length === 0) {
@@ -89,10 +107,12 @@ function validateNickname(raw) {
   return { ok: true, value };
 }
 export {
+  FOLLOW_UP_COUNT,
   MAX_NICKNAME_LENGTH,
   TOPIC_PRIORITY,
   detectTopics,
   normalizeText,
   resolveReply,
+  suggestFollowUps,
   validateNickname
 };

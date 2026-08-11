@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FOLLOW_UP_COUNT,
   MAX_NICKNAME_LENGTH,
   TOPIC_PRIORITY,
   detectTopics,
   normalizeText,
   resolveReply,
+  suggestFollowUps,
   validateNickname,
   type ChatCharacter,
+  type FollowUpRegistry,
   type TopicRegistry,
 } from '../../src/shared/chatEngine.ts';
 
@@ -211,6 +214,86 @@ describe('resolveReply — cross-character deferral', () => {
     const reply = resolveReply('Řekni mi o smrti', pupil, [pupil], topics, 'cs', { random: () => 0 });
     const pool = [...pupil.quotes.general.cs, ...pupil.fallback.cs];
     expect(pool).toContain(reply.text);
+  });
+});
+
+const followUps: FollowUpRegistry = {
+  default: {
+    cs: ['Co je smrt?', 'Kdo je Fawkes?', 'Máš rodinu?', 'Co je láska?'],
+    en: ['What is death?', 'Who is Fawkes?', 'Do you have a family?', 'What is love?'],
+  },
+  byTopic: {
+    laska: {
+      cs: ['Je láska oběť?', 'Proč láska chrání?', 'Cítil jsi lásku?'],
+      en: ['Is love sacrifice?', 'Why does love protect?', 'Have you felt love?'],
+    },
+    smrt: { cs: ['Bojíš se smrti?'], en: ['Do you fear death?'] },
+  },
+};
+
+describe('suggestFollowUps', () => {
+  it('offers the bespoke set of a topic that has one', () => {
+    const questions = suggestFollowUps('laska', followUps, 'cs', { random: () => 0 });
+    expect(questions).toEqual(followUps.byTopic.laska.cs);
+  });
+
+  it('falls back to the default pool for a null topic', () => {
+    const questions = suggestFollowUps(null, followUps, 'cs', { random: () => 0 });
+    expect(questions).toEqual(['Co je smrt?', 'Kdo je Fawkes?', 'Máš rodinu?']);
+  });
+
+  it('falls back to the default pool for a topic with no bespoke set', () => {
+    const questions = suggestFollowUps('rodina', followUps, 'cs', { random: () => 0 });
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+    questions.forEach(question => expect(followUps.default.cs).toContain(question));
+  });
+
+  it('tops a short bespoke set up from the default pool', () => {
+    const questions = suggestFollowUps('smrt', followUps, 'cs', { random: () => 0 });
+    expect(questions[0]).toBe('Bojíš se smrti?');
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+    expect(new Set(questions).size).toBe(FOLLOW_UP_COUNT);
+  });
+
+  it('uses the requested locale', () => {
+    expect(suggestFollowUps('laska', followUps, 'en', { random: () => 0 })).toEqual(
+      followUps.byTopic.laska.en,
+    );
+  });
+
+  it('never offers a question the player already asked', () => {
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: ['Je láska oběť?'],
+    });
+    expect(questions).not.toContain('Je láska oběť?');
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+  });
+
+  it('compares exclusions without case or diacritics', () => {
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: ['  JE LASKA OBET?  '],
+    });
+    expect(questions).not.toContain('Je láska oběť?');
+  });
+
+  it('still offers a full set when every question was already asked', () => {
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: [...followUps.byTopic.laska.cs, ...followUps.default.cs],
+    });
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+    expect(new Set(questions).size).toBe(FOLLOW_UP_COUNT);
+  });
+
+  it('honours an explicit count', () => {
+    expect(suggestFollowUps(null, followUps, 'cs', { count: 2, random: () => 0 })).toHaveLength(2);
+  });
+
+  it('returns fewer than requested only when the registry cannot supply more', () => {
+    const sparse: FollowUpRegistry = { default: { cs: ['Jediná otázka?'], en: ['Only one?'] }, byTopic: {} };
+    expect(suggestFollowUps(null, sparse, 'cs', { random: () => 0 })).toEqual(['Jediná otázka?']);
   });
 });
 

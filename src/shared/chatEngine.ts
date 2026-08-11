@@ -71,6 +71,24 @@ export interface ChatResponse {
   topic: string | null;
 }
 
+/** How many follow-up questions are offered after a reply. */
+export const FOLLOW_UP_COUNT = 3;
+
+/**
+ * Suggested next questions: a bespoke set for the topics players actually dig
+ * into, plus a shared default pool used for every other topic and for the
+ * opening of a conversation.
+ */
+export interface FollowUpRegistry {
+  default: LocalizedList;
+  byTopic: Record<string, LocalizedList>;
+}
+
+type SuggestOptions = PickOptions & {
+  /** How many questions to offer; defaults to {@link FOLLOW_UP_COUNT}. */
+  count?: number;
+};
+
 export type NicknameValidation =
   | { ok: true; value: string }
   | { ok: false; reason: 'empty' | 'tooLong' };
@@ -215,6 +233,40 @@ export function resolveReply(
     ...speaker.fallback[locale],
   ];
   return { text: pickFrom(fallbackPool, excluded, random), topic: null };
+}
+
+/**
+ * Picks up to `count` distinct follow-up questions for `topic`: its bespoke set
+ * first, topped up from the default pool. Questions in `exclude` (compared on
+ * the normalized form, so a hand-typed variant counts too) are skipped, and the
+ * exclusion is relaxed only if it would otherwise leave the player with an
+ * empty or short row of suggestions.
+ */
+export function suggestFollowUps(
+  topic: string | null,
+  followUps: FollowUpRegistry,
+  locale: Locale,
+  options: SuggestOptions = {},
+): string[] {
+  const count = options.count ?? FOLLOW_UP_COUNT;
+  const random = options.random ?? Math.random;
+  const excluded = new Set([...toExcludeSet(options.exclude)].map(normalizeText));
+
+  const bespoke = (topic !== null ? followUps.byTopic[topic]?.[locale] : undefined) ?? [];
+  const pool = [...bespoke, ...followUps.default[locale]];
+  const picked: string[] = [];
+
+  const take = (candidates: string[]): void => {
+    const remaining = candidates.filter(question => !picked.includes(question));
+    while (picked.length < count && remaining.length > 0) {
+      picked.push(...remaining.splice(Math.floor(random() * remaining.length), 1));
+    }
+  };
+
+  take(pool.filter(question => !excluded.has(normalizeText(question))));
+  take(pool);
+
+  return picked;
 }
 
 /** Validates and trims a nickname. Rendering is always via textContent, so
