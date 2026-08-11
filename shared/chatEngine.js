@@ -1,4 +1,12 @@
 const MAX_NICKNAME_LENGTH = 32;
+const TOPIC_PRIORITY = {
+  /** Greetings, thanks, farewells, being hailed by name — always yields. */
+  PHATIC: -2,
+  /** Small talk — answered only when nothing more substantial was asked. */
+  SMALL_TALK: -1,
+  /** Implicit default for every topic that does not declare one. */
+  NORMAL: 0
+};
 const COMBINING_MARKS = /[̀-ͯ]/g;
 function normalizeText(text) {
   return text.normalize("NFD").replace(COMBINING_MARKS, "").toLowerCase().trim();
@@ -30,12 +38,18 @@ function detectTopics(text, registry, locale) {
   return Object.entries(registry).filter(([, def]) => bestMatchLength(haystack, def.keywords[locale] ?? []) > 0).map(([id]) => id);
 }
 function matchTopic(haystack, registry, locale, random) {
-  const scored = Object.entries(registry).map(([id, def]) => ({ id, length: bestMatchLength(haystack, def.keywords[locale] ?? []) })).filter((entry) => entry.length > 0);
+  const scored = Object.entries(registry).map(([id, def]) => ({
+    id,
+    length: bestMatchLength(haystack, def.keywords[locale] ?? []),
+    priority: def.priority ?? TOPIC_PRIORITY.NORMAL
+  })).filter((entry) => entry.length > 0);
   if (scored.length === 0) {
     return null;
   }
-  const maxLength = Math.max(...scored.map((entry) => entry.length));
-  const mostSpecific = scored.filter((entry) => entry.length === maxLength);
+  const maxPriority = Math.max(...scored.map((entry) => entry.priority));
+  const preferred = scored.filter((entry) => entry.priority === maxPriority);
+  const maxLength = Math.max(...preferred.map((entry) => entry.length));
+  const mostSpecific = preferred.filter((entry) => entry.length === maxLength);
   return pickRandom(mostSpecific, random).id;
 }
 function resolveReply(text, speaker, roster, registry, locale, options = {}) {
@@ -76,6 +90,7 @@ function validateNickname(raw) {
 }
 export {
   MAX_NICKNAME_LENGTH,
+  TOPIC_PRIORITY,
   detectTopics,
   normalizeText,
   resolveReply,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   MAX_NICKNAME_LENGTH,
+  TOPIC_PRIORITY,
   detectTopics,
   normalizeText,
   resolveReply,
@@ -14,6 +15,16 @@ const topics: TopicRegistry = {
   smrt: { deferrable: true, keywords: { cs: ['smrt', 'umír'], en: ['death', 'dying'] } },
   rodina: { deferrable: false, keywords: { cs: ['rodin', 'bratr'], en: ['family'] } },
   deepLove: { deferrable: true, keywords: { cs: ['láska je oběť'], en: ['love is sacrifice'] } },
+  pozdrav: {
+    deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
+    keywords: { cs: ['dobrý večer'], en: ['good evening'] },
+  },
+  jaksemas: {
+    deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
+    keywords: { cs: ['jak se máš'], en: ['how are you'] },
+  },
 };
 
 const sage: ChatCharacter = {
@@ -30,6 +41,8 @@ const sage: ChatCharacter = {
     smrt: { cs: ['Smrt je dobrodružství.'], en: ['Death is an adventure.'] },
     rodina: { cs: ['Má rodina je má.'], en: ['My family is mine.'] },
     deepLove: { cs: ['Nejhlubší pravda.'], en: ['The deepest truth.'] },
+    pozdrav: { cs: ['Dobrý večer.'], en: ['Good evening.'] },
+    jaksemas: { cs: ['Daří se mi dobře.'], en: ['I am well.'] },
   },
   fallback: { cs: ['Zvláštní otázka…'], en: ['A curious question…'] },
 };
@@ -138,6 +151,38 @@ describe('resolveReply — own quotes', () => {
     // keyword wins, so the deepLove bucket is used.
     const reply = resolveReply('řekni mi: láska je oběť', sage, roster, topics, 'cs', { random: () => 0 });
     expect(reply).toEqual({ text: 'Nejhlubší pravda.', topic: 'deepLove' });
+  });
+});
+
+describe('resolveReply — topic priority', () => {
+  it('lets a substantive question beat a phatic greeting in the same message', () => {
+    // "dobrý večer" (11 chars) is longer than "cit" (3), so keyword length alone
+    // would answer the greeting and drop the actual question.
+    const reply = resolveReply('Dobrý večer, co je cit?', sage, roster, topics, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('laska');
+  });
+
+  it('lets small talk beat a phatic greeting', () => {
+    const reply = resolveReply('Dobrý večer, jak se máš?', sage, roster, topics, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('jaksemas');
+  });
+
+  it('still answers a phatic message when nothing more substantial was asked', () => {
+    const reply = resolveReply('Dobrý večer!', sage, roster, topics, 'cs', { random: () => 0 });
+    expect(reply).toEqual({ text: 'Dobrý večer.', topic: 'pozdrav' });
+  });
+
+  it('falls back to the longest keyword within the same priority', () => {
+    const reply = resolveReply('Dobrý večer, jak se máš? A co cit?', sage, roster, topics, 'cs', {
+      random: () => 0,
+    });
+    // Both `laska` and `jaksemas` match, but only `jaksemas` is de-prioritised.
+    expect(reply.topic).toBe('laska');
+  });
+
+  it('treats a topic without an explicit priority as normal', () => {
+    const reply = resolveReply('Bojím se smrti a citů', sage, roster, topics, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('smrt');
   });
 });
 

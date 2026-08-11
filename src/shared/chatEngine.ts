@@ -13,15 +13,33 @@ export type LocalizedList = Record<Locale, string[]>;
 export type DeferralTemplate = Record<Locale, (source: string, quote: string) => string>;
 
 /**
+ * Weight used when several topics match one message; compared *before* keyword
+ * length, so conversational filler never drowns out a real question ("Dobrý
+ * večer, kdo je Fawkes?" is about Fawkes). Opt-in per topic — it must not be
+ * derived from `deferrable`, whose personal group also holds very specific
+ * topics such as a character's favourite spell.
+ */
+export const TOPIC_PRIORITY = {
+  /** Greetings, thanks, farewells, being hailed by name — always yields. */
+  PHATIC: -2,
+  /** Small talk — answered only when nothing more substantial was asked. */
+  SMALL_TALK: -1,
+  /** Implicit default for every topic that does not declare one. */
+  NORMAL: 0,
+} as const;
+
+/**
  * A topic in the shared world taxonomy. `keywords` are the word *stems* that
  * trigger it (matched as substrings on a diacritics-stripped form, so inflected
  * forms match). `deferrable` marks world/lore/opinion topics one character may
  * relay from another; personal topics (family, age, one's own name…) are not
- * deferrable and are answered only from the speaker's own quotes.
+ * deferrable and are answered only from the speaker's own quotes. `priority`
+ * defaults to {@link TOPIC_PRIORITY}.NORMAL.
  */
 export interface TopicDef {
   keywords: LocalizedList;
   deferrable: boolean;
+  priority?: number;
 }
 
 export type TopicRegistry = Record<string, TopicDef>;
@@ -121,10 +139,11 @@ export function detectTopics(
 }
 
 /**
- * Picks the single best-matching topic for `text`: the one hit by the *most
- * specific* (longest) keyword, so "temný pán" resolves to Voldemort rather than
- * the broader "temn" fear topic. Ties are broken with `random`. Returns null
- * when nothing matches.
+ * Picks the single best-matching topic for `text`: the highest {@link
+ * TOPIC_PRIORITY}, and within it the one hit by the *most specific* (longest)
+ * keyword — so "temný pán" resolves to Voldemort rather than the broader "temn"
+ * fear topic, and a greeting never outranks the question next to it. Ties are
+ * broken with `random`. Returns null when nothing matches.
  */
 function matchTopic(
   haystack: string,
@@ -133,15 +152,21 @@ function matchTopic(
   random: () => number,
 ): string | null {
   const scored = Object.entries(registry)
-    .map(([id, def]) => ({ id, length: bestMatchLength(haystack, def.keywords[locale] ?? []) }))
+    .map(([id, def]) => ({
+      id,
+      length: bestMatchLength(haystack, def.keywords[locale] ?? []),
+      priority: def.priority ?? TOPIC_PRIORITY.NORMAL,
+    }))
     .filter(entry => entry.length > 0);
 
   if (scored.length === 0) {
     return null;
   }
 
-  const maxLength = Math.max(...scored.map(entry => entry.length));
-  const mostSpecific = scored.filter(entry => entry.length === maxLength);
+  const maxPriority = Math.max(...scored.map(entry => entry.priority));
+  const preferred = scored.filter(entry => entry.priority === maxPriority);
+  const maxLength = Math.max(...preferred.map(entry => entry.length));
+  const mostSpecific = preferred.filter(entry => entry.length === maxLength);
   return pickRandom(mostSpecific, random).id;
 }
 

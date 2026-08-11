@@ -651,11 +651,22 @@ var dumbledore = {
   }
 };
 
+// src/shared/chatEngine.ts
+var TOPIC_PRIORITY = {
+  /** Greetings, thanks, farewells, being hailed by name — always yields. */
+  PHATIC: -2,
+  /** Small talk — answered only when nothing more substantial was asked. */
+  SMALL_TALK: -1,
+  /** Implicit default for every topic that does not declare one. */
+  NORMAL: 0
+};
+
 // src/chat-with-character/data/topics.ts
 var TOPICS = {
   // --- Personal / small-talk: answered only from a character's own quotes ---
   pozdrav: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ["ahoj", "cau", "nazdar", "zdrav", "dobry den", "dobre rano", "dobry vecer", "vitej"],
       en: ["hello", "hey there", "greetings", "good morning", "good evening", "good day"]
@@ -663,6 +674,7 @@ var TOPICS = {
   },
   jaksemas: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["jak se mas", "jak se mate", "jak ti je", "jak se ti dari", "jak se vede", "jak se citis", "co je noveho", "co delas", "jak to jde"],
       en: ["how are you", "how do you do", "how are things", "how have you been", "how are you feeling", "how is it going", "whats up"]
@@ -670,6 +682,7 @@ var TOPICS = {
   },
   oblibene: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["co mas rad", "mas rad", "co te bavi", "oblib", "co miluje", "co preferuje", "co te tesi"],
       en: ["what do you like", "do you like", "what do you enjoy", "favourite", "favorite", "what makes you happy"]
@@ -677,6 +690,7 @@ var TOPICS = {
   },
   identita: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["kdo jsi", "kdo jste", "jak se jmenuje", "predstav se", "co jsi zac", "o sobe"],
       en: ["who are you", "what is your name", "whats your name", "introduce yourself", "about you"]
@@ -684,6 +698,7 @@ var TOPICS = {
   },
   namety: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["o cem", "co umis", "co vis", "na co se", "poradi", "napovez", "temata", "co bys"],
       en: ["what can we talk", "what can you", "what do you know", "suggest a topic", "topics", "help me", "what should i ask"]
@@ -691,6 +706,7 @@ var TOPICS = {
   },
   podekovani: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ["diky", "dekuj", "dekuju", "jsi hodny"],
       en: ["thank", "thanks", "cheers", "much appreciated"]
@@ -698,6 +714,7 @@ var TOPICS = {
   },
   rozlouceni: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ["sbohem", "nashledanou", "na shledanou", "mej se", "loucim", "tak zatim", "papa"],
       en: ["goodbye", "good bye", "farewell", "see you", "take care"]
@@ -705,6 +722,7 @@ var TOPICS = {
   },
   vtipy: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["vtip", "sranda", "legrace", "humor", "rozesmej", "nasmej", "pobav", "zavtipkuj"],
       en: ["joke", "funny", "make me laugh", "tell me something funny", "humour", "humor"]
