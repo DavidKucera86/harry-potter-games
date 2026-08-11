@@ -14,12 +14,18 @@ import { TOPIC_PRIORITY, type TopicRegistry } from '../../shared/chatEngine.js';
  */
 export const TOPICS: TopicRegistry = {
   // --- Personal / small-talk: answered only from a character's own quotes ---
+  // Being hailed by name belongs here rather than in `identita`: it is a form of
+  // address, not a request to introduce oneself, and PHATIC keeps it from
+  // outranking the question that follows it. 'bumbal' is a common misspelling
+  // and is not a substring of 'brumbal', so both stems are needed. A third-person
+  // mention with no other keyword ("Co si myslíš o Brumbálovi?") lands here too —
+  // acceptable, since the player is talking *to* him.
   pozdrav: {
     deferrable: false,
     priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
-      cs: ['ahoj', 'cau', 'nazdar', 'zdrav', 'dobry den', 'dobre rano', 'dobry vecer', 'vitej'],
-      en: ['hello', 'hey there', 'greetings', 'good morning', 'good evening', 'good day'],
+      cs: ['ahoj', 'cau', 'nazdar', 'zdrav', 'dobry den', 'dobre rano', 'dobry vecer', 'vitej', 'brumbal', 'bumbal'],
+      en: ['hello', 'hey there', 'greetings', 'good morning', 'good evening', 'good day', 'dumbledore', 'dumbledor'],
     },
   },
   jaksemas: {
@@ -300,7 +306,7 @@ export const TOPICS: TopicRegistry = {
   brumbaluv_plan: {
     deferrable: true,
     keywords: {
-      cs: ['tvuj plan', 'tvoje smrt', 'tva smrt', 'proc jsi zemrel', 'proc te zabil', 'kdo te zabil', 'cerna ruka', 'zcernal', 'prokleta ruk', 'tva ruk', 'tvou ruk', 'proc snape'],
+      cs: ['tvuj plan', 'brumbaluv plan', 'tvoje smrt', 'tva smrt', 'proc jsi zemrel', 'proc te zabil', 'kdo te zabil', 'cerna ruka', 'zcernal', 'prokleta ruk', 'tva ruk', 'tvou ruk', 'proc snape'],
       en: ['your death', 'your plan', 'who killed you', 'why did you die', 'why snape killed', 'blackened hand', 'cursed hand', 'withered hand'],
     },
   },
@@ -414,6 +420,16 @@ export const TOPICS: TopicRegistry = {
     keywords: {
       cs: ['mnoholicny lektvar', 'mnoholicneho lektvar', 'felix felicis', 'tekute stesti', 'tekuteho stesti', 'amortenci', 'veritaserum', 'polyjuice'],
       en: ['polyjuice', 'felix felicis', 'liquid luck', 'amortentia', 'veritaserum'],
+    },
+  },
+  // Muggle technology the wizarding world knows nothing about. Keywords are
+  // matched as plain substrings, so short stems are unsafe here: 'kod' hides in
+  // "škoda", 'ai' in "afraid"/"again", 'app' in "happy". Spell them out.
+  technologie: {
+    deferrable: true,
+    keywords: {
+      cs: ['programov', 'programuj', 'programator', 'kodovan', 'zdrojak', 'pocitac', 'notebook', 'software', 'hardware', 'technologi', 'internet', 'algoritm', 'databaz', 'robot', 'umela inteligence', 'umele inteligenc', 'chatgpt', 'javascript', 'python', 'mobil'],
+      en: ['programming', 'programmer', 'coding', 'source code', 'computer', 'laptop', 'software', 'hardware', 'technology', 'internet', 'algorithm', 'database', 'robot', 'artificial intelligence', 'machine learning', 'chatgpt', 'javascript', 'python', 'smartphone', 'developer', 'website'],
     },
   },
 };

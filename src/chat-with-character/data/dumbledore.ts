@@ -637,6 +637,20 @@ export const dumbledore: ChatCharacter = {
         'I have seen a potion save a life and undo a mind alike. As with all magic, it matters less what the recipe says than what lies in the heart of the one who stirs the cauldron.',
       ],
     },
+    technologie: {
+      cs: [
+        'Mudlovské stroje v Bradavicích nefungují — je tu příliš mnoho magie ve zdech. Zaklínadlo je ostatně jistý druh programu: přesná instrukce, vyslovená přesně, a svět poslechne. Splete-li žák jedinou slabiku, získá ropuchu tam, kde čekal světlo.',
+        'Nejblíž tomu, čemu říkáš kód, mám zaklínadlo. Rozdíl je v tom, že chybné kouzlo neopravíš středníkem, nýbrž pokorou — a někdy návštěvou ošetřovny.',
+        'Co vím o počítačích, mám od Artura Weasleyho, jehož nadšení pro zástrčky nezná mezí. Mne však zajímá jiný stroj — lidská mysl. I tu lze programovat; právě proto stojí za to učit se nitrobraně.',
+        'Umělá inteligence? Myslící stroj bez srdce mi připomíná deník Toma Raddlea: také odpovídal chytře, ochotně a lživě. Nikdy nevěř tomu, co myslí, aniž bys věděl, čí vůle za odpověďmi stojí.',
+      ],
+      en: [
+        'Muggle machines do not work at Hogwarts — there is far too much magic in these walls. An incantation is a kind of program, mind you: a precise instruction, precisely spoken, and the world obeys. Slip a single syllable and a student gets a toad where they expected light.',
+        'The closest thing I have to what you call code is a spell. The difference is that a flawed one is not mended with a semicolon but with humility — and occasionally a visit to the hospital wing.',
+        'What I know of computers I owe to Arthur Weasley, whose enthusiasm for plugs knows no bounds. The machine that interests me is a different one: the mind. It, too, can be programmed — which is precisely why Occlumency is worth learning.',
+        'Artificial intelligence? A thinking machine without a heart puts me in mind of Tom Riddle’s diary: it also answered cleverly, obligingly and falsely. Never trust a thing that thinks until you know whose will stands behind its answers.',
+      ],
+    },
   },
   fallback: {
     cs: [

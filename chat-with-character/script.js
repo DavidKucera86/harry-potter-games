@@ -633,6 +633,20 @@ var dumbledore = {
         "Potions are a subtle and powerful art. Polyjuice Potion lends you another\u2019s form; Felix Felicis, liquid luck, grants a spell of good fortune; Amortentia stirs mere infatuation, never true love \u2014 that cannot be brewed.",
         "I have seen a potion save a life and undo a mind alike. As with all magic, it matters less what the recipe says than what lies in the heart of the one who stirs the cauldron."
       ]
+    },
+    technologie: {
+      cs: [
+        "Mudlovsk\xE9 stroje v Bradavic\xEDch nefunguj\xED \u2014 je tu p\u0159\xEDli\u0161 mnoho magie ve zdech. Zakl\xEDnadlo je ostatn\u011B jist\xFD druh programu: p\u0159esn\xE1 instrukce, vysloven\xE1 p\u0159esn\u011B, a sv\u011Bt poslechne. Splete-li \u017E\xE1k jedinou slabiku, z\xEDsk\xE1 ropuchu tam, kde \u010Dekal sv\u011Btlo.",
+        "Nejbl\xED\u017E tomu, \u010Demu \u0159\xEDk\xE1\u0161 k\xF3d, m\xE1m zakl\xEDnadlo. Rozd\xEDl je v tom, \u017Ee chybn\xE9 kouzlo neoprav\xED\u0161 st\u0159edn\xEDkem, n\xFDbr\u017E pokorou \u2014 a n\u011Bkdy n\xE1v\u0161t\u011Bvou o\u0161et\u0159ovny.",
+        "Co v\xEDm o po\u010D\xEDta\u010D\xEDch, m\xE1m od Artura Weasleyho, jeho\u017E nad\u0161en\xED pro z\xE1str\u010Dky nezn\xE1 mez\xED. Mne v\u0161ak zaj\xEDm\xE1 jin\xFD stroj \u2014 lidsk\xE1 mysl. I tu lze programovat; pr\xE1v\u011B proto stoj\xED za to u\u010Dit se nitrobran\u011B.",
+        "Um\u011Bl\xE1 inteligence? Mysl\xEDc\xED stroj bez srdce mi p\u0159ipom\xEDn\xE1 den\xEDk Toma Raddlea: tak\xE9 odpov\xEDdal chyt\u0159e, ochotn\u011B a l\u017Eiv\u011B. Nikdy nev\u011B\u0159 tomu, co mysl\xED, ani\u017E bys v\u011Bd\u011Bl, \u010D\xED v\u016Fle za odpov\u011B\u010Fmi stoj\xED."
+      ],
+      en: [
+        "Muggle machines do not work at Hogwarts \u2014 there is far too much magic in these walls. An incantation is a kind of program, mind you: a precise instruction, precisely spoken, and the world obeys. Slip a single syllable and a student gets a toad where they expected light.",
+        "The closest thing I have to what you call code is a spell. The difference is that a flawed one is not mended with a semicolon but with humility \u2014 and occasionally a visit to the hospital wing.",
+        "What I know of computers I owe to Arthur Weasley, whose enthusiasm for plugs knows no bounds. The machine that interests me is a different one: the mind. It, too, can be programmed \u2014 which is precisely why Occlumency is worth learning.",
+        "Artificial intelligence? A thinking machine without a heart puts me in mind of Tom Riddle\u2019s diary: it also answered cleverly, obligingly and falsely. Never trust a thing that thinks until you know whose will stands behind its answers."
+      ]
     }
   },
   fallback: {
@@ -664,12 +678,18 @@ var TOPIC_PRIORITY = {
 // src/chat-with-character/data/topics.ts
 var TOPICS = {
   // --- Personal / small-talk: answered only from a character's own quotes ---
+  // Being hailed by name belongs here rather than in `identita`: it is a form of
+  // address, not a request to introduce oneself, and PHATIC keeps it from
+  // outranking the question that follows it. 'bumbal' is a common misspelling
+  // and is not a substring of 'brumbal', so both stems are needed. A third-person
+  // mention with no other keyword ("Co si myslíš o Brumbálovi?") lands here too —
+  // acceptable, since the player is talking *to* him.
   pozdrav: {
     deferrable: false,
     priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
-      cs: ["ahoj", "cau", "nazdar", "zdrav", "dobry den", "dobre rano", "dobry vecer", "vitej"],
-      en: ["hello", "hey there", "greetings", "good morning", "good evening", "good day"]
+      cs: ["ahoj", "cau", "nazdar", "zdrav", "dobry den", "dobre rano", "dobry vecer", "vitej", "brumbal", "bumbal"],
+      en: ["hello", "hey there", "greetings", "good morning", "good evening", "good day", "dumbledore", "dumbledor"]
     }
   },
   jaksemas: {
@@ -949,7 +969,7 @@ var TOPICS = {
   brumbaluv_plan: {
     deferrable: true,
     keywords: {
-      cs: ["tvuj plan", "tvoje smrt", "tva smrt", "proc jsi zemrel", "proc te zabil", "kdo te zabil", "cerna ruka", "zcernal", "prokleta ruk", "tva ruk", "tvou ruk", "proc snape"],
+      cs: ["tvuj plan", "brumbaluv plan", "tvoje smrt", "tva smrt", "proc jsi zemrel", "proc te zabil", "kdo te zabil", "cerna ruka", "zcernal", "prokleta ruk", "tva ruk", "tvou ruk", "proc snape"],
       en: ["your death", "your plan", "who killed you", "why did you die", "why snape killed", "blackened hand", "cursed hand", "withered hand"]
     }
   },
@@ -1063,6 +1083,16 @@ var TOPICS = {
     keywords: {
       cs: ["mnoholicny lektvar", "mnoholicneho lektvar", "felix felicis", "tekute stesti", "tekuteho stesti", "amortenci", "veritaserum", "polyjuice"],
       en: ["polyjuice", "felix felicis", "liquid luck", "amortentia", "veritaserum"]
+    }
+  },
+  // Muggle technology the wizarding world knows nothing about. Keywords are
+  // matched as plain substrings, so short stems are unsafe here: 'kod' hides in
+  // "škoda", 'ai' in "afraid"/"again", 'app' in "happy". Spell them out.
+  technologie: {
+    deferrable: true,
+    keywords: {
+      cs: ["programov", "programuj", "programator", "kodovan", "zdrojak", "pocitac", "notebook", "software", "hardware", "technologi", "internet", "algoritm", "databaz", "robot", "umela inteligence", "umele inteligenc", "chatgpt", "javascript", "python", "mobil"],
+      en: ["programming", "programmer", "coding", "source code", "computer", "laptop", "software", "hardware", "technology", "internet", "algorithm", "database", "robot", "artificial intelligence", "machine learning", "chatgpt", "javascript", "python", "smartphone", "developer", "website"]
     }
   }
 };

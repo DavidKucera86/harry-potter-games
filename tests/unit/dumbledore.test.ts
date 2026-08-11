@@ -187,3 +187,64 @@ describe('dumbledore small talk', () => {
     expect(dumbledore.fallback.cs).not.toContain(reply.text);
   });
 });
+
+describe('dumbledore answers questions greeted at him', () => {
+  it('answers "Čau Bumbále, v čem programuješ?" about technology, not with a greeting', () => {
+    const reply = resolveReply('Čau Bumbále, v čem programuješ?', dumbledore, [dumbledore], TOPICS, 'cs', {
+      random: () => 0,
+    });
+    expect(reply.topic).toBe('technologie');
+    expect(dumbledore.quotes.technologie.cs).toContain(reply.text);
+    expect(dumbledore.quotes.pozdrav.cs).not.toContain(reply.text);
+  });
+
+  it('answers "Dobrý večer, kdo je Fawkes?" about Fawkes, not with a greeting', () => {
+    const reply = resolveReply('Dobrý večer, kdo je Fawkes?', dumbledore, [dumbledore], TOPICS, 'cs', {
+      random: () => 0,
+    });
+    expect(reply.topic).toBe('fawkes');
+  });
+
+  it('answers "Hello Dumbledore, what do you think about programming?" about technology', () => {
+    const reply = resolveReply(
+      'Hello Dumbledore, what do you think about programming?',
+      dumbledore,
+      [dumbledore],
+      TOPICS,
+      'en',
+      { random: () => 0 },
+    );
+    expect(reply.topic).toBe('technologie');
+  });
+
+  it('still greets back when the message is only a greeting', () => {
+    const reply = resolveReply('Čau Bumbále!', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('pozdrav');
+  });
+
+  const technologyCases = [
+    { text: 'V čem programuješ?', locale: 'cs', topic: 'technologie' },
+    { text: 'Máš počítač?', locale: 'cs', topic: 'technologie' },
+    { text: 'Co si myslíš o umělé inteligenci?', locale: 'cs', topic: 'technologie' },
+    { text: 'Znáš internet?', locale: 'cs', topic: 'technologie' },
+    { text: 'Do you know anything about programming?', locale: 'en', topic: 'technologie' },
+    { text: 'Have you ever used a computer?', locale: 'en', topic: 'technologie' },
+    { text: 'What about artificial intelligence?', locale: 'en', topic: 'technologie' },
+  ] as const;
+
+  it.each(technologyCases)('detects "$text" as topic "$topic"', ({ text, locale, topic }) => {
+    expect(detectTopics(text, TOPICS, locale)).toContain(topic);
+  });
+
+  const falsePositiveCases = [
+    // Guards short stems: "škoda" normalizes to "skoda", which contains "kod".
+    { text: 'To je ale škoda', locale: 'cs' },
+    { text: 'Nemám z čeho mít škodu', locale: 'cs' },
+    { text: 'Are you afraid again?', locale: 'en' },
+    { text: 'What makes you happy?', locale: 'en' },
+  ] as const;
+
+  it.each(falsePositiveCases)('does not read "$text" as a technology question', ({ text, locale }) => {
+    expect(detectTopics(text, TOPICS, locale)).not.toContain('technologie');
+  });
+});
