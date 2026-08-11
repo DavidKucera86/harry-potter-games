@@ -126,6 +126,7 @@ export const cs = {
     chatNicknamePlaceholder: 'Zadej přezdívku (max. 32 znaků)',
     chatMessagePlaceholder: 'Napiš zprávu…',
     chatLogLabel: 'Průběh konverzace',
+    chatSuggestionsLabel: 'Návrhy otázek',
   },
   pages: {
     menuTitle: 'Harry Potter Games',

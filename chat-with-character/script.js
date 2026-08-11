@@ -1,7 +1,11 @@
 // src/chat-with-character/ChatGame.ts
 import { BaseGame } from "../shared/BaseGame.js";
 import { getLocale, getStrings } from "../shared/i18n/index.js";
-import { resolveReply, validateNickname } from "../shared/chatEngine.js";
+import {
+  resolveReply,
+  suggestFollowUps,
+  validateNickname
+} from "../shared/chatEngine.js";
 
 // src/chat-with-character/data/dumbledore.ts
 var dumbledore = {
@@ -1097,6 +1101,94 @@ var TOPICS = {
   }
 };
 
+// src/chat-with-character/data/followUps.ts
+var FOLLOW_UPS = {
+  default: {
+    cs: [
+      "Co je vite\xE1l?",
+      "Pov\u011Bz mi o relikvi\xEDch smrti",
+      "Jak\xE9 je tv\xE9 obl\xEDben\xE9 kouzlo?",
+      "Co si mysl\xED\u0161 o Harrym?",
+      "Pro\u010D t\u011B zabil Snape?",
+      "Jak\xE9 sladkosti m\xE1\u0161 r\xE1d?",
+      "Kdo zalo\u017Eil Bradavice?",
+      "Co je Bezov\xE1 h\u016Flka?",
+      "Co je Tajemn\xE1 komnata?",
+      "\u0158ekni mi n\u011Bjak\xFD vtip"
+    ],
+    en: [
+      "What is a Horcrux?",
+      "Tell me about the Deathly Hallows",
+      "What is your favourite spell?",
+      "What do you think of Harry?",
+      "Why did Snape kill you?",
+      "What sweets do you like?",
+      "Who were the four founders?",
+      "What is the Elder Wand?",
+      "What is the Chamber of Secrets?",
+      "Tell me a joke"
+    ]
+  },
+  byTopic: {
+    technologie: {
+      cs: ["Jak vlastn\u011B funguje kouzlo?", "Co je nitrobrana?", "Kdo byl Tom Raddle?"],
+      en: ["How does a spell actually work?", "What is Occlumency?", "Who was Tom Riddle?"]
+    },
+    sladkosti: {
+      cs: ["Pro\u010D m\xE1\u0161 r\xE1d citronov\xE9 bonbony?", "Jak\xE9 bylo heslo do tv\xE9 pracovny?", "Co je \u010Dokol\xE1dov\xE1 \u017E\xE1ba?"],
+      en: ["Why do you love sherbet lemons?", "What was the password to your study?", "What is a Chocolate Frog?"]
+    },
+    harry: {
+      cs: ["Pro\u010D Harry p\u0159e\u017Eil?", "Co \u0159\xEDk\xE1 proroctv\xED?", "Byl Harry vite\xE1l?"],
+      en: ["Why did Harry survive?", "What does the prophecy say?", "Was Harry a Horcrux?"]
+    },
+    voldemort: {
+      cs: ["Kolik vite\xE1l\u016F si vytvo\u0159il?", "Jak jsi Toma Raddlea poznal?", "Pro\u010D se boj\xEDme vyslovit jeho jm\xE9no?"],
+      en: ["How many Horcruxes did he make?", "How did you meet Tom Riddle?", "Why do we fear his name?"]
+    },
+    viteal: {
+      cs: ["Jak zni\u010Dit vite\xE1l?", "Kter\xE9 vite\xE1ly to byly?", "Co jsou relikvie smrti?"],
+      en: ["How do you destroy a Horcrux?", "Which Horcruxes were there?", "What are the Deathly Hallows?"]
+    },
+    viteal_zniceni: {
+      cs: ["Kdo zni\u010Dil medailon?", "Co je Tajemn\xE1 komnata?", "Pro\u010D tv\xE1 ruka z\u010Dernala?"],
+      en: ["Who destroyed the locket?", "What is the Chamber of Secrets?", "What happened to your cursed hand?"]
+    },
+    relikvie: {
+      cs: ["Kdo byli brat\u0159i Peverellov\xE9?", "Komu pat\u0159\xED Bezov\xE1 h\u016Flka?", "Co ukazuje k\xE1men vzk\u0159\xED\u0161en\xED?"],
+      en: ["Who were the Peverell brothers?", "Who owns the Elder Wand?", "What does the Resurrection Stone show?"]
+    },
+    bezova_hulka: {
+      cs: ["Kdo je p\xE1n h\u016Flky?", "Jak\xFD byl souboj s Grindelwaldem?", "Co jsou relikvie smrti?"],
+      en: ["Who is the master of the wand?", "How did you defeat Grindelwald?", "What are the Deathly Hallows?"]
+    },
+    brumbaluv_plan: {
+      cs: ["Pro\u010D jsi Snapeovi v\u011B\u0159il?", "Pro\u010D tv\xE1 ruka z\u010Dernala?", "Co je Bezov\xE1 h\u016Flka?"],
+      en: ["Why did you trust Snape?", "What happened to your cursed hand?", "What is the Elder Wand?"]
+    },
+    bradavice: {
+      cs: ["Kdo zalo\u017Eil Bradavice?", "Co je Komnata nejvy\u0161\u0161\xED pot\u0159eby?", "Kdo jsou zdej\u0161\xED duchov\xE9?"],
+      en: ["Who were the four founders?", "What is the Room of Requirement?", "Why do some become ghosts?"]
+    },
+    kouzla: {
+      cs: ["Jak\xE9 je tv\xE9 obl\xEDben\xE9 kouzlo?", "Co je nitrobrana?", "Co je mysl\xE1nka?"],
+      en: ["What is your favourite spell?", "What is Occlumency?", "What is a Pensieve?"]
+    },
+    smrt: {
+      cs: ["Boj\xED\u0161 se smrti?", "Co jsou mozkomorov\xE9?", "Existuj\xED duchov\xE9?"],
+      en: ["Do you fear death?", "What are Dementors?", "Why do some become ghosts?"]
+    },
+    laska: {
+      cs: ["Pro\u010D n\xE1s l\xE1ska chr\xE1n\xED?", "Co ukazuje zrcadlo z Erisedu?", "Byl jsi n\u011Bkdy zamilovan\xFD?"],
+      en: ["Why does love protect us?", "What does the Mirror of Erised show?", "Have you ever been in love?"]
+    },
+    snape: {
+      cs: ["Pro\u010D jsi Snapeovi v\u011B\u0159il?", "Pro\u010D t\u011B zabil Snape?", "Um\xED Snape nitrobranu?"],
+      en: ["Why did you trust Snape?", "What was your plan with Snape?", "Is Snape a Legilimens?"]
+    }
+  }
+};
+
 // src/chat-with-character/data/index.ts
 var CHAT_CHARACTERS = [dumbledore];
 function getChatCharacter(id) {
@@ -1105,6 +1197,7 @@ function getChatCharacter(id) {
 
 // src/chat-with-character/ChatGame.ts
 var RECENT_REPLY_MEMORY = 4;
+var ASKED_QUESTION_MEMORY = 6;
 var ChatGame = class extends BaseGame {
   setupSection = null;
   chatSection = null;
@@ -1115,12 +1208,15 @@ var ChatGame = class extends BaseGame {
   chatForm = null;
   messageInput = null;
   chatLog = null;
+  suggestionsEl = null;
   partnerNameEl = null;
   partnerTitleEl = null;
   backBtn = null;
   nickname = "";
   character = null;
   recentReplies = [];
+  askedQuestions = [];
+  lastTopic = null;
   constructor() {
     super();
     this.setupSection = document.getElementById("chatSetup");
@@ -1132,6 +1228,7 @@ var ChatGame = class extends BaseGame {
     this.chatForm = document.getElementById("chatForm");
     this.messageInput = document.getElementById("messageInput");
     this.chatLog = document.getElementById("chatLog");
+    this.suggestionsEl = document.getElementById("chatSuggestions");
     this.partnerNameEl = document.getElementById("partnerName");
     this.partnerTitleEl = document.getElementById("partnerTitle");
     this.backBtn = document.getElementById("backToSetupBtn");
@@ -1151,6 +1248,7 @@ var ChatGame = class extends BaseGame {
     this.populateCharacterOptions();
     if (this.character) {
       this.renderPartner(this.character);
+      this.renderSuggestions(this.lastTopic);
     }
   }
   populateCharacterOptions() {
@@ -1187,35 +1285,86 @@ var ChatGame = class extends BaseGame {
     this.nickname = nickname.value;
     this.character = character;
     this.recentReplies = [];
+    this.askedQuestions = [];
+    this.lastTopic = null;
     this.renderPartner(character);
     this.chatLog?.replaceChildren();
     this.showChatScreen(true);
     this.appendMessage("character", character.name[getLocale()], strings.chat.greeting(this.nickname));
+    this.renderSuggestions(null);
     this.messageInput?.focus();
   }
   sendMessage() {
-    if (!this.character || !this.messageInput) return;
-    const text = this.messageInput.value.trim();
+    if (!this.messageInput) return;
+    const text = this.messageInput.value;
+    this.messageInput.value = "";
+    this.askQuestion(text);
+    this.messageInput.focus();
+  }
+  /** Single entry point for a player question — from the form or a suggestion. */
+  askQuestion(question) {
+    if (!this.character) return;
+    const text = question.trim();
     if (text.length === 0) return;
     const locale = getLocale();
     this.appendMessage("user", this.nickname, text);
-    const { text: reply } = resolveReply(text, this.character, CHAT_CHARACTERS, TOPICS, locale, {
+    const { text: reply, topic } = resolveReply(text, this.character, CHAT_CHARACTERS, TOPICS, locale, {
       exclude: this.recentReplies
     });
     this.rememberReply(reply);
+    this.rememberQuestion(text);
     this.appendMessage("character", this.character.name[locale], reply);
-    this.messageInput.value = "";
-    this.messageInput.focus();
+    this.renderSuggestions(topic);
+  }
+  /**
+   * Renders the follow-up questions for `topic` as buttons. The row is rebuilt
+   * from scratch each turn, which drops the previous buttons together with their
+   * listeners; text is set via textContent only.
+   */
+  renderSuggestions(topic) {
+    if (!this.suggestionsEl) return;
+    const questions = suggestFollowUps(topic, FOLLOW_UPS, getLocale(), {
+      exclude: this.askedQuestions
+    });
+    this.suggestionsEl.replaceChildren();
+    for (const question of questions) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chat-suggestion";
+      chip.textContent = question;
+      chip.addEventListener("click", () => this.askSuggested(question));
+      this.suggestionsEl.appendChild(chip);
+    }
+    this.suggestionsEl.hidden = questions.length === 0;
+    this.lastTopic = topic;
+  }
+  /** Asks a suggested question; the clicked chip is gone, so focus moves on. */
+  askSuggested(question) {
+    this.askQuestion(question);
+    this.messageInput?.focus();
   }
   backToSetup() {
+    this.clearSuggestions();
     this.showChatScreen(false);
     this.nicknameInput?.focus();
+  }
+  clearSuggestions() {
+    if (!this.suggestionsEl) return;
+    this.suggestionsEl.replaceChildren();
+    this.suggestionsEl.hidden = true;
   }
   /** Records a reply and keeps only the most recent ones, to avoid repeats. */
   rememberReply(reply) {
     this.recentReplies.push(reply);
     if (this.recentReplies.length > RECENT_REPLY_MEMORY) {
       this.recentReplies.shift();
+    }
+  }
+  /** Records a question so it is not suggested back to the player. */
+  rememberQuestion(question) {
+    this.askedQuestions.push(question);
+    if (this.askedQuestions.length > ASKED_QUESTION_MEMORY) {
+      this.askedQuestions.shift();
     }
   }
   renderPartner(character) {

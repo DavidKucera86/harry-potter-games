@@ -1,10 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ChatGame } from '../../src/chat-with-character/ChatGame.ts';
+import { setLocale } from '../../src/shared/i18n/index.ts';
 import { setupChatDom } from './helpers/domFixture.ts';
 
 function newGame(): ChatGame {
   setupChatDom();
   return new ChatGame();
+}
+
+function suggestions(game: ChatGame): HTMLButtonElement[] {
+  return [...game.suggestionsEl!.querySelectorAll('button')];
 }
 
 function startChatAs(game: ChatGame, nickname: string): void {
@@ -120,5 +125,105 @@ describe('ChatGame conversation', () => {
     game.backBtn!.click();
     expect(game.setupSection!.hidden).toBe(false);
     expect(game.chatSection!.hidden).toBe(true);
+  });
+});
+
+describe('ChatGame follow-up suggestions', () => {
+  afterEach(() => {
+    setLocale('cs');
+  });
+
+  it('offers three questions to open the conversation', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+
+    const chips = suggestions(game);
+    expect(chips).toHaveLength(3);
+    expect(game.suggestionsEl!.hidden).toBe(false);
+    chips.forEach(chip => {
+      expect(chip.type).toBe('button');
+      expect(chip.textContent).not.toBe('');
+    });
+  });
+
+  it('offers a fresh set of three after every reply', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+
+    game.messageInput!.value = 'Co je viteál?';
+    game.chatForm!.requestSubmit();
+
+    expect(suggestions(game)).toHaveLength(3);
+  });
+
+  it('asks the clicked question as if the player had typed it', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+    const question = suggestions(game)[0].textContent;
+
+    suggestions(game)[0].click();
+
+    const userMessages = game.chatLog!.querySelectorAll('.chat-message--user');
+    expect(userMessages).toHaveLength(1);
+    expect(userMessages[0].querySelector('.chat-message-text')!.textContent).toBe(question);
+    // greeting + the reply to the clicked question
+    expect(game.chatLog!.querySelectorAll('.chat-message--character')).toHaveLength(2);
+  });
+
+  it('moves focus to the message input after a click, since the chip is gone', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+
+    suggestions(game)[0].click();
+
+    expect(document.activeElement).toBe(game.messageInput);
+  });
+
+  it('never offers a question the player already asked', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+    const asked = suggestions(game)[0].textContent;
+
+    suggestions(game)[0].click();
+
+    expect(suggestions(game).map(chip => chip.textContent)).not.toContain(asked);
+  });
+
+  it('does not offer a question the player typed by hand', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+
+    game.messageInput!.value = 'CO JE VITEAL?';
+    game.chatForm!.requestSubmit();
+
+    expect(suggestions(game).map(chip => chip.textContent)).not.toContain('Co je viteál?');
+  });
+
+  it('builds chips as plain text nodes, never as parsed markup (Zero Trust)', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+
+    suggestions(game).forEach(chip => expect(chip.children).toHaveLength(0));
+  });
+
+  it('hides the empty suggestion row after returning to the setup screen', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+    game.backBtn!.click();
+
+    expect(suggestions(game)).toHaveLength(0);
+    expect(game.suggestionsEl!.hidden).toBe(true);
+  });
+
+  it('re-renders the suggestions in the new language', () => {
+    const game = newGame();
+    startChatAs(game, 'Harry');
+    const before = suggestions(game).map(chip => chip.textContent);
+
+    setLocale('en');
+
+    const after = suggestions(game).map(chip => chip.textContent);
+    expect(after).toHaveLength(3);
+    expect(after).not.toEqual(before);
   });
 });
