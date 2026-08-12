@@ -5,6 +5,7 @@
    authoritative for toggling. */
 .chat-setup[hidden],
 .chat-room[hidden],
+.chat-suggestions[hidden],
 #setupError[hidden] {
   display: none;
 }
@@ -182,6 +183,43 @@
   color: var(--text-muted);
 }
 
+/* Follow-up questions offered after each reply. Chips wrap and grow with their
+   text so a long question never pushes the page sideways on a narrow screen. */
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.chat-suggestion {
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--purple-light);
+  border-radius: 999px;
+  background: rgba(107, 63, 160, 0.18);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.chat-suggestion:hover {
+  background: rgba(107, 63, 160, 0.32);
+}
+
+.chat-suggestion:focus-visible {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+}
+
 @media (max-width: 480px) {
   .chat-log {
     height: 300px;
@@ -198,5 +236,11 @@
 
   .chat-input .btn {
     width: 100%;
+  }
+
+  /* Full-width chips: easier to hit, and long questions stay readable. */
+  .chat-suggestions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

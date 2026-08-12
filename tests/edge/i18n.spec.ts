@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { setupGameMocks } from '../helpers/api';
 import { waitForHangmanReady, waitForQuizReady } from '../helpers/hangman';
+import { waitForChatReady } from '../helpers/chat';
 import { given, when, then } from '../helpers/gwt';
 import {
   assertPageLocaleConsistency,
@@ -20,6 +21,7 @@ const pages: Array<{
   { path: '/guess-spell/', ready: waitForHangmanReady, messageKey: 'hangman.guessSpell' },
   { path: '/guess-house/', ready: waitForQuizReady, messageKey: 'quiz.housePrompt' },
   { path: '/who-is-on-photo/', ready: waitForQuizReady, messageKey: 'quiz.photoPrompt' },
+  { path: '/chat-with-character/', ready: waitForChatReady },
 ];
 
 test.describe('Internationalization @edge', () => {

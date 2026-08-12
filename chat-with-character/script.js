@@ -1,7 +1,11 @@
 // src/chat-with-character/ChatGame.ts
 import { BaseGame } from "../shared/BaseGame.js";
 import { getLocale, getStrings } from "../shared/i18n/index.js";
-import { resolveReply, validateNickname } from "../shared/chatEngine.js";
+import {
+  resolveReply,
+  suggestFollowUps,
+  validateNickname
+} from "../shared/chatEngine.js";
 
 // src/chat-with-character/data/dumbledore.ts
 var dumbledore = {
@@ -633,6 +637,34 @@ var dumbledore = {
         "Potions are a subtle and powerful art. Polyjuice Potion lends you another\u2019s form; Felix Felicis, liquid luck, grants a spell of good fortune; Amortentia stirs mere infatuation, never true love \u2014 that cannot be brewed.",
         "I have seen a potion save a life and undo a mind alike. As with all magic, it matters less what the recipe says than what lies in the heart of the one who stirs the cauldron."
       ]
+    },
+    bdelost: {
+      cs: [
+        "Uk\xE1zn\u011Bn\xE1 mysl nen\xED mysl uml\u010Den\xE1, n\xFDbr\u017E mysl bd\u011Bl\xE1. V\u011Bt\u0161ina kouzeln\xEDk\u016F proch\xE1z\xED \u017Eivotem jako ve snu: jednaj\xED, ani\u017E v\u011Bd\xED pro\u010D, a tomu, co si sami zp\u016Fsobili, pak \u0159\xEDkaj\xED osud. Probudit se znamen\xE1 vid\u011Bt v\u011Bci takov\xE9, jak\xE9 jsou \u2014 ne takov\xE9, jak\xE9 se boj\xEDme, \u017Ee jsou.",
+        "Nau\u010D se svou mysl pozorovat, m\xEDsto abys j\xED naslouchal. My\u0161lenka, na kterou se d\xEDv\xE1\u0161, nad tebou ztr\xE1c\xED moc; my\u0161lenka, kter\xE9 naslouch\xE1\u0161, t\u011B vede za ruku. Pr\xE1v\u011B proto za\u010D\xEDn\xE1 nitrobrana tichem, nikoli kouzlem.",
+        "Ticho nen\xED pr\xE1zdnota, n\xFDbr\u017E jedin\xE9 m\xEDsto, kde kone\u010Dn\u011B usly\u0161\xED\u0161, co ti mysl celou dobu \u0161eptala. A velmi \u010Dasto zjist\xED\u0161, \u017Ee to nebyl tv\u016Fj hlas, ale hlas tv\xE9ho strachu.",
+        "Pozornost je vz\xE1cn\u011Bj\u0161\xED ne\u017E talent, mil\xFD p\u0159\xEDteli. V\u011Bt\u0161ina chyb, jich\u017E jsem v \u017Eivot\u011B litoval, nevznikla z neznalosti \u2014 vznikla z nepozornosti. Vid\u011Bt a vid\u011Bt bd\u011Ble jsou dv\u011B zcela r\u016Fzn\xE9 v\u011Bci."
+      ],
+      en: [
+        "A disciplined mind is not a silenced mind but a wakeful one. Most wizards move through life as though asleep: they act without knowing why, and then call what they brought upon themselves fate. To wake is to see things as they are \u2014 not as we fear them to be.",
+        "Learn to watch your mind rather than listen to it. A thought you observe loses its hold on you; a thought you heed takes you by the hand. That is why Occlumency begins in silence and not with a spell.",
+        "Silence is not emptiness. It is the one place where you finally hear what your mind has been whispering all along \u2014 and very often you discover the voice was not yours at all, but your fear\u2019s.",
+        "Attention is rarer than talent, my friend. Most of the mistakes I have come to regret arose not from ignorance but from inattention. To see, and to see with awareness, are two quite different things."
+      ]
+    },
+    technologie: {
+      cs: [
+        "Mudlovsk\xE9 stroje v Bradavic\xEDch nefunguj\xED \u2014 je tu p\u0159\xEDli\u0161 mnoho magie ve zdech. Zakl\xEDnadlo je ostatn\u011B jist\xFD druh programu: p\u0159esn\xE1 instrukce, vysloven\xE1 p\u0159esn\u011B, a sv\u011Bt poslechne. Splete-li \u017E\xE1k jedinou slabiku, z\xEDsk\xE1 ropuchu tam, kde \u010Dekal sv\u011Btlo.",
+        "Nejbl\xED\u017E tomu, \u010Demu \u0159\xEDk\xE1\u0161 k\xF3d, m\xE1m zakl\xEDnadlo. Rozd\xEDl je v tom, \u017Ee chybn\xE9 kouzlo neoprav\xED\u0161 st\u0159edn\xEDkem, n\xFDbr\u017E pokorou \u2014 a n\u011Bkdy n\xE1v\u0161t\u011Bvou o\u0161et\u0159ovny.",
+        "Co v\xEDm o po\u010D\xEDta\u010D\xEDch, m\xE1m od Artura Weasleyho, jeho\u017E nad\u0161en\xED pro z\xE1str\u010Dky nezn\xE1 mez\xED. Mne v\u0161ak zaj\xEDm\xE1 jin\xFD stroj \u2014 lidsk\xE1 mysl. I tu lze programovat; pr\xE1v\u011B proto stoj\xED za to u\u010Dit se nitrobran\u011B.",
+        "Um\u011Bl\xE1 inteligence? Mysl\xEDc\xED stroj bez srdce mi p\u0159ipom\xEDn\xE1 den\xEDk Toma Raddlea: tak\xE9 odpov\xEDdal chyt\u0159e, ochotn\u011B a l\u017Eiv\u011B. Nikdy nev\u011B\u0159 tomu, co mysl\xED, ani\u017E bys v\u011Bd\u011Bl, \u010D\xED v\u016Fle za odpov\u011B\u010Fmi stoj\xED."
+      ],
+      en: [
+        "Muggle machines do not work at Hogwarts \u2014 there is far too much magic in these walls. An incantation is a kind of program, mind you: a precise instruction, precisely spoken, and the world obeys. Slip a single syllable and a student gets a toad where they expected light.",
+        "The closest thing I have to what you call code is a spell. The difference is that a flawed one is not mended with a semicolon but with humility \u2014 and occasionally a visit to the hospital wing.",
+        "What I know of computers I owe to Arthur Weasley, whose enthusiasm for plugs knows no bounds. The machine that interests me is a different one: the mind. It, too, can be programmed \u2014 which is precisely why Occlumency is worth learning.",
+        "Artificial intelligence? A thinking machine without a heart puts me in mind of Tom Riddle\u2019s diary: it also answered cleverly, obligingly and falsely. Never trust a thing that thinks until you know whose will stands behind its answers."
+      ]
     }
   },
   fallback: {
@@ -651,18 +683,36 @@ var dumbledore = {
   }
 };
 
+// src/shared/chatEngine.ts
+var TOPIC_PRIORITY = {
+  /** Greetings, thanks, farewells, being hailed by name — always yields. */
+  PHATIC: -2,
+  /** Small talk — answered only when nothing more substantial was asked. */
+  SMALL_TALK: -1,
+  /** Implicit default for every topic that does not declare one. */
+  NORMAL: 0
+};
+
 // src/chat-with-character/data/topics.ts
 var TOPICS = {
   // --- Personal / small-talk: answered only from a character's own quotes ---
+  // Being hailed by name belongs here rather than in `identita`: it is a form of
+  // address, not a request to introduce oneself, and PHATIC keeps it from
+  // outranking the question that follows it. 'bumbal' is a common misspelling
+  // and is not a substring of 'brumbal', so both stems are needed. A third-person
+  // mention with no other keyword ("Co si myslíš o Brumbálovi?") lands here too —
+  // acceptable, since the player is talking *to* him.
   pozdrav: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
-      cs: ["ahoj", "cau", "nazdar", "zdrav", "dobry den", "dobre rano", "dobry vecer", "vitej"],
-      en: ["hello", "hey there", "greetings", "good morning", "good evening", "good day"]
+      cs: ["ahoj", "cau", "nazdar", "zdrav", "dobry den", "dobre rano", "dobry vecer", "vitej", "brumbal", "bumbal"],
+      en: ["hello", "hey there", "greetings", "good morning", "good evening", "good day", "dumbledore", "dumbledor"]
     }
   },
   jaksemas: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["jak se mas", "jak se mate", "jak ti je", "jak se ti dari", "jak se vede", "jak se citis", "co je noveho", "co delas", "jak to jde"],
       en: ["how are you", "how do you do", "how are things", "how have you been", "how are you feeling", "how is it going", "whats up"]
@@ -670,6 +720,7 @@ var TOPICS = {
   },
   oblibene: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["co mas rad", "mas rad", "co te bavi", "oblib", "co miluje", "co preferuje", "co te tesi"],
       en: ["what do you like", "do you like", "what do you enjoy", "favourite", "favorite", "what makes you happy"]
@@ -677,6 +728,7 @@ var TOPICS = {
   },
   identita: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["kdo jsi", "kdo jste", "jak se jmenuje", "predstav se", "co jsi zac", "o sobe"],
       en: ["who are you", "what is your name", "whats your name", "introduce yourself", "about you"]
@@ -684,6 +736,7 @@ var TOPICS = {
   },
   namety: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["o cem", "co umis", "co vis", "na co se", "poradi", "napovez", "temata", "co bys"],
       en: ["what can we talk", "what can you", "what do you know", "suggest a topic", "topics", "help me", "what should i ask"]
@@ -691,6 +744,7 @@ var TOPICS = {
   },
   podekovani: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ["diky", "dekuj", "dekuju", "jsi hodny"],
       en: ["thank", "thanks", "cheers", "much appreciated"]
@@ -698,6 +752,7 @@ var TOPICS = {
   },
   rozlouceni: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ["sbohem", "nashledanou", "na shledanou", "mej se", "loucim", "tak zatim", "papa"],
       en: ["goodbye", "good bye", "farewell", "see you", "take care"]
@@ -705,6 +760,7 @@ var TOPICS = {
   },
   vtipy: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ["vtip", "sranda", "legrace", "humor", "rozesmej", "nasmej", "pobav", "zavtipkuj"],
       en: ["joke", "funny", "make me laugh", "tell me something funny", "humour", "humor"]
@@ -931,7 +987,7 @@ var TOPICS = {
   brumbaluv_plan: {
     deferrable: true,
     keywords: {
-      cs: ["tvuj plan", "tvoje smrt", "tva smrt", "proc jsi zemrel", "proc te zabil", "kdo te zabil", "cerna ruka", "zcernal", "prokleta ruk", "tva ruk", "tvou ruk", "proc snape"],
+      cs: ["tvuj plan", "brumbaluv plan", "tvoje smrt", "tva smrt", "proc jsi zemrel", "proc te zabil", "kdo te zabil", "cerna ruka", "zcernal", "prokleta ruk", "tva ruk", "tvou ruk", "proc snape"],
       en: ["your death", "your plan", "who killed you", "why did you die", "why snape killed", "blackened hand", "cursed hand", "withered hand"]
     }
   },
@@ -1046,6 +1102,123 @@ var TOPICS = {
       cs: ["mnoholicny lektvar", "mnoholicneho lektvar", "felix felicis", "tekute stesti", "tekuteho stesti", "amortenci", "veritaserum", "polyjuice"],
       en: ["polyjuice", "felix felicis", "liquid luck", "amortentia", "veritaserum"]
     }
+  },
+  // Attention, inner quiet and self-observation — where Occlumency stops being a
+  // spell and becomes a discipline. Bare 'mysl'/'mysli' are deliberately absent:
+  // they hide inside "co si myslíš", which is how players open half their
+  // questions about something else entirely.
+  bdelost: {
+    deferrable: true,
+    keywords: {
+      cs: ["ukaznen", "kazen", "bdelost", "bdela mysl", "pozornost", "soustredeni", "vsimav", "medit", "rozjiman", "usebran", "vnitrni klid", "klid mysli", "ovladat mysl", "ovladani mysli", "cvicit mysl", "sebeovladani", "probuzen", "vedomi", "ticho"],
+      en: ["disciplined mind", "discipline of the mind", "awareness", "mindful", "medit", "contemplat", "inner peace", "stillness", "attention", "awake", "presence of mind", "self-control", "silence"]
+    }
+  },
+  // Muggle technology the wizarding world knows nothing about. Keywords are
+  // matched as plain substrings, so short stems are unsafe here: 'kod' hides in
+  // "škoda", 'ai' in "afraid"/"again", 'app' in "happy". Spell them out.
+  technologie: {
+    deferrable: true,
+    keywords: {
+      cs: ["programov", "programuj", "programator", "kodovan", "zdrojak", "pocitac", "notebook", "software", "hardware", "technologi", "internet", "algoritm", "databaz", "robot", "umela inteligence", "umele inteligenc", "chatgpt", "javascript", "python", "mobil"],
+      en: ["programming", "programmer", "coding", "source code", "computer", "laptop", "software", "hardware", "technology", "internet", "algorithm", "database", "robot", "artificial intelligence", "machine learning", "chatgpt", "javascript", "python", "smartphone", "developer", "website"]
+    }
+  }
+};
+
+// src/chat-with-character/data/followUps.ts
+var FOLLOW_UPS = {
+  default: {
+    cs: [
+      "Co je vite\xE1l?",
+      "Pov\u011Bz mi o relikvi\xEDch smrti",
+      "Jak\xE9 je tv\xE9 obl\xEDben\xE9 kouzlo?",
+      "Co si mysl\xED\u0161 o Harrym?",
+      "Pro\u010D t\u011B zabil Snape?",
+      "Jak\xE9 sladkosti m\xE1\u0161 r\xE1d?",
+      "Kdo zalo\u017Eil Bradavice?",
+      "Co je Bezov\xE1 h\u016Flka?",
+      "Co je Tajemn\xE1 komnata?",
+      "\u0158ekni mi n\u011Bjak\xFD vtip"
+    ],
+    en: [
+      "What is a Horcrux?",
+      "Tell me about the Deathly Hallows",
+      "What is your favourite spell?",
+      "What do you think of Harry?",
+      "Why did Snape kill you?",
+      "What sweets do you like?",
+      "Who were the four founders?",
+      "What is the Elder Wand?",
+      "What is the Chamber of Secrets?",
+      "Tell me a joke"
+    ]
+  },
+  byTopic: {
+    technologie: {
+      cs: ["Jak vlastn\u011B funguje kouzlo?", "Co je nitrobrana?", "Kdo byl Tom Raddle?"],
+      en: ["How does a spell actually work?", "What is Occlumency?", "Who was Tom Riddle?"]
+    },
+    nitrozpyt: {
+      cs: ["Co je uk\xE1zn\u011Bn\xE1 mysl?", "Co je mysl\xE1nka?", "Um\xED Snape nitrobranu?"],
+      en: ["What is a disciplined mind?", "What is a Pensieve?", "Is Snape a Legilimens?"]
+    },
+    bdelost: {
+      cs: ["Co je nitrobrana?", "Jak se cvi\u010D\xED pozornost?", "Co ukazuje zrcadlo z Erisedu?"],
+      en: ["What is Occlumency?", "How does one train attention?", "What does the Mirror of Erised show?"]
+    },
+    sladkosti: {
+      cs: ["Pro\u010D m\xE1\u0161 r\xE1d citronov\xE9 bonbony?", "Jak\xE9 bylo heslo do tv\xE9 pracovny?", "Co je \u010Dokol\xE1dov\xE1 \u017E\xE1ba?"],
+      en: ["Why do you love sherbet lemons?", "What was the password to your study?", "What is a Chocolate Frog?"]
+    },
+    harry: {
+      cs: ["Pro\u010D Harry p\u0159e\u017Eil?", "Co \u0159\xEDk\xE1 proroctv\xED?", "Byl Harry vite\xE1l?"],
+      en: ["Why did Harry survive?", "What does the prophecy say?", "Was Harry a Horcrux?"]
+    },
+    voldemort: {
+      cs: ["Kolik vite\xE1l\u016F si vytvo\u0159il?", "Jak jsi Toma Raddlea poznal?", "Pro\u010D se boj\xEDme vyslovit jeho jm\xE9no?"],
+      en: ["How many Horcruxes did he make?", "How did you meet Tom Riddle?", "Why do we fear his name?"]
+    },
+    viteal: {
+      cs: ["Jak zni\u010Dit vite\xE1l?", "Kter\xE9 vite\xE1ly to byly?", "Co jsou relikvie smrti?"],
+      en: ["How do you destroy a Horcrux?", "Which Horcruxes were there?", "What are the Deathly Hallows?"]
+    },
+    viteal_zniceni: {
+      cs: ["Kdo zni\u010Dil medailon?", "Co je Tajemn\xE1 komnata?", "Pro\u010D tv\xE1 ruka z\u010Dernala?"],
+      en: ["Who destroyed the locket?", "What is the Chamber of Secrets?", "What happened to your cursed hand?"]
+    },
+    relikvie: {
+      cs: ["Kdo byli brat\u0159i Peverellov\xE9?", "Komu pat\u0159\xED Bezov\xE1 h\u016Flka?", "Co ukazuje k\xE1men vzk\u0159\xED\u0161en\xED?"],
+      en: ["Who were the Peverell brothers?", "Who owns the Elder Wand?", "What does the Resurrection Stone show?"]
+    },
+    bezova_hulka: {
+      cs: ["Kdo je p\xE1n h\u016Flky?", "Jak\xFD byl souboj s Grindelwaldem?", "Co jsou relikvie smrti?"],
+      en: ["Who is the master of the wand?", "How did you defeat Grindelwald?", "What are the Deathly Hallows?"]
+    },
+    brumbaluv_plan: {
+      cs: ["Pro\u010D jsi Snapeovi v\u011B\u0159il?", "Pro\u010D tv\xE1 ruka z\u010Dernala?", "Co je Bezov\xE1 h\u016Flka?"],
+      en: ["Why did you trust Snape?", "What happened to your cursed hand?", "What is the Elder Wand?"]
+    },
+    bradavice: {
+      cs: ["Kdo zalo\u017Eil Bradavice?", "Co je Komnata nejvy\u0161\u0161\xED pot\u0159eby?", "Kdo jsou zdej\u0161\xED duchov\xE9?"],
+      en: ["Who were the four founders?", "What is the Room of Requirement?", "Why do some become ghosts?"]
+    },
+    kouzla: {
+      cs: ["Jak\xE9 je tv\xE9 obl\xEDben\xE9 kouzlo?", "Co je nitrobrana?", "Co je mysl\xE1nka?"],
+      en: ["What is your favourite spell?", "What is Occlumency?", "What is a Pensieve?"]
+    },
+    smrt: {
+      cs: ["Boj\xED\u0161 se smrti?", "Co jsou mozkomorov\xE9?", "Existuj\xED duchov\xE9?"],
+      en: ["Do you fear death?", "What are Dementors?", "Why do some become ghosts?"]
+    },
+    laska: {
+      cs: ["Pro\u010D n\xE1s l\xE1ska chr\xE1n\xED?", "Co ukazuje zrcadlo z Erisedu?", "Byl jsi n\u011Bkdy zamilovan\xFD?"],
+      en: ["Why does love protect us?", "What does the Mirror of Erised show?", "Have you ever been in love?"]
+    },
+    snape: {
+      cs: ["Pro\u010D jsi Snapeovi v\u011B\u0159il?", "Pro\u010D t\u011B zabil Snape?", "Um\xED Snape nitrobranu?"],
+      en: ["Why did you trust Snape?", "What was your plan with Snape?", "Is Snape a Legilimens?"]
+    }
   }
 };
 
@@ -1057,6 +1230,7 @@ function getChatCharacter(id) {
 
 // src/chat-with-character/ChatGame.ts
 var RECENT_REPLY_MEMORY = 4;
+var ASKED_QUESTION_MEMORY = 6;
 var ChatGame = class extends BaseGame {
   setupSection = null;
   chatSection = null;
@@ -1067,12 +1241,15 @@ var ChatGame = class extends BaseGame {
   chatForm = null;
   messageInput = null;
   chatLog = null;
+  suggestionsEl = null;
   partnerNameEl = null;
   partnerTitleEl = null;
   backBtn = null;
   nickname = "";
   character = null;
   recentReplies = [];
+  askedQuestions = [];
+  lastTopic = null;
   constructor() {
     super();
     this.setupSection = document.getElementById("chatSetup");
@@ -1084,6 +1261,7 @@ var ChatGame = class extends BaseGame {
     this.chatForm = document.getElementById("chatForm");
     this.messageInput = document.getElementById("messageInput");
     this.chatLog = document.getElementById("chatLog");
+    this.suggestionsEl = document.getElementById("chatSuggestions");
     this.partnerNameEl = document.getElementById("partnerName");
     this.partnerTitleEl = document.getElementById("partnerTitle");
     this.backBtn = document.getElementById("backToSetupBtn");
@@ -1103,6 +1281,7 @@ var ChatGame = class extends BaseGame {
     this.populateCharacterOptions();
     if (this.character) {
       this.renderPartner(this.character);
+      this.renderSuggestions(this.lastTopic);
     }
   }
   populateCharacterOptions() {
@@ -1139,35 +1318,86 @@ var ChatGame = class extends BaseGame {
     this.nickname = nickname.value;
     this.character = character;
     this.recentReplies = [];
+    this.askedQuestions = [];
+    this.lastTopic = null;
     this.renderPartner(character);
     this.chatLog?.replaceChildren();
     this.showChatScreen(true);
     this.appendMessage("character", character.name[getLocale()], strings.chat.greeting(this.nickname));
+    this.renderSuggestions(null);
     this.messageInput?.focus();
   }
   sendMessage() {
-    if (!this.character || !this.messageInput) return;
-    const text = this.messageInput.value.trim();
+    if (!this.messageInput) return;
+    const text = this.messageInput.value;
+    this.messageInput.value = "";
+    this.askQuestion(text);
+    this.messageInput.focus();
+  }
+  /** Single entry point for a player question — from the form or a suggestion. */
+  askQuestion(question) {
+    if (!this.character) return;
+    const text = question.trim();
     if (text.length === 0) return;
     const locale = getLocale();
     this.appendMessage("user", this.nickname, text);
-    const reply = resolveReply(text, this.character, CHAT_CHARACTERS, TOPICS, locale, {
+    const { text: reply, topic } = resolveReply(text, this.character, CHAT_CHARACTERS, TOPICS, locale, {
       exclude: this.recentReplies
     });
     this.rememberReply(reply);
+    this.rememberQuestion(text);
     this.appendMessage("character", this.character.name[locale], reply);
-    this.messageInput.value = "";
-    this.messageInput.focus();
+    this.renderSuggestions(topic);
+  }
+  /**
+   * Renders the follow-up questions for `topic` as buttons. The row is rebuilt
+   * from scratch each turn, which drops the previous buttons together with their
+   * listeners; text is set via textContent only.
+   */
+  renderSuggestions(topic) {
+    if (!this.suggestionsEl) return;
+    const questions = suggestFollowUps(topic, FOLLOW_UPS, getLocale(), {
+      exclude: this.askedQuestions
+    });
+    this.suggestionsEl.replaceChildren();
+    for (const question of questions) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chat-suggestion";
+      chip.textContent = question;
+      chip.addEventListener("click", () => this.askSuggested(question));
+      this.suggestionsEl.appendChild(chip);
+    }
+    this.suggestionsEl.hidden = questions.length === 0;
+    this.lastTopic = topic;
+  }
+  /** Asks a suggested question; the clicked chip is gone, so focus moves on. */
+  askSuggested(question) {
+    this.askQuestion(question);
+    this.messageInput?.focus();
   }
   backToSetup() {
+    this.clearSuggestions();
     this.showChatScreen(false);
     this.nicknameInput?.focus();
+  }
+  clearSuggestions() {
+    if (!this.suggestionsEl) return;
+    this.suggestionsEl.replaceChildren();
+    this.suggestionsEl.hidden = true;
   }
   /** Records a reply and keeps only the most recent ones, to avoid repeats. */
   rememberReply(reply) {
     this.recentReplies.push(reply);
     if (this.recentReplies.length > RECENT_REPLY_MEMORY) {
       this.recentReplies.shift();
+    }
+  }
+  /** Records a question so it is not suggested back to the player. */
+  rememberQuestion(question) {
+    this.askedQuestions.push(question);
+    if (this.askedQuestions.length > ASKED_QUESTION_MEMORY) {
+      this.askedQuestions.shift();
     }
   }
   renderPartner(character) {

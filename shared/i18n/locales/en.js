@@ -125,7 +125,8 @@ const en = {
     chatYou: "You",
     chatNicknamePlaceholder: "Enter a nickname (max. 32 characters)",
     chatMessagePlaceholder: "Type a message\u2026",
-    chatLogLabel: "Conversation log"
+    chatLogLabel: "Conversation log",
+    chatSuggestionsLabel: "Suggested questions"
   },
   pages: {
     menuTitle: "Harry Potter Games",

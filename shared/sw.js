@@ -14,6 +14,7 @@ const PRECACHE_URLS = [
   "/shared/styles/components.css",
   "/shared/styles/games.css",
   "/shared/styles/hangman.css",
+  "/shared/styles/chat.css",
   "/shared/icons/icon.svg",
   "/shared/initLocale.js",
   "/shared/registerSw.js",

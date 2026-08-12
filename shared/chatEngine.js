@@ -1,4 +1,13 @@
 const MAX_NICKNAME_LENGTH = 32;
+const TOPIC_PRIORITY = {
+  /** Greetings, thanks, farewells, being hailed by name — always yields. */
+  PHATIC: -2,
+  /** Small talk — answered only when nothing more substantial was asked. */
+  SMALL_TALK: -1,
+  /** Implicit default for every topic that does not declare one. */
+  NORMAL: 0
+};
+const FOLLOW_UP_COUNT = 3;
 const COMBINING_MARKS = /[̀-ͯ]/g;
 function normalizeText(text) {
   return text.normalize("NFD").replace(COMBINING_MARKS, "").toLowerCase().trim();
@@ -30,12 +39,18 @@ function detectTopics(text, registry, locale) {
   return Object.entries(registry).filter(([, def]) => bestMatchLength(haystack, def.keywords[locale] ?? []) > 0).map(([id]) => id);
 }
 function matchTopic(haystack, registry, locale, random) {
-  const scored = Object.entries(registry).map(([id, def]) => ({ id, length: bestMatchLength(haystack, def.keywords[locale] ?? []) })).filter((entry) => entry.length > 0);
+  const scored = Object.entries(registry).map(([id, def]) => ({
+    id,
+    length: bestMatchLength(haystack, def.keywords[locale] ?? []),
+    priority: def.priority ?? TOPIC_PRIORITY.NORMAL
+  })).filter((entry) => entry.length > 0);
   if (scored.length === 0) {
     return null;
   }
-  const maxLength = Math.max(...scored.map((entry) => entry.length));
-  const mostSpecific = scored.filter((entry) => entry.length === maxLength);
+  const maxPriority = Math.max(...scored.map((entry) => entry.priority));
+  const preferred = scored.filter((entry) => entry.priority === maxPriority);
+  const maxLength = Math.max(...preferred.map((entry) => entry.length));
+  const mostSpecific = preferred.filter((entry) => entry.length === maxLength);
   return pickRandom(mostSpecific, random).id;
 }
 function resolveReply(text, speaker, roster, registry, locale, options = {}) {
@@ -46,7 +61,7 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
   if (topic) {
     const own = speaker.quotes[topic]?.[locale];
     if (own && own.length > 0) {
-      return pickFrom(own, excluded, random);
+      return { text: pickFrom(own, excluded, random), topic };
     }
     if (registry[topic].deferrable) {
       const source = roster.find(
@@ -54,7 +69,7 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
       );
       if (source) {
         const quote = pickFrom(source.quotes[topic][locale], excluded, random);
-        return speaker.deferral[locale](source.name[locale], quote);
+        return { text: speaker.deferral[locale](source.name[locale], quote), topic };
       }
     }
   }
@@ -62,7 +77,24 @@ function resolveReply(text, speaker, roster, registry, locale, options = {}) {
     ...speaker.quotes.general?.[locale] ?? [],
     ...speaker.fallback[locale]
   ];
-  return pickFrom(fallbackPool, excluded, random);
+  return { text: pickFrom(fallbackPool, excluded, random), topic: null };
+}
+function suggestFollowUps(topic, followUps, locale, options = {}) {
+  const count = options.count ?? FOLLOW_UP_COUNT;
+  const random = options.random ?? Math.random;
+  const excluded = new Set([...toExcludeSet(options.exclude)].map(normalizeText));
+  const bespoke = (topic !== null ? followUps.byTopic[topic]?.[locale] : void 0) ?? [];
+  const pool = [...bespoke, ...followUps.default[locale]];
+  const picked = [];
+  const take = (candidates) => {
+    const remaining = candidates.filter((question) => !picked.includes(question));
+    while (picked.length < count && remaining.length > 0) {
+      picked.push(...remaining.splice(Math.floor(random() * remaining.length), 1));
+    }
+  };
+  take(pool.filter((question) => !excluded.has(normalizeText(question))));
+  take(pool);
+  return picked;
 }
 function validateNickname(raw) {
   const value = raw.trim();
@@ -75,9 +107,12 @@ function validateNickname(raw) {
   return { ok: true, value };
 }
 export {
+  FOLLOW_UP_COUNT,
   MAX_NICKNAME_LENGTH,
+  TOPIC_PRIORITY,
   detectTopics,
   normalizeText,
   resolveReply,
+  suggestFollowUps,
   validateNickname
 };

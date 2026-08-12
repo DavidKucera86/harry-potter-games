@@ -138,52 +138,148 @@ describe('dumbledore small talk', () => {
 
   it('resolves "oblíbené kouzlo" to the favourite-spell topic, not generic magic or likes', () => {
     const reply = resolveReply('Jaké je tvé oblíbené kouzlo?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.oblibenekouzlo.cs).toContain(reply);
+    expect(dumbledore.quotes.oblibenekouzlo.cs).toContain(reply.text);
   });
 
   it('resolves "relikvie smrti" to the Hallows topic, not the generic death topic', () => {
     const reply = resolveReply('Pověz mi o relikviích smrti', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.relikvie.cs).toContain(reply);
+    expect(dumbledore.quotes.relikvie.cs).toContain(reply.text);
   });
 
   it('resolves "souboj s Grindelwaldem" to the duel topic, not the romance topic', () => {
     const reply = resolveReply('Jaký byl souboj s Grindelwaldem?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.grindelwald_souboj.cs).toContain(reply);
+    expect(dumbledore.quotes.grindelwald_souboj.cs).toContain(reply.text);
   });
 
   it('resolves "Řád fénixe" to the Order topic, not the Fawkes topic', () => {
     const reply = resolveReply('Co je Řád fénixe?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply);
+    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply.text);
   });
 
   it('resolves "jak zničit viteál" to the destruction topic, not the general Horcrux topic', () => {
     const reply = resolveReply('Jak se ničí viteály?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.viteal_zniceni.cs).toContain(reply);
+    expect(dumbledore.quotes.viteal_zniceni.cs).toContain(reply.text);
   });
 
   it('resolves "Mnoholičný lektvar" to the specific-potions topic, not generic magic', () => {
     const reply = resolveReply('Co je Mnoholičný lektvar?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.lektvary.cs).toContain(reply);
+    expect(dumbledore.quotes.lektvary.cs).toContain(reply.text);
   });
 
   it('resolves "Salazar Zmijozel" to the founders topic, not the generic Hogwarts topic', () => {
     const reply = resolveReply('Kdo byl Salazar Zmijozel?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.zakladatele.cs).toContain(reply);
+    expect(dumbledore.quotes.zakladatele.cs).toContain(reply.text);
   });
 
   it('resolves "temné časy" to the dark-times topic, not the generic fear topic', () => {
     const reply = resolveReply('temné časy', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.temne_casy.cs).toContain(reply);
+    expect(dumbledore.quotes.temne_casy.cs).toContain(reply.text);
   });
 
   it('resolves "kdo se postavil temnotě" to the Order topic, not the generic fear topic', () => {
     const reply = resolveReply('Kdo se postavili temnotě?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply);
+    expect(dumbledore.quotes.rad_fenixe.cs).toContain(reply.text);
   });
 
   it('answers small talk from the topic bucket, not from the generic fallback', () => {
     const reply = resolveReply('Jak se máš?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
-    expect(dumbledore.quotes.jaksemas.cs).toContain(reply);
-    expect(dumbledore.fallback.cs).not.toContain(reply);
+    expect(dumbledore.quotes.jaksemas.cs).toContain(reply.text);
+    expect(dumbledore.fallback.cs).not.toContain(reply.text);
+  });
+});
+
+describe('dumbledore answers questions greeted at him', () => {
+  it('answers "Čau Bumbále, v čem programuješ?" about technology, not with a greeting', () => {
+    const reply = resolveReply('Čau Bumbále, v čem programuješ?', dumbledore, [dumbledore], TOPICS, 'cs', {
+      random: () => 0,
+    });
+    expect(reply.topic).toBe('technologie');
+    expect(dumbledore.quotes.technologie.cs).toContain(reply.text);
+    expect(dumbledore.quotes.pozdrav.cs).not.toContain(reply.text);
+  });
+
+  it('answers "Dobrý večer, kdo je Fawkes?" about Fawkes, not with a greeting', () => {
+    const reply = resolveReply('Dobrý večer, kdo je Fawkes?', dumbledore, [dumbledore], TOPICS, 'cs', {
+      random: () => 0,
+    });
+    expect(reply.topic).toBe('fawkes');
+  });
+
+  it('answers "Hello Dumbledore, what do you think about programming?" about technology', () => {
+    const reply = resolveReply(
+      'Hello Dumbledore, what do you think about programming?',
+      dumbledore,
+      [dumbledore],
+      TOPICS,
+      'en',
+      { random: () => 0 },
+    );
+    expect(reply.topic).toBe('technologie');
+  });
+
+  it('still greets back when the message is only a greeting', () => {
+    const reply = resolveReply('Čau Bumbále!', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('pozdrav');
+  });
+
+  const technologyCases = [
+    { text: 'V čem programuješ?', locale: 'cs', topic: 'technologie' },
+    { text: 'Máš počítač?', locale: 'cs', topic: 'technologie' },
+    { text: 'Co si myslíš o umělé inteligenci?', locale: 'cs', topic: 'technologie' },
+    { text: 'Znáš internet?', locale: 'cs', topic: 'technologie' },
+    { text: 'Do you know anything about programming?', locale: 'en', topic: 'technologie' },
+    { text: 'Have you ever used a computer?', locale: 'en', topic: 'technologie' },
+    { text: 'What about artificial intelligence?', locale: 'en', topic: 'technologie' },
+  ] as const;
+
+  it.each(technologyCases)('detects "$text" as topic "$topic"', ({ text, locale, topic }) => {
+    expect(detectTopics(text, TOPICS, locale)).toContain(topic);
+  });
+
+  const falsePositiveCases = [
+    // Guards short stems: "škoda" normalizes to "skoda", which contains "kod".
+    { text: 'To je ale škoda', locale: 'cs' },
+    { text: 'Nemám z čeho mít škodu', locale: 'cs' },
+    { text: 'Are you afraid again?', locale: 'en' },
+    { text: 'What makes you happy?', locale: 'en' },
+  ] as const;
+
+  it.each(falsePositiveCases)('does not read "$text" as a technology question', ({ text, locale }) => {
+    expect(detectTopics(text, TOPICS, locale)).not.toContain('technologie');
+  });
+});
+
+describe('dumbledore on a disciplined mind', () => {
+  const cases = [
+    { text: 'ukázněná mysl?', locale: 'cs', topic: 'bdelost' },
+    { text: 'Jak se cvičí pozornost?', locale: 'cs', topic: 'bdelost' },
+    { text: 'K čemu je ticho?', locale: 'cs', topic: 'bdelost' },
+    { text: 'Co je vnitřní klid?', locale: 'cs', topic: 'bdelost' },
+    { text: 'Medituješ?', locale: 'cs', topic: 'bdelost' },
+    { text: 'What is a disciplined mind?', locale: 'en', topic: 'bdelost' },
+    { text: 'How does one train attention?', locale: 'en', topic: 'bdelost' },
+    { text: 'Do you meditate?', locale: 'en', topic: 'bdelost' },
+  ] as const;
+
+  it.each(cases)('detects "$text" as topic "$topic"', ({ text, locale, topic }) => {
+    expect(detectTopics(text, TOPICS, locale)).toContain(topic);
+  });
+
+  it('answers a bare follow-up about a disciplined mind instead of falling back', () => {
+    const reply = resolveReply('ukázněná mysl?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('bdelost');
+    expect(dumbledore.fallback.cs).not.toContain(reply.text);
+  });
+
+  const falsePositiveCases = [
+    // 'mysl' and 'mysli' are deliberately not keywords — they hide in "myslíš".
+    { text: 'Co si myslíš o Harrym?', locale: 'cs' },
+    { text: 'Co si o tom myslíš?', locale: 'cs' },
+    { text: 'Kdo tě vymyslel?', locale: 'cs' },
+    { text: 'Co je myslánka?', locale: 'cs' },
+  ] as const;
+
+  it.each(falsePositiveCases)('does not read "$text" as a question about attention', ({ text, locale }) => {
+    expect(detectTopics(text, TOPICS, locale)).not.toContain('bdelost');
   });
 });

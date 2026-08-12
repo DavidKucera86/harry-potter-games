@@ -2,6 +2,7 @@ import type { ChatCharacter } from '../../shared/chatEngine.js';
 import { dumbledore } from './dumbledore.js';
 
 export { TOPICS } from './topics.js';
+export { FOLLOW_UPS } from './followUps.js';
 
 /**
  * Roster of chat characters. Order is also the *source priority* for deferrals:

@@ -40,4 +40,6 @@ export const selectors = {
   partnerName: '#partnerName',
   chatUserText: '.chat-message--user .chat-message-text',
   chatCharacterText: '.chat-message--character .chat-message-text',
+  chatSuggestions: '#chatSuggestions',
+  chatSuggestion: '#chatSuggestions button',
 };

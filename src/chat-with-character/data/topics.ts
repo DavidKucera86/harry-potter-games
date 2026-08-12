@@ -1,4 +1,4 @@
-import type { TopicRegistry } from '../../shared/chatEngine.js';
+import { TOPIC_PRIORITY, type TopicRegistry } from '../../shared/chatEngine.js';
 
 /**
  * Shared topic taxonomy for the Harry Potter world. Keyword sets are authored
@@ -8,18 +8,29 @@ import type { TopicRegistry } from '../../shared/chatEngine.js';
  * says…"). Personal topics (family, romance, one's own name/age…) are
  * `deferrable: false` — a character answers those only for themselves, never on
  * someone else's behalf.
+ *
+ * `priority` de-ranks conversational filler: a greeting or a "thanks" must never
+ * win over the real question standing next to it in the same message.
  */
 export const TOPICS: TopicRegistry = {
   // --- Personal / small-talk: answered only from a character's own quotes ---
+  // Being hailed by name belongs here rather than in `identita`: it is a form of
+  // address, not a request to introduce oneself, and PHATIC keeps it from
+  // outranking the question that follows it. 'bumbal' is a common misspelling
+  // and is not a substring of 'brumbal', so both stems are needed. A third-person
+  // mention with no other keyword ("Co si myslíš o Brumbálovi?") lands here too —
+  // acceptable, since the player is talking *to* him.
   pozdrav: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
-      cs: ['ahoj', 'cau', 'nazdar', 'zdrav', 'dobry den', 'dobre rano', 'dobry vecer', 'vitej'],
-      en: ['hello', 'hey there', 'greetings', 'good morning', 'good evening', 'good day'],
+      cs: ['ahoj', 'cau', 'nazdar', 'zdrav', 'dobry den', 'dobre rano', 'dobry vecer', 'vitej', 'brumbal', 'bumbal'],
+      en: ['hello', 'hey there', 'greetings', 'good morning', 'good evening', 'good day', 'dumbledore', 'dumbledor'],
     },
   },
   jaksemas: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ['jak se mas', 'jak se mate', 'jak ti je', 'jak se ti dari', 'jak se vede', 'jak se citis', 'co je noveho', 'co delas', 'jak to jde'],
       en: ['how are you', 'how do you do', 'how are things', 'how have you been', 'how are you feeling', 'how is it going', 'whats up'],
@@ -27,6 +38,7 @@ export const TOPICS: TopicRegistry = {
   },
   oblibene: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ['co mas rad', 'mas rad', 'co te bavi', 'oblib', 'co miluje', 'co preferuje', 'co te tesi'],
       en: ['what do you like', 'do you like', 'what do you enjoy', 'favourite', 'favorite', 'what makes you happy'],
@@ -34,6 +46,7 @@ export const TOPICS: TopicRegistry = {
   },
   identita: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ['kdo jsi', 'kdo jste', 'jak se jmenuje', 'predstav se', 'co jsi zac', 'o sobe'],
       en: ['who are you', 'what is your name', 'whats your name', 'introduce yourself', 'about you'],
@@ -41,6 +54,7 @@ export const TOPICS: TopicRegistry = {
   },
   namety: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ['o cem', 'co umis', 'co vis', 'na co se', 'poradi', 'napovez', 'temata', 'co bys'],
       en: ['what can we talk', 'what can you', 'what do you know', 'suggest a topic', 'topics', 'help me', 'what should i ask'],
@@ -48,6 +62,7 @@ export const TOPICS: TopicRegistry = {
   },
   podekovani: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ['diky', 'dekuj', 'dekuju', 'jsi hodny'],
       en: ['thank', 'thanks', 'cheers', 'much appreciated'],
@@ -55,6 +70,7 @@ export const TOPICS: TopicRegistry = {
   },
   rozlouceni: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.PHATIC,
     keywords: {
       cs: ['sbohem', 'nashledanou', 'na shledanou', 'mej se', 'loucim', 'tak zatim', 'papa'],
       en: ['goodbye', 'good bye', 'farewell', 'see you', 'take care'],
@@ -62,6 +78,7 @@ export const TOPICS: TopicRegistry = {
   },
   vtipy: {
     deferrable: false,
+    priority: TOPIC_PRIORITY.SMALL_TALK,
     keywords: {
       cs: ['vtip', 'sranda', 'legrace', 'humor', 'rozesmej', 'nasmej', 'pobav', 'zavtipkuj'],
       en: ['joke', 'funny', 'make me laugh', 'tell me something funny', 'humour', 'humor'],
@@ -289,7 +306,7 @@ export const TOPICS: TopicRegistry = {
   brumbaluv_plan: {
     deferrable: true,
     keywords: {
-      cs: ['tvuj plan', 'tvoje smrt', 'tva smrt', 'proc jsi zemrel', 'proc te zabil', 'kdo te zabil', 'cerna ruka', 'zcernal', 'prokleta ruk', 'tva ruk', 'tvou ruk', 'proc snape'],
+      cs: ['tvuj plan', 'brumbaluv plan', 'tvoje smrt', 'tva smrt', 'proc jsi zemrel', 'proc te zabil', 'kdo te zabil', 'cerna ruka', 'zcernal', 'prokleta ruk', 'tva ruk', 'tvou ruk', 'proc snape'],
       en: ['your death', 'your plan', 'who killed you', 'why did you die', 'why snape killed', 'blackened hand', 'cursed hand', 'withered hand'],
     },
   },
@@ -403,6 +420,27 @@ export const TOPICS: TopicRegistry = {
     keywords: {
       cs: ['mnoholicny lektvar', 'mnoholicneho lektvar', 'felix felicis', 'tekute stesti', 'tekuteho stesti', 'amortenci', 'veritaserum', 'polyjuice'],
       en: ['polyjuice', 'felix felicis', 'liquid luck', 'amortentia', 'veritaserum'],
+    },
+  },
+  // Attention, inner quiet and self-observation — where Occlumency stops being a
+  // spell and becomes a discipline. Bare 'mysl'/'mysli' are deliberately absent:
+  // they hide inside "co si myslíš", which is how players open half their
+  // questions about something else entirely.
+  bdelost: {
+    deferrable: true,
+    keywords: {
+      cs: ['ukaznen', 'kazen', 'bdelost', 'bdela mysl', 'pozornost', 'soustredeni', 'vsimav', 'medit', 'rozjiman', 'usebran', 'vnitrni klid', 'klid mysli', 'ovladat mysl', 'ovladani mysli', 'cvicit mysl', 'sebeovladani', 'probuzen', 'vedomi', 'ticho'],
+      en: ['disciplined mind', 'discipline of the mind', 'awareness', 'mindful', 'medit', 'contemplat', 'inner peace', 'stillness', 'attention', 'awake', 'presence of mind', 'self-control', 'silence'],
+    },
+  },
+  // Muggle technology the wizarding world knows nothing about. Keywords are
+  // matched as plain substrings, so short stems are unsafe here: 'kod' hides in
+  // "škoda", 'ai' in "afraid"/"again", 'app' in "happy". Spell them out.
+  technologie: {
+    deferrable: true,
+    keywords: {
+      cs: ['programov', 'programuj', 'programator', 'kodovan', 'zdrojak', 'pocitac', 'notebook', 'software', 'hardware', 'technologi', 'internet', 'algoritm', 'databaz', 'robot', 'umela inteligence', 'umele inteligenc', 'chatgpt', 'javascript', 'python', 'mobil'],
+      en: ['programming', 'programmer', 'coding', 'source code', 'computer', 'laptop', 'software', 'hardware', 'technology', 'internet', 'algorithm', 'database', 'robot', 'artificial intelligence', 'machine learning', 'chatgpt', 'javascript', 'python', 'smartphone', 'developer', 'website'],
     },
   },
 };

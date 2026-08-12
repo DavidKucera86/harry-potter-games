@@ -128,6 +128,7 @@ export const en = {
     chatNicknamePlaceholder: 'Enter a nickname (max. 32 characters)',
     chatMessagePlaceholder: 'Type a message…',
     chatLogLabel: 'Conversation log',
+    chatSuggestionsLabel: 'Suggested questions',
   },
   pages: {
     menuTitle: 'Harry Potter Games',

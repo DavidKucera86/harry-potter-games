@@ -125,7 +125,8 @@ const cs = {
     chatYou: "Ty",
     chatNicknamePlaceholder: "Zadej p\u0159ezd\xEDvku (max. 32 znak\u016F)",
     chatMessagePlaceholder: "Napi\u0161 zpr\xE1vu\u2026",
-    chatLogLabel: "Pr\u016Fb\u011Bh konverzace"
+    chatLogLabel: "Pr\u016Fb\u011Bh konverzace",
+    chatSuggestionsLabel: "N\xE1vrhy ot\xE1zek"
   },
   pages: {
     menuTitle: "Harry Potter Games",

@@ -69,6 +69,7 @@ export function setupChatDom(): void {
           <span class="chat-partner-title" id="partnerTitle"></span>
         </div>
         <div class="chat-log" id="chatLog" role="log"></div>
+        <div class="chat-suggestions" id="chatSuggestions" role="group" hidden></div>
         <form class="chat-input" id="chatForm">
           <input type="text" id="messageInput" name="message" maxlength="500" />
           <button type="submit" id="sendBtn">Send</button>
