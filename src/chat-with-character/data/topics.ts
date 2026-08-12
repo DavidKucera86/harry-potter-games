@@ -422,6 +422,17 @@ export const TOPICS: TopicRegistry = {
       en: ['polyjuice', 'felix felicis', 'liquid luck', 'amortentia', 'veritaserum'],
     },
   },
+  // Attention, inner quiet and self-observation — where Occlumency stops being a
+  // spell and becomes a discipline. Bare 'mysl'/'mysli' are deliberately absent:
+  // they hide inside "co si myslíš", which is how players open half their
+  // questions about something else entirely.
+  bdelost: {
+    deferrable: true,
+    keywords: {
+      cs: ['ukaznen', 'kazen', 'bdelost', 'bdela mysl', 'pozornost', 'soustredeni', 'vsimav', 'medit', 'rozjiman', 'usebran', 'vnitrni klid', 'klid mysli', 'ovladat mysl', 'ovladani mysli', 'cvicit mysl', 'sebeovladani', 'probuzen', 'vedomi', 'ticho'],
+      en: ['disciplined mind', 'discipline of the mind', 'awareness', 'mindful', 'medit', 'contemplat', 'inner peace', 'stillness', 'attention', 'awake', 'presence of mind', 'self-control', 'silence'],
+    },
+  },
   // Muggle technology the wizarding world knows nothing about. Keywords are
   // matched as plain substrings, so short stems are unsafe here: 'kod' hides in
   // "škoda", 'ai' in "afraid"/"again", 'app' in "happy". Spell them out.

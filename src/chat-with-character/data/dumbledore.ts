@@ -637,6 +637,20 @@ export const dumbledore: ChatCharacter = {
         'I have seen a potion save a life and undo a mind alike. As with all magic, it matters less what the recipe says than what lies in the heart of the one who stirs the cauldron.',
       ],
     },
+    bdelost: {
+      cs: [
+        'Ukázněná mysl není mysl umlčená, nýbrž mysl bdělá. Většina kouzelníků prochází životem jako ve snu: jednají, aniž vědí proč, a tomu, co si sami způsobili, pak říkají osud. Probudit se znamená vidět věci takové, jaké jsou — ne takové, jaké se bojíme, že jsou.',
+        'Nauč se svou mysl pozorovat, místo abys jí naslouchal. Myšlenka, na kterou se díváš, nad tebou ztrácí moc; myšlenka, které nasloucháš, tě vede za ruku. Právě proto začíná nitrobrana tichem, nikoli kouzlem.',
+        'Ticho není prázdnota, nýbrž jediné místo, kde konečně uslyšíš, co ti mysl celou dobu šeptala. A velmi často zjistíš, že to nebyl tvůj hlas, ale hlas tvého strachu.',
+        'Pozornost je vzácnější než talent, milý příteli. Většina chyb, jichž jsem v životě litoval, nevznikla z neznalosti — vznikla z nepozornosti. Vidět a vidět bděle jsou dvě zcela různé věci.',
+      ],
+      en: [
+        'A disciplined mind is not a silenced mind but a wakeful one. Most wizards move through life as though asleep: they act without knowing why, and then call what they brought upon themselves fate. To wake is to see things as they are — not as we fear them to be.',
+        'Learn to watch your mind rather than listen to it. A thought you observe loses its hold on you; a thought you heed takes you by the hand. That is why Occlumency begins in silence and not with a spell.',
+        'Silence is not emptiness. It is the one place where you finally hear what your mind has been whispering all along — and very often you discover the voice was not yours at all, but your fear’s.',
+        'Attention is rarer than talent, my friend. Most of the mistakes I have come to regret arose not from ignorance but from inattention. To see, and to see with awareness, are two quite different things.',
+      ],
+    },
     technologie: {
       cs: [
         'Mudlovské stroje v Bradavicích nefungují — je tu příliš mnoho magie ve zdech. Zaklínadlo je ostatně jistý druh programu: přesná instrukce, vyslovená přesně, a svět poslechne. Splete-li žák jedinou slabiku, získá ropuchu tam, kde čekal světlo.',

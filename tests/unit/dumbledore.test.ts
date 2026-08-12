@@ -248,3 +248,38 @@ describe('dumbledore answers questions greeted at him', () => {
     expect(detectTopics(text, TOPICS, locale)).not.toContain('technologie');
   });
 });
+
+describe('dumbledore on a disciplined mind', () => {
+  const cases = [
+    { text: 'ukázněná mysl?', locale: 'cs', topic: 'bdelost' },
+    { text: 'Jak se cvičí pozornost?', locale: 'cs', topic: 'bdelost' },
+    { text: 'K čemu je ticho?', locale: 'cs', topic: 'bdelost' },
+    { text: 'Co je vnitřní klid?', locale: 'cs', topic: 'bdelost' },
+    { text: 'Medituješ?', locale: 'cs', topic: 'bdelost' },
+    { text: 'What is a disciplined mind?', locale: 'en', topic: 'bdelost' },
+    { text: 'How does one train attention?', locale: 'en', topic: 'bdelost' },
+    { text: 'Do you meditate?', locale: 'en', topic: 'bdelost' },
+  ] as const;
+
+  it.each(cases)('detects "$text" as topic "$topic"', ({ text, locale, topic }) => {
+    expect(detectTopics(text, TOPICS, locale)).toContain(topic);
+  });
+
+  it('answers a bare follow-up about a disciplined mind instead of falling back', () => {
+    const reply = resolveReply('ukázněná mysl?', dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 });
+    expect(reply.topic).toBe('bdelost');
+    expect(dumbledore.fallback.cs).not.toContain(reply.text);
+  });
+
+  const falsePositiveCases = [
+    // 'mysl' and 'mysli' are deliberately not keywords — they hide in "myslíš".
+    { text: 'Co si myslíš o Harrym?', locale: 'cs' },
+    { text: 'Co si o tom myslíš?', locale: 'cs' },
+    { text: 'Kdo tě vymyslel?', locale: 'cs' },
+    { text: 'Co je myslánka?', locale: 'cs' },
+  ] as const;
+
+  it.each(falsePositiveCases)('does not read "$text" as a question about attention', ({ text, locale }) => {
+    expect(detectTopics(text, TOPICS, locale)).not.toContain('bdelost');
+  });
+});

@@ -638,6 +638,20 @@ var dumbledore = {
         "I have seen a potion save a life and undo a mind alike. As with all magic, it matters less what the recipe says than what lies in the heart of the one who stirs the cauldron."
       ]
     },
+    bdelost: {
+      cs: [
+        "Uk\xE1zn\u011Bn\xE1 mysl nen\xED mysl uml\u010Den\xE1, n\xFDbr\u017E mysl bd\u011Bl\xE1. V\u011Bt\u0161ina kouzeln\xEDk\u016F proch\xE1z\xED \u017Eivotem jako ve snu: jednaj\xED, ani\u017E v\u011Bd\xED pro\u010D, a tomu, co si sami zp\u016Fsobili, pak \u0159\xEDkaj\xED osud. Probudit se znamen\xE1 vid\u011Bt v\u011Bci takov\xE9, jak\xE9 jsou \u2014 ne takov\xE9, jak\xE9 se boj\xEDme, \u017Ee jsou.",
+        "Nau\u010D se svou mysl pozorovat, m\xEDsto abys j\xED naslouchal. My\u0161lenka, na kterou se d\xEDv\xE1\u0161, nad tebou ztr\xE1c\xED moc; my\u0161lenka, kter\xE9 naslouch\xE1\u0161, t\u011B vede za ruku. Pr\xE1v\u011B proto za\u010D\xEDn\xE1 nitrobrana tichem, nikoli kouzlem.",
+        "Ticho nen\xED pr\xE1zdnota, n\xFDbr\u017E jedin\xE9 m\xEDsto, kde kone\u010Dn\u011B usly\u0161\xED\u0161, co ti mysl celou dobu \u0161eptala. A velmi \u010Dasto zjist\xED\u0161, \u017Ee to nebyl tv\u016Fj hlas, ale hlas tv\xE9ho strachu.",
+        "Pozornost je vz\xE1cn\u011Bj\u0161\xED ne\u017E talent, mil\xFD p\u0159\xEDteli. V\u011Bt\u0161ina chyb, jich\u017E jsem v \u017Eivot\u011B litoval, nevznikla z neznalosti \u2014 vznikla z nepozornosti. Vid\u011Bt a vid\u011Bt bd\u011Ble jsou dv\u011B zcela r\u016Fzn\xE9 v\u011Bci."
+      ],
+      en: [
+        "A disciplined mind is not a silenced mind but a wakeful one. Most wizards move through life as though asleep: they act without knowing why, and then call what they brought upon themselves fate. To wake is to see things as they are \u2014 not as we fear them to be.",
+        "Learn to watch your mind rather than listen to it. A thought you observe loses its hold on you; a thought you heed takes you by the hand. That is why Occlumency begins in silence and not with a spell.",
+        "Silence is not emptiness. It is the one place where you finally hear what your mind has been whispering all along \u2014 and very often you discover the voice was not yours at all, but your fear\u2019s.",
+        "Attention is rarer than talent, my friend. Most of the mistakes I have come to regret arose not from ignorance but from inattention. To see, and to see with awareness, are two quite different things."
+      ]
+    },
     technologie: {
       cs: [
         "Mudlovsk\xE9 stroje v Bradavic\xEDch nefunguj\xED \u2014 je tu p\u0159\xEDli\u0161 mnoho magie ve zdech. Zakl\xEDnadlo je ostatn\u011B jist\xFD druh programu: p\u0159esn\xE1 instrukce, vysloven\xE1 p\u0159esn\u011B, a sv\u011Bt poslechne. Splete-li \u017E\xE1k jedinou slabiku, z\xEDsk\xE1 ropuchu tam, kde \u010Dekal sv\u011Btlo.",
@@ -1089,6 +1103,17 @@ var TOPICS = {
       en: ["polyjuice", "felix felicis", "liquid luck", "amortentia", "veritaserum"]
     }
   },
+  // Attention, inner quiet and self-observation — where Occlumency stops being a
+  // spell and becomes a discipline. Bare 'mysl'/'mysli' are deliberately absent:
+  // they hide inside "co si myslíš", which is how players open half their
+  // questions about something else entirely.
+  bdelost: {
+    deferrable: true,
+    keywords: {
+      cs: ["ukaznen", "kazen", "bdelost", "bdela mysl", "pozornost", "soustredeni", "vsimav", "medit", "rozjiman", "usebran", "vnitrni klid", "klid mysli", "ovladat mysl", "ovladani mysli", "cvicit mysl", "sebeovladani", "probuzen", "vedomi", "ticho"],
+      en: ["disciplined mind", "discipline of the mind", "awareness", "mindful", "medit", "contemplat", "inner peace", "stillness", "attention", "awake", "presence of mind", "self-control", "silence"]
+    }
+  },
   // Muggle technology the wizarding world knows nothing about. Keywords are
   // matched as plain substrings, so short stems are unsafe here: 'kod' hides in
   // "škoda", 'ai' in "afraid"/"again", 'app' in "happy". Spell them out.
@@ -1133,6 +1158,14 @@ var FOLLOW_UPS = {
     technologie: {
       cs: ["Jak vlastn\u011B funguje kouzlo?", "Co je nitrobrana?", "Kdo byl Tom Raddle?"],
       en: ["How does a spell actually work?", "What is Occlumency?", "Who was Tom Riddle?"]
+    },
+    nitrozpyt: {
+      cs: ["Co je uk\xE1zn\u011Bn\xE1 mysl?", "Co je mysl\xE1nka?", "Um\xED Snape nitrobranu?"],
+      en: ["What is a disciplined mind?", "What is a Pensieve?", "Is Snape a Legilimens?"]
+    },
+    bdelost: {
+      cs: ["Co je nitrobrana?", "Jak se cvi\u010D\xED pozornost?", "Co ukazuje zrcadlo z Erisedu?"],
+      en: ["What is Occlumency?", "How does one train attention?", "What does the Mirror of Erised show?"]
     },
     sladkosti: {
       cs: ["Pro\u010D m\xE1\u0161 r\xE1d citronov\xE9 bonbony?", "Jak\xE9 bylo heslo do tv\xE9 pracovny?", "Co je \u010Dokol\xE1dov\xE1 \u017E\xE1ba?"],

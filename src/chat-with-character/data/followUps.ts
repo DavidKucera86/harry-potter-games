@@ -42,6 +42,14 @@ export const FOLLOW_UPS: FollowUpRegistry = {
       cs: ['Jak vlastně funguje kouzlo?', 'Co je nitrobrana?', 'Kdo byl Tom Raddle?'],
       en: ['How does a spell actually work?', 'What is Occlumency?', 'Who was Tom Riddle?'],
     },
+    nitrozpyt: {
+      cs: ['Co je ukázněná mysl?', 'Co je myslánka?', 'Umí Snape nitrobranu?'],
+      en: ['What is a disciplined mind?', 'What is a Pensieve?', 'Is Snape a Legilimens?'],
+    },
+    bdelost: {
+      cs: ['Co je nitrobrana?', 'Jak se cvičí pozornost?', 'Co ukazuje zrcadlo z Erisedu?'],
+      en: ['What is Occlumency?', 'How does one train attention?', 'What does the Mirror of Erised show?'],
+    },
     sladkosti: {
       cs: ['Proč máš rád citronové bonbony?', 'Jaké bylo heslo do tvé pracovny?', 'Co je čokoládová žába?'],
       en: ['Why do you love sherbet lemons?', 'What was the password to your study?', 'What is a Chocolate Frog?'],
