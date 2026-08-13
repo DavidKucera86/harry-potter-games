@@ -104,13 +104,22 @@ The baseline below already exists in the codebase; keep it intact and extend it.
 - **Dependencies / supply chain** — the app ships **zero runtime dependencies** on
   purpose; everything under `dependencies` at runtime is our own code. Do not add a
   runtime dependency without a strong reason. Keep `package-lock.json` committed, install
-  with `npm ci`, and run `npm audit` before adding or upgrading any package.
-- **Security headers & CSP** — the production headers (Content-Security-Policy,
-  Permissions-Policy, X-Content-Type-Options, Referrer-Policy) are defined in
-  [netlify.toml](netlify.toml) and **mirrored verbatim** in
-  [docker/nginx.conf](docker/nginx.conf); the CSP is also inlined via `<meta>` in
-  [shared/templates/partials/head.html](shared/templates/partials/head.html). These three
-  must not drift apart — change all of them together. The CSP is strict
+  with `npm ci`, and run `npm run audit` (`npm audit --audit-level=high`) before adding or
+  upgrading any package. The same command gates the `pre_deploy_tests` CI job, so a new
+  high/critical advisory fails the build.
+- **Security headers & CSP** — the headers (Content-Security-Policy, Permissions-Policy,
+  X-Content-Type-Options, Referrer-Policy, Strict-Transport-Security,
+  Cross-Origin-Opener-Policy) have **one source of truth**:
+  [scripts/security-headers.mjs](scripts/security-headers.mjs). The build injects the CSP
+  into [shared/templates/partials/head.html](shared/templates/partials/head.html) via the
+  `{{CSP}}` placeholder; [netlify.toml](netlify.toml) and
+  [docker/nginx.conf](docker/nginx.conf) repeat the values verbatim and are checked
+  against the constants by
+  [tests/unit/security-headers.test.ts](tests/unit/security-headers.test.ts) — change the
+  module and both config files together, or the unit suite goes red.
+  [tests/edge/security-headers.spec.ts](tests/edge/security-headers.spec.ts) asserts the
+  headers are actually served (real headers only under `PLAYWRIGHT_TARGET=production`,
+  i.e. `npm run test:docker`; the `<meta>` CSP everywhere). The CSP is strict
   (`default-src 'self'`, no inline/remote scripts, `frame-ancestors 'none'`); a new
   external origin (image host, API) requires widening the matching directive
   (`img-src` / `connect-src`) or the browser will block it.
@@ -120,10 +129,16 @@ The baseline below already exists in the codebase; keep it intact and extend it.
   responses. New routes/assets must be added to both the Dockerfile `COPY` list and the
   `sw.ts` precache list.
 - **Zero Trust — validate input and API responses** — see the Zero Trust principle above.
-  Validate the *shape* of every API response (not just handle the error), keep the
-  timeout / retry / fixture-fallback path intact, and build DOM with
+  `parseCharacters` / `parseSpells` in
+  [src/shared/dataProvider.ts](src/shared/dataProvider.ts) validate the *shape* of every
+  payload — including data read back from the `sessionStorage` cache — drop unusable
+  entries and throw when nothing is left, which hands over to the fixture fallback. Keep
+  the timeout / retry / fixture-fallback path intact. URLs from API data are checked with
+  `isSafeImageUrl` ([src/shared/urlUtils.ts](src/shared/urlUtils.ts)) before they reach an
+  `img.src`; any new URL sink (`href`, `srcset`) needs the same. Build DOM with
   `textContent` / `createElement` — never `innerHTML` from untrusted strings. This is
-  covered by tests (e.g. [tests/edge/xss-safe-dom.spec.ts](tests/edge/xss-safe-dom.spec.ts)).
+  covered by tests (e.g. [tests/edge/xss-safe-dom.spec.ts](tests/edge/xss-safe-dom.spec.ts),
+  [tests/unit/urlUtils.test.ts](tests/unit/urlUtils.test.ts)).
 - **Rate limiting — don't let the UI flood the network** — user actions that reach the
   network must be guarded against rapid repeats. In-round answer controls are locked via
   `setControlsEnabled(false)` the moment a choice is made; data loads are de-duplicated
@@ -133,7 +148,11 @@ The baseline below already exists in the codebase; keep it intact and extend it.
   calls. Any new network-triggering button must reuse this guard, not bypass it.
 - **Security review before a PR** — a security-sensitive change (headers, CSP, input
   handling, dependencies, service worker) should get a security pass — run the
-  `/security-review` skill in addition to `npm test`.
+  `/security-review` skill in addition to `npm test`. For a structured pass there is a
+  repo-local skill, `/owasp-security-testing`
+  ([.claude/skills/owasp-security-testing/SKILL.md](.claude/skills/owasp-security-testing/SKILL.md)):
+  it maps OWASP Top 10 / API Top 10 / WSTG / ASVS onto this codebase and marks the
+  backend-only categories N/A, so a review covers what actually applies here.
 
 ## SEO, responsiveness & accessibility
 
@@ -233,6 +252,7 @@ npm run build        # regenerate JS + HTML (run after editing src/, then commit
 npm run lint         # eslint src/ tests/
 npm run typecheck    # tsc for src + tests
 npm run test:unit    # vitest
+npm run audit        # npm audit --audit-level=high (same gate as CI)
 npm test             # vitest + playwright (E2E against `npx serve`, incl. @visual)
 npm run test:docker  # full E2E against the built Docker image (nginx); @visual skipped
 npm run verify:build # fail if generated files are out of sync with src/
