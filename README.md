@@ -63,17 +63,17 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
 - **Prefetch:** menu stránka na pozadí stáhne postavy a kouzla do session cache (`prefetchGameData.js`)
 - **Sdílené moduly** (kompilované do `shared/`):
   - `config.js` — globální konfigurace (životy, API URL, cache verze, retry)
-  - `dataProvider.js` — načítání dat s cache v `sessionStorage` a retry logikou
+  - `dataProvider.js` — načítání dat s cache v `sessionStorage`, retry logikou a runtime validací tvaru odpovědi (nepoužitelné položky zahodí, prázdný výsledek spadne na fixtures)
   - `BaseGame.js` — společná logika her (životy, modal, loader, balíček postav)
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
-  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js` — utility
+  - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js`, `urlUtils.js` — utility (`urlUtils` hlídá, že URL fotky z API je bezpečná, než se dostane do `img.src`)
   - `chatEngine.js` — pravidlový chat engine (normalizace, matching klíčových slov, výběr hlášek, návrhy navazujících otázek, validace přezdívky); klíčová slova žijí ve sdíleném registru témat (`chat-with-character/data/topics.js`), hlášky u postav — postava umí u „sdílitelných" témat převzít odpověď od jiné (`resolveReply` + deferral). `resolveReply` vrací i téma, ze kterého odpověď pochází, a `suggestFollowUps` z něj složí tři návrhy (data v `chat-with-character/data/followUps.js`). Priorita témat (`TOPIC_PRIORITY`) zajistí, že pozdrav nepřebije věcnou otázku ve stejné zprávě
   - `i18n/index.js` — lokalizace UI textů
 - **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry, `chat.css` pro chat)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
 - **SEO:** každá stránka má unikátní popisek, canonical, Open Graph i Twitter card tagy (`shared/templates/partials/head.html` + `scripts/build-html.mjs`, absolutní URL z `SITE_URL`); `robots.txt` a `sitemap.xml` se generují buildem, náhledový obrázek je `shared/og-image.png`
-- **Bezpečnost:** přísné Content-Security-Policy a další security headers (`netlify.toml` ↔ `docker/nginx.conf`), zero-trust validace vstupů a odpovědí API, rate-limit guard proti záplavě požadavků — viz [CLAUDE.md](CLAUDE.md)
+- **Bezpečnost:** přísné Content-Security-Policy a další security headers z jednoho zdroje pravdy ([scripts/security-headers.mjs](scripts/security-headers.mjs) → `netlify.toml`, `docker/nginx.conf`, `<meta>` v šabloně; drift hlídá unit test), zero-trust validace vstupů a odpovědí API, rate-limit guard proti záplavě požadavků, `npm run audit` v CI — viz [CLAUDE.md](CLAUDE.md)
 - **Testování:** Vitest (unit) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`
 
 ## Build a úpravy kódu
@@ -144,7 +144,7 @@ Co se stane:
 
 1. `npm run build` — HTML + JS
 2. `npm run lint` + `npm run typecheck`
-3. Vitest spustí unit testy (utility, dataProvider, BaseGame, HangmanGame, QuizGame, GuessHouseGame, WhoIsOnPhotoGame, RockPaperScissorsGame, i18n)
+3. Vitest spustí unit testy (utility, dataProvider, BaseGame, HangmanGame, QuizGame, GuessHouseGame, WhoIsOnPhotoGame, RockPaperScissorsGame, i18n, security headers)
 4. Playwright spustí lokální server (`npx serve . -l 4173`)
 5. Provede celou testovací sadu (smoke + critical + edge + a11y + visual)
 6. HP API je mockované — testy nepotřebují internet ani live API
@@ -161,6 +161,7 @@ Co se stane:
 | `npm run test:e2e` | Jen Playwright E2E testy |
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
 | `npm run docs:test-catalog` | Vygeneruje [E2E test katalog](docs/E2E-TEST-CATALOG.md) ve stylu Given-When-Then |
+| `npm run audit` | `npm audit --audit-level=high` — stejná kontrola závislostí jako v CI |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
 | `npx playwright test --grep @visual` | Visual regression screenshoty |
@@ -229,6 +230,7 @@ Plný popis všech E2E scénářů ve stylu **Given-When-Then** je v [docs/E2E-T
 | E54.01–E54.04 | chat-setup | Validace přezdívky, limit 32 znaků, XSS bezpečnost a skrytí chybového pole |
 | E57.01–E57.04 | chat-suggestions | Navazující otázky: tři návrhy, žádné opakování, ovládání klávesnicí |
 | E58.01–E58.02 | chat-mobile | Návrhy otázek na mobilu (dotyková plocha 44 px, žádné vodorovné rolování) |
+| E60.01–E60.09 | security-headers | Security hlavičky (E60.01 jen proti reálnému artefaktu), meta CSP na všech stránkách, blokovaný inline skript |
 | V01.01–V07.01 | visual/screenshots | Visual regression snapshoty |
 
 ### Visual regression
@@ -247,7 +249,7 @@ Workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) se spou�
 
 Průběh:
 
-1. **Pre-deploy** — `verify:build`, `typecheck`, celá testovací sada proti localhost (~91 testů včetně visual)
+1. **Pre-deploy** — `verify:build`, `typecheck`, `audit`, celá testovací sada proti localhost (včetně visual)
 2. **Deploy** — Netlify CLI
 3. **Post-deploy** — menu smoke testy S01.01 + S02.01 proti produkční URL (`tests/smoke/menu.spec.ts`, `--workers=1`)
 

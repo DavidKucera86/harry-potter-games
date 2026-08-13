@@ -37,6 +37,20 @@ describe('RockPaperScissorsGame', () => {
     expect(game.getMessageType()).toBe('info');
   });
 
+  it('drops opponents whose photo URL is not a safe https URL', async () => {
+    setupRpsDom();
+    sessionStorage.clear(); // otherwise the previous test's cached payload wins
+    const hostile = { id: '99', name: 'Script', house: 'Slytherin', image: 'javascript:alert(1)' };
+    vi.stubGlobal('fetch', mockFetch([hostile, ...characters]));
+
+    const game = new RockPaperScissorsGame();
+    await vi.waitFor(() => {
+      expect(game.isReady).toBe(true);
+    });
+
+    expect(game.characters.map(c => c.id)).toEqual(['1', '2', '3']);
+  });
+
   it('scores a win when the player beats the opponent', async () => {
     const game = await newReadyGame();
     vi.spyOn(Math, 'random').mockReturnValue(0); // opponent -> rock

@@ -803,6 +803,55 @@
 - **When** proběhne axe accessibility scan
 - **Then** nejsou nalezeny serious ani critical porušení
 
+### E60.02 — / má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka / je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.03 — /guess-character-name/ má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka /guess-character-name/ je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.04 — /guess-house/ má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka /guess-house/ je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.05 — /guess-spell/ má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka /guess-spell/ je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.06 — /who-is-on-photo/ má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka /who-is-on-photo/ je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.07 — /rock-paper-scissors/ má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka /rock-paper-scissors/ je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.08 — /chat-with-character/ má CSP i v meta tagu
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** stránka /chat-with-character/ je načtená
+- **Then** meta CSP odpovídá sdílenému zdroji pravdy
+
+### E60.09 — CSP zablokuje vložený inline skript
+**Soubor:** `tests/edge/security-headers.spec.ts`
+
+- **Given** úvodní stránka je načtená
+- **When** se do stránky pokusí vložit inline skript
+- **Then** skript se nespustí
+
 ## Visual (@visual)
 
 ### V01.01 — menu page layout

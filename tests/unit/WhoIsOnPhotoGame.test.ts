@@ -35,4 +35,21 @@ describe('WhoIsOnPhotoGame', () => {
     expect(game.imageErrorCount).toBe(1);
     vi.unstubAllGlobals();
   });
+
+  it('drops characters whose photo URL is not a safe https URL', async () => {
+    setupQuizDom(true);
+    sessionStorage.clear(); // otherwise the previous test's cached payload wins
+    const hostile = [
+      { id: '90', name: 'Script', house: 'Slytherin', image: 'javascript:alert(1)' },
+      { id: '91', name: 'Data', house: 'Slytherin', image: 'data:image/svg+xml,<svg/>' },
+      { id: '92', name: 'Insecure', house: 'Slytherin', image: 'http://example.com/x.png' },
+    ];
+    vi.stubGlobal('fetch', mockFetch([...hostile, ...characters]));
+
+    const game = new WhoIsOnPhotoGame();
+    await waitForReady(game);
+
+    expect(game.characters.map(c => c.id)).toEqual(['1', '2', '3', '4']);
+    vi.unstubAllGlobals();
+  });
 });

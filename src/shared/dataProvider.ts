@@ -1,8 +1,61 @@
 import { GAME_CONFIG } from './config.js';
-import type { Character } from './types.js';
+import type { Character, Spell } from './types.js';
 
 function delay(ms: number) {
   return new Promise<void>(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * The HP API is public, third-party and outside our control, so its responses —
+ * and anything we cached from them earlier — are untrusted input. Every payload
+ * is checked entry by entry before the games see it; malformed entries are
+ * dropped and a payload with nothing usable left throws, which puts us on the
+ * existing fixture-fallback path instead of rendering garbage.
+ */
+type Parse<T> = (data: unknown) => T[];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function isOptionalString(value: unknown): boolean {
+  return value === undefined || typeof value === 'string';
+}
+
+function parseList<T>(
+  data: unknown,
+  isValid: (item: Record<string, unknown>) => boolean,
+  label: string,
+): T[] {
+  if (!Array.isArray(data)) {
+    throw new Error(`Malformed ${label} payload: expected an array`);
+  }
+
+  const items = data.filter(item => isRecord(item) && isValid(item)) as T[];
+  if (items.length === 0) {
+    throw new Error(`Malformed ${label} payload: no usable entries`);
+  }
+
+  return items;
+}
+
+export function parseCharacters(data: unknown): Character[] {
+  return parseList<Character>(
+    data,
+    item => isNonEmptyString(item.id)
+      && isNonEmptyString(item.name)
+      && isOptionalString(item.house)
+      && isOptionalString(item.image),
+    'characters',
+  );
+}
+
+export function parseSpells(data: unknown): Spell[] {
+  return parseList<Spell>(data, item => isNonEmptyString(item.name), 'spells');
 }
 
 export class FetchTimeoutError extends Error {
@@ -69,19 +122,32 @@ async function loadFallback(url: string): Promise<unknown> {
   return response.json();
 }
 
-async function fetchCached(
+async function fetchCached<T>(
   url: string,
   storageKey: string,
+  parse: Parse<T>,
   fallbackUrl?: string,
-): Promise<unknown> {
+): Promise<T[]> {
   const versionedKey = cacheStorageKey(storageKey);
+
+  function writeCache(data: unknown) {
+    try {
+      sessionStorage.setItem(versionedKey, JSON.stringify({
+        data,
+        timestamp: Date.now(),
+      }));
+    } catch (error) {
+      console.warn('Cache write failed:', error);
+    }
+  }
 
   try {
     const cachedRaw = sessionStorage.getItem(versionedKey);
     if (cachedRaw) {
       const cached = JSON.parse(cachedRaw) as { data: unknown; timestamp: number };
       if (Date.now() - cached.timestamp < GAME_CONFIG.CACHE_TTL_MS) {
-        return cached.data;
+        // Cached data is only as trustworthy as the response that produced it.
+        return parse(cached.data);
       }
     }
   } catch (error) {
@@ -92,17 +158,9 @@ async function fetchCached(
   try {
     const response = await fetchWithRetry(url);
     const data = await response.json();
-
-    try {
-      sessionStorage.setItem(versionedKey, JSON.stringify({
-        data,
-        timestamp: Date.now(),
-      }));
-    } catch (error) {
-      console.warn('Cache write failed:', error);
-    }
-
-    return data;
+    const items = parse(data);
+    writeCache(data);
+    return items;
   } catch (error) {
     apiError = error;
     console.warn('API fetch failed, trying fallback:', error);
@@ -111,15 +169,9 @@ async function fetchCached(
   if (fallbackUrl) {
     try {
       const data = await loadFallback(fallbackUrl);
-      try {
-        sessionStorage.setItem(versionedKey, JSON.stringify({
-          data,
-          timestamp: Date.now(),
-        }));
-      } catch (error) {
-        console.warn('Cache write failed:', error);
-      }
-      return data;
+      const items = parse(data);
+      writeCache(data);
+      return items;
     } catch (fallbackError) {
       if (apiError instanceof FetchTimeoutError) {
         throw apiError;
@@ -135,14 +187,16 @@ export async function getCharacters(): Promise<Character[]> {
   return fetchCached(
     GAME_CONFIG.API.CHARACTERS,
     GAME_CONFIG.CACHE_KEYS.CHARACTERS,
+    parseCharacters,
     GAME_CONFIG.FALLBACK.CHARACTERS,
-  ) as Promise<Character[]>;
+  );
 }
 
-export async function getSpells(): Promise<{ name: string }[]> {
+export async function getSpells(): Promise<Spell[]> {
   return fetchCached(
     GAME_CONFIG.API.SPELLS,
     GAME_CONFIG.CACHE_KEYS.SPELLS,
+    parseSpells,
     GAME_CONFIG.FALLBACK.SPELLS,
-  ) as Promise<{ name: string }[]>;
+  );
 }

@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CSP } from './security-headers.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -58,6 +59,7 @@ function buildPage({
 }) {
   const canonical = `${SITE_URL}${route}`;
   const head = replacePlaceholders(readPartial('head.html'), {
+    CSP,
     TITLE: title,
     DESCRIPTION: description,
     CANONICAL: canonical,
