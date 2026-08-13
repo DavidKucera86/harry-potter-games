@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FetchTimeoutError, getCharacters } from '../../src/shared/dataProvider.ts';
+import { FetchTimeoutError, getCharacters, getSpells } from '../../src/shared/dataProvider.ts';
 import { GAME_CONFIG } from '../../src/shared/config.ts';
 
 function createAbortError() {
@@ -156,5 +156,99 @@ describe('fetchWithRetry 4xx handling', () => {
 
     expect(apiAttempts).toBe(1);
     expect(data).toEqual([{ id: '99', name: 'Fallback Hero' }]);
+  });
+});
+
+describe('API response shape validation', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockSessionStorage();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  const withApiPayload = (payload: unknown) => vi.stubGlobal('fetch', vi.fn(async (url: string | URL | Request) => {
+    if (String(url).includes('/api/characters')) {
+      return { ok: true, json: async () => payload };
+    }
+    return { ok: true, json: async () => [{ id: '99', name: 'Fallback Hero' }] };
+  }));
+
+  async function resolveCharacters() {
+    const promise = getCharacters();
+    await vi.runAllTimersAsync();
+    return promise;
+  }
+
+  it.each([
+    ['an object instead of an array', { characters: [] }],
+    ['a bare string', 'not json'],
+    ['null', null],
+  ])('falls back to fixtures when the API returns %s', async (_label, payload) => {
+    withApiPayload(payload);
+    expect(await resolveCharacters()).toEqual([{ id: '99', name: 'Fallback Hero' }]);
+  });
+
+  it('drops entries that are not shaped like a character', async () => {
+    withApiPayload([
+      null,
+      42,
+      'Albus',
+      { id: 1, name: 'Numeric id' },
+      { id: '2', name: 42 },
+      { id: '3', name: 'Harry', house: 'Gryffindor', image: 'https://hp.local/h.png' },
+      { id: '4', name: 'Ron', house: ['Gryffindor'], image: 'https://hp.local/r.png' },
+    ]);
+
+    expect(await resolveCharacters()).toEqual([
+      { id: '3', name: 'Harry', house: 'Gryffindor', image: 'https://hp.local/h.png' },
+    ]);
+  });
+
+  it('falls back to fixtures when no entry survives validation', async () => {
+    withApiPayload([null, { id: 1 }, { name: '' }]);
+    expect(await resolveCharacters()).toEqual([{ id: '99', name: 'Fallback Hero' }]);
+  });
+
+  it('ignores a cached payload that no longer has a valid shape', async () => {
+    const storage = mockSessionStorage();
+    storage.set(
+      `${GAME_CONFIG.CACHE_KEYS.CHARACTERS}-v${GAME_CONFIG.CACHE_VERSION}`,
+      JSON.stringify({ data: { poisoned: true }, timestamp: Date.now() }),
+    );
+    withApiPayload([{ id: '7', name: 'Fresh', house: 'Ravenclaw', image: 'https://hp.local/f.png' }]);
+
+    expect(await resolveCharacters()).toEqual([
+      { id: '7', name: 'Fresh', house: 'Ravenclaw', image: 'https://hp.local/f.png' },
+    ]);
+  });
+});
+
+describe('spell response shape validation', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockSessionStorage();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('keeps only spells with a usable name', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => [{ name: 'Lumos' }, { name: '' }, { name: 7 }, {}, null],
+    })));
+
+    const promise = getSpells();
+    await vi.runAllTimersAsync();
+
+    expect(await promise).toEqual([{ name: 'Lumos' }]);
   });
 });
