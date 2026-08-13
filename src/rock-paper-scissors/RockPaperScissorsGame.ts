@@ -3,6 +3,7 @@ import { getCharacters } from '../shared/dataProvider.js';
 import { getStrings } from '../shared/i18n/index.js';
 import { BaseGame } from '../shared/BaseGame.js';
 import { randomMove, resolveRps, type RpsMove, type RpsOutcome } from '../shared/rpsUtils.js';
+import { isSafeImageUrl } from '../shared/urlUtils.js';
 import type { Character } from '../shared/types.js';
 
 const MOVE_EMOJI: Record<RpsMove, string> = {
@@ -106,7 +107,7 @@ export class RockPaperScissorsGame extends BaseGame<Character> {
     const strings = getStrings();
     return this.loadGameData({
       fetchFn: getCharacters,
-      transform: (data: Character[]) => data.filter(c => c.name && c.image),
+      transform: (data: Character[]) => data.filter(c => c.name && isSafeImageUrl(c.image)),
       minCount: 1,
       emptyError: strings.errors.notEnoughPhotoCharacters,
       logLabel: 'postav',

@@ -4,6 +4,7 @@ import { getCharacters } from "../shared/dataProvider.js";
 import { getStrings } from "../shared/i18n/index.js";
 import { BaseGame } from "../shared/BaseGame.js";
 import { randomMove, resolveRps } from "../shared/rpsUtils.js";
+import { isSafeImageUrl } from "../shared/urlUtils.js";
 var MOVE_EMOJI = {
   rock: "\u{1FAA8}",
   paper: "\u{1F4C4}",
@@ -84,7 +85,7 @@ var RockPaperScissorsGame = class extends BaseGame {
     const strings = getStrings();
     return this.loadGameData({
       fetchFn: getCharacters,
-      transform: (data) => data.filter((c) => c.name && c.image),
+      transform: (data) => data.filter((c) => c.name && isSafeImageUrl(c.image)),
       minCount: 1,
       emptyError: strings.errors.notEnoughPhotoCharacters,
       logLabel: "postav",

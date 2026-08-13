@@ -2,6 +2,7 @@
 import { GAME_CONFIG } from "../shared/config.js";
 import { getStrings } from "../shared/i18n/index.js";
 import { QuizGame } from "../shared/QuizGame.js";
+import { isSafeImageUrl } from "../shared/urlUtils.js";
 var WhoIsOnPhotoGame = class extends QuizGame {
   failedImageIds = /* @__PURE__ */ new Set();
   imageErrorCount = 0;
@@ -10,7 +11,7 @@ var WhoIsOnPhotoGame = class extends QuizGame {
   _photoRoundId = null;
   constructor() {
     super({
-      transform: (data) => data.filter((c) => c.name && c.image),
+      transform: (data) => data.filter((c) => c.name && isSafeImageUrl(c.image)),
       resolveEmptyError: () => getStrings().errors.notEnoughPhotoCharacters,
       resolvePrompt: () => getStrings().quiz.photoPrompt,
       buildLastAnswer: (character) => ({ name: character.name }),

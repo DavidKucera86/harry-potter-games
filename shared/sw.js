@@ -28,6 +28,7 @@ const PRECACHE_URLS = [
   "/shared/deckUtils.js",
   "/shared/wordUtils.js",
   "/shared/hangmanUtils.js",
+  "/shared/urlUtils.js",
   "/shared/chatEngine.js",
   "/shared/prefetchGameData.js",
   "/shared/i18n/index.js",
