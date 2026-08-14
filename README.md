@@ -11,7 +11,7 @@ Sada jednoduchých browser her ze světa Harryho Pottera. Data z [HP API](https:
 | [Hádej zaklínadlo](guess-spell/) | Hangman — uhodni zaklínadlo |
 | [Kdo je na fotce?](who-is-on-photo/) | Podívej se na fotku a vyber správné jméno |
 | [Kámen, nůžky, papír](rock-paper-scissors/) | Utkej se v kámen–nůžky–papír proti postavám z Bradavic; kdo první získá pět výher, bere zápas |
-| [Chat s postavou](chat-with-character/) | Zadej přezdívku, vyber postavu a dej se s ní do řeči; odpovídá připravenými hláškami podle klíčových slov a po každé odpovědi nabídne tři navazující otázky (zatím Brumbál) |
+| [Chat s postavou](chat-with-character/) | Zadej přezdívku, vyber postavu a dej se s ní do řeči; odpovídá připravenými hláškami podle klíčových slov (58 témat, každé nejméně čtyři varianty odpovědi) a po každé odpovědi nabídne tři navazující otázky šité na míru danému tématu (zatím Brumbál) |
 
 ## Spuštění lokálně — vždy přes Docker
 
@@ -68,7 +68,7 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
   - `QuizGame.js` — sdílená logika kvízových her (kolej, fotka)
   - `HangmanGame.js` — sdílená hangman logika pro postavy i zaklínadla
   - `wordUtils.js`, `hangmanUtils.js`, `deckUtils.js`, `rpsUtils.js`, `urlUtils.js` — utility (`urlUtils` hlídá, že URL fotky z API je bezpečná, než se dostane do `img.src`)
-  - `chatEngine.js` — pravidlový chat engine (normalizace, matching klíčových slov, výběr hlášek, návrhy navazujících otázek, validace přezdívky); klíčová slova žijí ve sdíleném registru témat (`chat-with-character/data/topics.js`), hlášky u postav — postava umí u „sdílitelných" témat převzít odpověď od jiné (`resolveReply` + deferral). `resolveReply` vrací i téma, ze kterého odpověď pochází, a `suggestFollowUps` z něj složí tři návrhy (data v `chat-with-character/data/followUps.js`). Priorita témat (`TOPIC_PRIORITY`) zajistí, že pozdrav nepřebije věcnou otázku ve stejné zprávě
+  - `chatEngine.js` — pravidlový chat engine (normalizace, matching klíčových slov, výběr hlášek, návrhy navazujících otázek, validace přezdívky); klíčová slova žijí ve sdíleném registru témat (`chat-with-character/data/topics.js`), hlášky u postav — postava umí u „sdílitelných" témat převzít odpověď od jiné (`resolveReply` + deferral). `resolveReply` vrací i téma, ze kterého odpověď pochází, a `suggestFollowUps` z něj složí tři návrhy — nejdřív z vlastní sady tématu, teprve pak doplní z obecné (data v `chat-with-character/data/followUps.js`; vlastní sadu má každé téma, takže rozhovor nikde neskončí ve slepé uličce). Priorita témat (`TOPIC_PRIORITY`) zajistí, že pozdrav nepřebije věcnou otázku ve stejné zprávě
   - `i18n/index.js` — lokalizace UI textů
 - **Styly:** `shared/common.css` je entry point importující moduly v `shared/styles/` (+ `hangman.css` pro hangman hry, `chat.css` pro chat)
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`

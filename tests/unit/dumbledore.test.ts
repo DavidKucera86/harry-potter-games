@@ -5,6 +5,13 @@ import { detectTopics, resolveReply } from '../../src/shared/chatEngine.ts';
 
 const locales = ['cs', 'en'] as const;
 
+/**
+ * How many variants every topic must offer. `ChatGame` remembers the last four
+ * replies and excludes them, so anything below this makes the exclusion useless
+ * and the character starts repeating himself within a single conversation.
+ */
+const MIN_QUOTES_PER_TOPIC = 4;
+
 describe('dumbledore data integrity', () => {
   it('every registry topic has non-empty keywords in both locales', () => {
     for (const [topic, def] of Object.entries(TOPICS)) {
@@ -28,6 +35,33 @@ describe('dumbledore data integrity', () => {
     for (const locale of locales) {
       expect(dumbledore.quotes.general[locale].length).toBeGreaterThan(0);
       expect(dumbledore.fallback[locale].length).toBeGreaterThan(0);
+    }
+  });
+
+  it('answers every registry topic with enough variants in both locales', () => {
+    for (const topic of Object.keys(TOPICS)) {
+      for (const locale of locales) {
+        expect(dumbledore.quotes[topic]?.[locale].length, `quotes for "${topic}" (${locale})`).toBeGreaterThanOrEqual(
+          MIN_QUOTES_PER_TOPIC,
+        );
+      }
+    }
+  });
+
+  it('keeps both locales of every quote bucket in step', () => {
+    // Lines are authored as translations of one another, so a length mismatch
+    // means one locale silently offers a variant the other cannot.
+    for (const [topic, byLocale] of Object.entries(dumbledore.quotes)) {
+      expect(byLocale.en.length, `quote count for "${topic}"`).toBe(byLocale.cs.length);
+    }
+    expect(dumbledore.fallback.en.length, 'fallback count').toBe(dumbledore.fallback.cs.length);
+  });
+
+  it('never repeats a line within one quote bucket', () => {
+    for (const [topic, byLocale] of Object.entries(dumbledore.quotes)) {
+      for (const locale of locales) {
+        expect(new Set(byLocale[locale]).size, `duplicate in "${topic}" (${locale})`).toBe(byLocale[locale].length);
+      }
     }
   });
 });

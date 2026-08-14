@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FOLLOW_UPS } from '../../src/chat-with-character/data/followUps.ts';
 import { TOPICS } from '../../src/chat-with-character/data/topics.ts';
-import { FOLLOW_UP_COUNT, detectTopics, resolveReply } from '../../src/shared/chatEngine.ts';
+import { FOLLOW_UP_COUNT, TOPIC_PRIORITY, detectTopics, resolveReply } from '../../src/shared/chatEngine.ts';
 import { dumbledore } from '../../src/chat-with-character/data/dumbledore.ts';
 
 const locales = ['cs', 'en'] as const;
@@ -26,6 +26,14 @@ describe('follow-up question data integrity', () => {
     }
   });
 
+  it('leaves no topic without its own follow-up set', () => {
+    // A topic with no bespoke set is a dead end: the row falls back to the
+    // generic pool and the conversation stops going anywhere in particular.
+    for (const topic of Object.keys(TOPICS)) {
+      expect(FOLLOW_UPS.byTopic[topic], `no follow-up set for topic "${topic}"`).toBeDefined();
+    }
+  });
+
   it('fills every bespoke set in both locales', () => {
     for (const [topic, byLocale] of Object.entries(FOLLOW_UPS.byTopic)) {
       for (const locale of locales) {
@@ -43,6 +51,36 @@ describe('follow-up question data integrity', () => {
           byLocale[locale].length,
         );
       }
+    }
+  });
+
+  it('leads to every substantial topic from somewhere', () => {
+    // Greetings and farewells are never offered back to the player, but any
+    // topic Dumbledore can actually talk about should be one chip away.
+    const reachable = new Set(
+      everyQuestion
+        .map(({ question, locale }) =>
+          resolveReply(question, dumbledore, [dumbledore], TOPICS, locale, { random: () => 0 }).topic,
+        )
+        .filter((topic): topic is string => topic !== null),
+    );
+    for (const [topic, def] of Object.entries(TOPICS)) {
+      if ((def.priority ?? TOPIC_PRIORITY.NORMAL) < TOPIC_PRIORITY.NORMAL) continue;
+      expect(reachable.has(topic), `no follow-up question leads to "${topic}"`).toBe(true);
+    }
+  });
+
+  it('keeps the two locales of a bespoke set pointing at the same topics', () => {
+    // A stem can hide inside an unrelated word in one locale only ('ally' in
+    // "really"), which silently sends the English player somewhere else.
+    for (const [topic, byLocale] of Object.entries(FOLLOW_UPS.byTopic)) {
+      byLocale.cs.forEach((question, index) => {
+        const cs = resolveReply(question, dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 }).topic;
+        const en = resolveReply(byLocale.en[index], dumbledore, [dumbledore], TOPICS, 'en', {
+          random: () => 0,
+        }).topic;
+        expect(en, `"${byLocale.en[index]}" in set "${topic}" leads elsewhere than its Czech twin`).toBe(cs);
+      });
     }
   });
 

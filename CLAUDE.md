@@ -57,6 +57,19 @@ substrings on a diacritics-stripped form, so a stem short enough to hide inside 
 unrelated word (`kod` in "škoda", `ai` in "afraid") will fire on innocent messages —
 add a false-positive test whenever you add one.
 
+The content carries invariants the unit suite enforces — keep them true when you add a
+topic ([tests/unit/dumbledore.test.ts](tests/unit/dumbledore.test.ts),
+[tests/unit/followUps.test.ts](tests/unit/followUps.test.ts)):
+
+- every registry topic is answered with **at least four** replies per locale, `cs` and `en`
+  mirrored line for line (same index = same line translated), with no repeats inside a bucket;
+- every topic has its **own set of three follow-up questions** — no topic may fall back to the
+  generic `default` pool, or the conversation dead-ends there;
+- every follow-up question must resolve to a real topic (never the generic fallback), and every
+  topic above `TOPIC_PRIORITY.PHATIC`/`SMALL_TALK` must be reachable from some question, so no
+  content is orphaned. When authoring a question, check which topic it actually matches —
+  priority first, then the longest stem — rather than assuming.
+
 ## Adding new functionality — non-negotiable principles
 
 When adding any new feature, these principles always apply — no exceptions, no

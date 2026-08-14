@@ -253,7 +253,7 @@ export function suggestFollowUps(
   const excluded = new Set([...toExcludeSet(options.exclude)].map(normalizeText));
 
   const bespoke = (topic !== null ? followUps.byTopic[topic]?.[locale] : undefined) ?? [];
-  const pool = [...bespoke, ...followUps.default[locale]];
+  const generic = followUps.default[locale];
   const picked: string[] = [];
 
   const take = (candidates: string[]): void => {
@@ -263,8 +263,16 @@ export function suggestFollowUps(
     }
   };
 
-  take(pool.filter(question => !excluded.has(normalizeText(question))));
-  take(pool);
+  // Bespoke questions are drawn first — mixing both pools into one draw would
+  // bury a topic's own three questions under the ten generic ones, and the row
+  // would show a tailored question barely once in three.
+  const allowed = (questions: string[]): string[] =>
+    questions.filter(question => !excluded.has(normalizeText(question)));
+
+  take(allowed(bespoke));
+  take(allowed(generic));
+  take(bespoke);
+  take(generic);
 
   return picked;
 }
