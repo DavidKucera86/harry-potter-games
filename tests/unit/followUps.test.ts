@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FOLLOW_UPS } from '../../src/chat-with-character/data/followUps.ts';
 import { TOPICS } from '../../src/chat-with-character/data/topics.ts';
-import { FOLLOW_UP_COUNT, detectTopics, resolveReply } from '../../src/shared/chatEngine.ts';
+import { FOLLOW_UP_COUNT, TOPIC_PRIORITY, detectTopics, resolveReply } from '../../src/shared/chatEngine.ts';
 import { dumbledore } from '../../src/chat-with-character/data/dumbledore.ts';
 
 const locales = ['cs', 'en'] as const;
@@ -51,6 +51,22 @@ describe('follow-up question data integrity', () => {
           byLocale[locale].length,
         );
       }
+    }
+  });
+
+  it('leads to every substantial topic from somewhere', () => {
+    // Greetings and farewells are never offered back to the player, but any
+    // topic Dumbledore can actually talk about should be one chip away.
+    const reachable = new Set(
+      everyQuestion
+        .map(({ question, locale }) =>
+          resolveReply(question, dumbledore, [dumbledore], TOPICS, locale, { random: () => 0 }).topic,
+        )
+        .filter((topic): topic is string => topic !== null),
+    );
+    for (const [topic, def] of Object.entries(TOPICS)) {
+      if ((def.priority ?? TOPIC_PRIORITY.NORMAL) < TOPIC_PRIORITY.NORMAL) continue;
+      expect(reachable.has(topic), `no follow-up question leads to "${topic}"`).toBe(true);
     }
   });
 

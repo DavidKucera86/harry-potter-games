@@ -102,5 +102,206 @@ export const FOLLOW_UPS: FollowUpRegistry = {
       cs: ['Proč jsi Snapeovi věřil?', 'Proč tě zabil Snape?', 'Umí Snape nitrobranu?'],
       en: ['Why did you trust Snape?', 'What was your plan with Snape?', 'Is Snape a Legilimens?'],
     },
+
+    // --- Small talk and the personal topics: lead the player from a pleasantry
+    // towards something he can actually tell a story about. ---
+    pozdrav: {
+      cs: ['Kdo jsi?', 'O čem si můžeme povídat?', 'Co je čokoládová žába?'],
+      en: ['Who are you?', 'What can we talk about?', 'What is a Chocolate Frog?'],
+    },
+    jaksemas: {
+      cs: ['Jaké jsou tvé oblíbené věci?', 'Jak najdu vnitřní klid?', 'Poradíš mi něco moudrého?'],
+      en: ['What are your favourite things?', 'How does one find inner peace?', 'Can you share some wisdom?'],
+    },
+    oblibene: {
+      cs: ['Které sladkosti jsou nejlepší?', 'Jaké kouzlo máš nejraději?', 'Hraješ rád famfrpál?'],
+      en: ['Which sweets are the best?', 'What is your best spell?', 'Do you enjoy Quidditch?'],
+    },
+    identita: {
+      cs: ['Kolik ti je let?', 'Jaké máš tituly?', 'Pověz mi o své rodině'],
+      en: ['How old are you?', 'What are your titles?', 'Tell me about your family'],
+    },
+    namety: {
+      cs: ['Pověz mi o viteálech', 'Jak se hraje famfrpál?', 'Co je Mnoholičný lektvar?'],
+      en: ['Tell me about Horcruxes', 'How is Quidditch played?', 'What is Polyjuice Potion?'],
+    },
+    podekovani: {
+      cs: ['Jaká je tvá nejlepší rada?', 'Co je pravé přátelství?', 'Řekni mi ještě nějaký vtip'],
+      en: ['What is your best advice?', 'What is true friendship?', 'Tell me another joke'],
+    },
+    rozlouceni: {
+      cs: ['Co dokáže láska?', 'Jak se cvičí ukázněná mysl?', 'Je smrt konec?'],
+      en: ['What can love do?', 'How does one train a disciplined mind?', 'Is death the end?'],
+    },
+    vtipy: {
+      cs: ['Jaké heslo máš na dveřích?', 'Kdo je tvůj bratr Aberforth?', 'Co jsou fazolky všech chutí?'],
+      en: ['What password do you use?', 'Who is your brother Aberforth?', 'What are Bertie Bott’s beans?'],
+    },
+    vek: {
+      cs: ['Kdo byl Nicolas Flamel?', 'Kdo tě vymyslel?', 'Je nesmrtelnost možná?'],
+      en: ['Who was Nicolas Flamel?', 'Who created you?', 'Is immortality possible?'],
+    },
+    oblibenekouzlo: {
+      cs: ['Jak se bránit mozkomorům?', 'Co je nemluvná magie?', 'Odkud se bere síla zaklínadla?'],
+      en: [
+        'How does one fight a Dementor?',
+        'What is nonverbal magic?',
+        'Where does a spell’s power come from?',
+      ],
+    },
+    rodina: {
+      cs: ['Jaký byl souboj s Grindelwaldem?', 'Proč jsi se nikdy neoženil?', 'Jak ses vyrovnal se ztrátou?'],
+      en: ['What happened at Nurmengard?', 'Did you ever love anyone?', 'How did you bear the loss?'],
+    },
+    romantika: {
+      cs: ['Co znamenalo pro vyšší dobro?', 'Jak láska mění srdce?', 'Jak poznat správnou volbu?'],
+      en: [
+        'What did the greater good mean?',
+        'How does love change the heart?',
+        'How does one know the right choice?',
+      ],
+    },
+    buh: {
+      cs: ['Co se děje po smrti?', 'Proč vznikají duchové?', 'Co je kus duše?'],
+      en: ['What happens after death?', 'Why do some become ghosts?', 'What does splitting the soul do?'],
+    },
+    rowling: {
+      cs: ['Umíš programovat?', 'Kdo jsi doopravdy?', 'Co je tvé největší tajemství?'],
+      en: ['Do you know about programming?', 'Who are you really?', 'What is your greatest secret?'],
+    },
+    heslo: {
+      cs: ['Jaké to je být ředitelem Bradavic?', 'Co jsou šumivé šumáky?', 'Jaká tajemství hrad skrývá?'],
+      en: ['What is Hogwarts like?', 'What are Fizzing Whizzbees?', 'What secrets does the castle keep?'],
+    },
+    tituly: {
+      cs: ['Jaké to je vést Bradavice?', 'Co dělal Řád fénixe?', 'Jaké byly kouzelnické války?'],
+      en: [
+        'What is it like to lead Hogwarts?',
+        'What did the Order of the Phoenix do?',
+        'What were the wizarding wars like?',
+      ],
+    },
+
+    // --- The big themes: fear, dark times, wisdom, secrets, sport, friendship. ---
+    strach: {
+      cs: ['Kdo jsou mozkomorové?', 'Kdo je Temný pán?', 'Jaké byly temné časy?'],
+      en: ['Who are the Dementors?', 'Who is the Dark Lord?', 'What were the dark times like?'],
+    },
+    temne_casy: {
+      cs: ['Kdy povstal Voldemort?', 'Kdo se postavil temnotě?', 'Jakou roli měl Harry Potter?'],
+      en: ['When did Voldemort rise?', 'Who stood against the darkness?', 'What was Harry Potter’s part in it?'],
+    },
+    moudrost: {
+      cs: ['Proč je pozornost vzácná?', 'Proč je zrcadlo touhy nebezpečné?', 'Co je nejmocnější magie?'],
+      en: ['Why is attention so rare?', 'Why is the Mirror of Erised dangerous?', 'What is the most powerful magic?'],
+    },
+    tajemstvi: {
+      cs: ['Jak najdu Komnatu nejvyšší potřeby?', 'K čemu je myslánka?', 'Jaký byl tvůj plán?'],
+      en: ['How do I find the Room of Requirement?', 'What do you store in the Pensieve?', 'What was your plan?'],
+    },
+    famfrpal: {
+      cs: ['Které koleje spolu soupeří?', 'Co dělá dobrého kamaráda?', 'Jaká kouzla se hodí ve hře?'],
+      en: ['Which houses compete?', 'What makes a good ally?', 'Which spells help in a game?'],
+    },
+    pratelstvi: {
+      cs: ['Jaká je Hermiona Grangerová?', 'Co si myslíš o Ronovi?', 'Jaký je Harry Potter?'],
+      en: ['What is Hermione Granger like?', 'What do you think of Ronald Weasley?', 'What is Harry Potter like?'],
+    },
+
+    // --- People around the castle. ---
+    hermiona: {
+      cs: ['Co si myslíš o Ronaldu Weasleym?', 'Jak je to s čistotou krve?', 'Kdo je Harry Potter?'],
+      en: ['What of Ronald Weasley?', 'What about blood purity?', 'Who is Harry Potter?'],
+    },
+    ron: {
+      cs: ['Jaká je Hermiona?', 'Kdo je nejlepší chytač?', 'Proč je věrnost důležitá?'],
+      en: ['What is Hermione like?', 'Who is the best Seeker?', 'Why does loyalty matter?'],
+    },
+    hagrid: {
+      cs: ['Kdo otevřel Tajemnou komnatu?', 'Kdo učí v Bradavicích?', 'Kdo je Minerva McGonagallová?'],
+      en: ['Who opened the Chamber of Secrets?', 'Who teaches at Hogwarts?', 'Who is Minerva McGonagall?'],
+    },
+    mcgonagall: {
+      cs: ['Kdo dál povede Bradavice?', 'Jaká kouzla učí?', 'Kdo bojoval v Řádu?'],
+      en: ['Who will lead Hogwarts next?', 'What magic does she teach?', 'Who fought in the Order?'],
+    },
+    draco: {
+      cs: ['Jak Snape Draca chránil?', 'Co po něm chtěl Temný pán?', 'Jaký byl tvůj plán s věží?'],
+      en: ['How did Severus protect the boy?', 'What did the Dark Lord want from him?', 'What was your plan on the tower?'],
+    },
+
+    // --- Lore: objects, places, prophecy, war. ---
+    fawkes: {
+      cs: ['Proč se Řád fénixe jmenuje takto?', 'Kdo zabil baziliška?', 'Je smrt jen dalším dobrodružstvím?'],
+      en: [
+        'Why is the Order of the Phoenix so named?',
+        'Who killed the basilisk?',
+        'Is death but the next adventure?',
+      ],
+    },
+    flamel: {
+      cs: ['Je nesmrtelnost prokletím?', 'Proč se bojíme smrti?', 'Jaké lektvary jsou nejmocnější?'],
+      en: ['Is immortality a curse?', 'Why do we fear death?', 'Which potions are the most powerful?'],
+    },
+    rad_fenixe: {
+      cs: ['Kdo byli Smrtijedi?', 'Kdo je Voldemort?', 'Čím byl Harry pro Řád?'],
+      en: ['Who were the Death Eaters?', 'Who is Voldemort?', 'What was Harry to the Order?'],
+    },
+    grindelwald_souboj: {
+      cs: ['Co je Bezová hůlka?', 'Miloval jsi Gellerta?', 'Kdo byla Ariana?'],
+      en: ['What is the Elder Wand?', 'Did you love Gellert?', 'Who was Ariana?'],
+    },
+    zrcadlo: {
+      cs: ['Co je kámen mudrců?', 'Po čem touží srdce?', 'Co je kámen vzkříšení?'],
+      en: ['What is the Philosopher’s Stone?', 'What does the heart desire?', 'What is the Resurrection Stone?'],
+    },
+    myslanka: {
+      cs: ['Co je nitrozpyt?', 'Kdo vyslovil to proroctví?', 'Co ti vzpomínky o Raddleovi prozradily?'],
+      en: [
+        'What is Legilimency?',
+        'Who spoke the prophecy?',
+        'What did the memories reveal about Riddle?',
+      ],
+    },
+    proroctvi: {
+      cs: ['Proč si Harryho vybral?', 'Co si o tom myslel Temný pán?', 'Máme svobodnou volbu?'],
+      en: ['Why did he choose Harry?', 'What did the Dark Lord make of it?', 'Do we have free choice?'],
+    },
+    puvod: {
+      cs: ['Proč je Hermiona výjimečná?', 'Jaký původ měl Tom Raddle?', 'Proč vznikla válka?'],
+      en: ['Why is Hermione exceptional?', 'What was Tom Riddle’s ancestry?', 'Why did the first war begin?'],
+    },
+    mozkomori: {
+      cs: ['Čeho se bojíš ty sám?', 'Jaké kouzlo je nejlepší obranou?', 'Co je horší než smrt?'],
+      en: ['What do you fear yourself?', 'What is your best spell for defence?', 'What is worse than death?'],
+    },
+    zakladatele: {
+      cs: ['Kdo je dědic Zmijozela?', 'Jak se dělí koleje?', 'Kdo je Šedá dáma?'],
+      en: ['Who is the heir of Slytherin?', 'How are the houses divided?', 'Who is the Grey Lady?'],
+    },
+    tajemna_komnata: {
+      cs: ['Kdo zničil deník?', 'Proč obvinili Hagrida?', 'Kdo je Ufňukaná Uršula?'],
+      en: ['Who destroyed the diary?', 'Why was Hagrid accused?', 'Who is Moaning Myrtle?'],
+    },
+    komnata_potreby: {
+      cs: ['Kde se ukrýval diadém?', 'Jaká další tajemství hrad má?', 'Co ještě skrývají Bradavice?'],
+      en: [
+        'Where was the diadem hidden?',
+        'What other secrets does the castle hold?',
+        'What else does Hogwarts hide?',
+      ],
+    },
+    duchove: {
+      cs: ['Věříš v posmrtný život?', 'Proč se lidé bojí smrti?', 'Kdo je fénix Fawkes?'],
+      en: ['What becomes of the soul?', 'Why do people fear death?', 'Who is Fawkes the phoenix?'],
+    },
+    valky: {
+      cs: ['Proč byli mudlorození pronásledováni?', 'Co dělali mozkomorové ve válce?', 'Jaký je Draco Malfoy?'],
+      en: ['Why were Muggle-borns persecuted?', 'What did the Dementors do in the war?', 'What of Draco Malfoy?'],
+    },
+    lektvary: {
+      cs: ['Jaký byl Snape jako učitel?', 'Lze uvařit lásku?', 'Které kouzlo je nejtěžší?'],
+      en: ['What was Snape like as a teacher?', 'Can love be brewed?', 'Which spell is the hardest?'],
+    },
   },
 };
