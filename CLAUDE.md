@@ -258,6 +258,34 @@ serve-based test passed), or nginx routing/header differences.
 > with the serve-based `npm test`. When adding a new game/page, remember both the
 > Dockerfile `COPY` list and the `sw.ts` precache list enumerate routes and must be updated.
 
+## After a successful deploy — always clean up
+
+A deploy is not finished when the workflow turns green; it is finished when nothing is
+left running or lying around. Run this checklist **after** the `Deploy` workflow succeeds
+on `main` *and* production has been verified — never before, because a stale container,
+the local image and the feature branch are exactly what you need to debug a bad deploy.
+
+```bash
+docker compose down --remove-orphans     # stop the local preview container on :4173
+git checkout main && git pull --ff-only origin main
+git branch -d <feature-branch>           # -d, never -D: it must refuse if something is unmerged
+git push origin --delete <feature-branch>
+rm -rf playwright-report test-results    # Playwright leftovers (gitignored, but they pile up)
+docker image rm harry-potter-games && docker builder prune -f   # ~0.5 GB of build cache
+```
+
+Then confirm the machine really is clean:
+
+```bash
+docker ps -q                             # no running containers
+git ls-remote --heads origin             # only the branches that should still exist
+git status --short --untracked=all       # empty — no stray files, no forgotten artifacts
+```
+
+Leaving the container up is the one that bites later: Playwright's `webServer` uses
+`reuseExistingServer: true`, so a forgotten container on port 4173 silently makes the next
+`npm test` run against the *old* image (see the warning above).
+
 ## Common commands
 
 ```bash
