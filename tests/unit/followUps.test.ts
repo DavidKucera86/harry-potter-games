@@ -70,6 +70,20 @@ describe('follow-up question data integrity', () => {
     }
   });
 
+  it('keeps the two locales of a bespoke set pointing at the same topics', () => {
+    // A stem can hide inside an unrelated word in one locale only ('ally' in
+    // "really"), which silently sends the English player somewhere else.
+    for (const [topic, byLocale] of Object.entries(FOLLOW_UPS.byTopic)) {
+      byLocale.cs.forEach((question, index) => {
+        const cs = resolveReply(question, dumbledore, [dumbledore], TOPICS, 'cs', { random: () => 0 }).topic;
+        const en = resolveReply(byLocale.en[index], dumbledore, [dumbledore], TOPICS, 'en', {
+          random: () => 0,
+        }).topic;
+        expect(en, `"${byLocale.en[index]}" in set "${topic}" leads elsewhere than its Czech twin`).toBe(cs);
+      });
+    }
+  });
+
   it.each(everyQuestion)('"$question" ($set/$locale) matches a topic', ({ question, locale }) => {
     expect(detectTopics(question, TOPICS, locale).length).toBeGreaterThan(0);
   });

@@ -1456,7 +1456,7 @@ var FOLLOW_UPS = {
       ]
     },
     rodina: {
-      cs: ["Jak\xFD byl souboj s Grindelwaldem?", "Pro\u010D jsi se nikdy neo\u017Eenil?", "Jak ses vyrovnal se ztr\xE1tou?"],
+      cs: ["Jak\xFD byl souboj s Grindelwaldem?", "Pro\u010D ses nikdy neo\u017Eenil?", "Jak ses vyrovnal se ztr\xE1tou?"],
       en: ["What happened at Nurmengard?", "Did you ever love anyone?", "How did you bear the loss?"]
     },
     romantika: {
@@ -1473,7 +1473,7 @@ var FOLLOW_UPS = {
     },
     rowling: {
       cs: ["Um\xED\u0161 programovat?", "Kdo jsi doopravdy?", "Co je tv\xE9 nejv\u011Bt\u0161\xED tajemstv\xED?"],
-      en: ["Do you know about programming?", "Who are you really?", "What is your greatest secret?"]
+      en: ["Do you know about programming?", "Who are you, truly?", "What is your greatest secret?"]
     },
     heslo: {
       cs: ["Jak\xE9 to je b\xFDt \u0159editelem Bradavic?", "Co jsou \u0161umiv\xE9 \u0161um\xE1ky?", "Jak\xE1 tajemstv\xED hrad skr\xFDv\xE1?"],
@@ -1543,8 +1543,8 @@ var FOLLOW_UPS = {
       ]
     },
     flamel: {
-      cs: ["Je nesmrtelnost proklet\xEDm?", "Pro\u010D se boj\xEDme smrti?", "Jak\xE9 lektvary jsou nejmocn\u011Bj\u0161\xED?"],
-      en: ["Is immortality a curse?", "Why do we fear death?", "Which potions are the most powerful?"]
+      cs: ["Je nesmrtelnost proklet\xEDm?", "Pro\u010D se boj\xEDme smrti?", "Co je Felix Felicis?"],
+      en: ["Is immortality a curse?", "Why do we fear death?", "What is Felix Felicis?"]
     },
     rad_fenixe: {
       cs: ["Kdo byli Smrtijedi?", "Kdo je Voldemort?", "\u010C\xEDm byl Harry pro \u0158\xE1d?"],

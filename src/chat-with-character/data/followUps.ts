@@ -150,7 +150,7 @@ export const FOLLOW_UPS: FollowUpRegistry = {
       ],
     },
     rodina: {
-      cs: ['Jaký byl souboj s Grindelwaldem?', 'Proč jsi se nikdy neoženil?', 'Jak ses vyrovnal se ztrátou?'],
+      cs: ['Jaký byl souboj s Grindelwaldem?', 'Proč ses nikdy neoženil?', 'Jak ses vyrovnal se ztrátou?'],
       en: ['What happened at Nurmengard?', 'Did you ever love anyone?', 'How did you bear the loss?'],
     },
     romantika: {
@@ -167,7 +167,7 @@ export const FOLLOW_UPS: FollowUpRegistry = {
     },
     rowling: {
       cs: ['Umíš programovat?', 'Kdo jsi doopravdy?', 'Co je tvé největší tajemství?'],
-      en: ['Do you know about programming?', 'Who are you really?', 'What is your greatest secret?'],
+      en: ['Do you know about programming?', 'Who are you, truly?', 'What is your greatest secret?'],
     },
     heslo: {
       cs: ['Jaké to je být ředitelem Bradavic?', 'Co jsou šumivé šumáky?', 'Jaká tajemství hrad skrývá?'],
@@ -240,8 +240,8 @@ export const FOLLOW_UPS: FollowUpRegistry = {
       ],
     },
     flamel: {
-      cs: ['Je nesmrtelnost prokletím?', 'Proč se bojíme smrti?', 'Jaké lektvary jsou nejmocnější?'],
-      en: ['Is immortality a curse?', 'Why do we fear death?', 'Which potions are the most powerful?'],
+      cs: ['Je nesmrtelnost prokletím?', 'Proč se bojíme smrti?', 'Co je Felix Felicis?'],
+      en: ['Is immortality a curse?', 'Why do we fear death?', 'What is Felix Felicis?'],
     },
     rad_fenixe: {
       cs: ['Kdo byli Smrtijedi?', 'Kdo je Voldemort?', 'Čím byl Harry pro Řád?'],

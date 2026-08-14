@@ -84,7 +84,7 @@ function suggestFollowUps(topic, followUps, locale, options = {}) {
   const random = options.random ?? Math.random;
   const excluded = new Set([...toExcludeSet(options.exclude)].map(normalizeText));
   const bespoke = (topic !== null ? followUps.byTopic[topic]?.[locale] : void 0) ?? [];
-  const pool = [...bespoke, ...followUps.default[locale]];
+  const generic = followUps.default[locale];
   const picked = [];
   const take = (candidates) => {
     const remaining = candidates.filter((question) => !picked.includes(question));
@@ -92,8 +92,11 @@ function suggestFollowUps(topic, followUps, locale, options = {}) {
       picked.push(...remaining.splice(Math.floor(random() * remaining.length), 1));
     }
   };
-  take(pool.filter((question) => !excluded.has(normalizeText(question))));
-  take(pool);
+  const allowed = (questions) => questions.filter((question) => !excluded.has(normalizeText(question)));
+  take(allowed(bespoke));
+  take(allowed(generic));
+  take(bespoke);
+  take(generic);
   return picked;
 }
 function validateNickname(raw) {

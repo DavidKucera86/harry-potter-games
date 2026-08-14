@@ -237,6 +237,15 @@ describe('suggestFollowUps', () => {
     expect(questions).toEqual(followUps.byTopic.laska.cs);
   });
 
+  it('always draws the bespoke set before the default pool', () => {
+    // `random: () => 0` alone would not catch a shared draw: with the two pools
+    // merged, a topic's own questions surface in barely a third of the row.
+    for (const value of [0, 0.25, 0.5, 0.75, 0.99]) {
+      const questions = suggestFollowUps('laska', followUps, 'cs', { random: () => value });
+      expect([...questions].sort()).toEqual([...followUps.byTopic.laska.cs].sort());
+    }
+  });
+
   it('falls back to the default pool for a null topic', () => {
     const questions = suggestFollowUps(null, followUps, 'cs', { random: () => 0 });
     expect(questions).toEqual(['Co je smrt?', 'Kdo je Fawkes?', 'Máš rodinu?']);
