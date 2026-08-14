@@ -26,6 +26,14 @@ describe('follow-up question data integrity', () => {
     }
   });
 
+  it('leaves no topic without its own follow-up set', () => {
+    // A topic with no bespoke set is a dead end: the row falls back to the
+    // generic pool and the conversation stops going anywhere in particular.
+    for (const topic of Object.keys(TOPICS)) {
+      expect(FOLLOW_UPS.byTopic[topic], `no follow-up set for topic "${topic}"`).toBeDefined();
+    }
+  });
+
   it('fills every bespoke set in both locales', () => {
     for (const [topic, byLocale] of Object.entries(FOLLOW_UPS.byTopic)) {
       for (const locale of locales) {
