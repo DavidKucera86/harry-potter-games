@@ -37,23 +37,42 @@ test.describe('Games load @smoke', () => {
     });
   });
 
-  test('S04.01: shared scripts load without critical console errors', { tag: '@smoke' }, async ({ page }) => {
-    const criticalErrors: string[] = [];
+  /**
+   * Deny by default. Anything not named below fails the test.
+   *
+   * The previous version did the opposite: it flagged only messages containing
+   * 'ReferenceError', 'Failed to load' or 'is not defined', so an ordinary
+   * "TypeError: Cannot read properties of undefined" went straight through. An
+   * allowlist of three substrings is a sieve, not a check.
+   *
+   * This test owns the console-error signal for the whole app, which is why the
+   * matching Lighthouse audit (errors-in-console) is switched off in
+   * lighthouserc.json: Lighthouse can only say "there was an error", this can say
+   * which one is expected and why.
+   */
+  const EXPECTED_CONSOLE_ERRORS = [
+    // Logged once per page load, and harmless. 'frame-ancestors' is spec'd to be
+    // ignored in a <meta> CSP — it binds only as an HTTP header, and netlify.toml
+    // and docker/nginx.conf both send it, so the clickjacking protection is real.
+    // The meta copy carries the directive because the policy has a single source of
+    // truth (scripts/security-headers.mjs); splitting it in two to silence one log
+    // line would be the worse trade.
+    "The Content Security Policy directive 'frame-ancestors' is ignored",
+  ];
 
+  test('S04.01: shared scripts load without unexpected console errors', { tag: '@smoke' }, async ({ page }) => {
+    const unexpected: string[] = [];
+
+    // An uncaught exception is never expected, whatever it says.
     page.on('pageerror', (error) => {
-      criticalErrors.push(error.message);
+      unexpected.push(`[pageerror] ${error.message}`);
     });
 
     page.on('console', (message) => {
       if (message.type() !== 'error') return;
       const text = message.text();
-      if (
-        text.includes('ReferenceError') ||
-        text.includes('Failed to load') ||
-        text.includes('is not defined')
-      ) {
-        criticalErrors.push(text);
-      }
+      if (EXPECTED_CONSOLE_ERRORS.some(expected => text.includes(expected))) return;
+      unexpected.push(text);
     });
 
     await given('uživatel postupně navštíví všechny hry', async () => {
@@ -65,8 +84,8 @@ test.describe('Games load @smoke', () => {
       }
     });
 
-    await then('v konzoli se neobjeví kritické chyby', async () => {
-      expect(criticalErrors).toEqual([]);
+    await then('v konzoli se neobjeví žádná neočekávaná chyba', async () => {
+      expect(unexpected).toEqual([]);
     });
   });
 
