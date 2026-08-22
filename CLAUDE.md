@@ -167,6 +167,39 @@ The baseline below already exists in the codebase; keep it intact and extend it.
   it maps OWASP Top 10 / API Top 10 / WSTG / ASVS onto this codebase and marks the
   backend-only categories N/A, so a review covers what actually applies here.
 
+## Test oracles and suite health
+
+An assertion that restates the implementation is a **null oracle**: it passes, it raises
+coverage, and it can never fail for the right reason. Before writing one, know which
+oracle justifies the expected value — [docs/ORACLES.md](docs/ORACLES.md) maps all eight
+HICCUPPS letters onto the concrete artifacts in this repo that enforce them, and the
+folder-level skills `test-oracles-hiccupps` and `pesticide-paradox-mitigation` carry the
+method. **Never report a finding without naming the oracle letter that revealed it.**
+
+Beyond example-based tests the suite carries two other techniques, because a suite that
+only ever grows in one shape decays in that shape:
+
+- **Property-based** ([tests/unit/properties.test.ts](tests/unit/properties.test.ts),
+  `fast-check`) over the pure functions — invariants over generated input instead of
+  remembered examples. When a property fails, add the shrunk counterexample as an
+  ordinary regression test *next to* it.
+- **Mutation testing** (`npm run test:mutation`, Stryker) over the pure modules, weekly in
+  [.github/workflows/quality.yml](.github/workflows/quality.yml) — **never** in the
+  pre-commit hook or the PR gate. Surviving mutants are a ranked to-do list in
+  [docs/SUITE-HEALTH.md](docs/SUITE-HEALTH.md), not a vanity score.
+
+Where things run — a check that slows the commit loop gets bypassed with `--no-verify`,
+taking the useful ones with it:
+
+| Layer | Budget | What runs |
+|---|---|---|
+| pre-commit | < 20 s | `verify:build`, `lint`, `typecheck` |
+| PR gate | < 15 min | full suite, coverage thresholds, catalog drift, Lighthouse |
+| weekly `quality.yml` | unbounded | mutation testing, HP API drift — never blocks |
+| manual / quarterly | human | exploratory charters, fixture refresh |
+
+Thresholds are set from a measured baseline, never from ambition, and ratchet up only.
+
 ## SEO, responsiveness & accessibility
 
 Every feature and every PR must verify all three of these — they are non-negotiable, on

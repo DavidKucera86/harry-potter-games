@@ -74,7 +74,7 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
 - **SEO:** každá stránka má unikátní popisek, canonical, Open Graph i Twitter card tagy (`shared/templates/partials/head.html` + `scripts/build-html.mjs`, absolutní URL z `SITE_URL`); `robots.txt` a `sitemap.xml` se generují buildem, náhledový obrázek je `shared/og-image.png`
 - **Bezpečnost:** přísné Content-Security-Policy a další security headers z jednoho zdroje pravdy ([scripts/security-headers.mjs](scripts/security-headers.mjs) → `netlify.toml`, `docker/nginx.conf`, `<meta>` v šabloně; drift hlídá unit test), zero-trust validace vstupů a odpovědí API, rate-limit guard proti záplavě požadavků, `npm run audit` v CI — viz [CLAUDE.md](CLAUDE.md)
-- **Testování:** Vitest (unit, s prahy pokrytí) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`; testovací orákula jsou zmapovaná v [docs/ORACLES.md](docs/ORACLES.md)
+- **Testování:** Vitest (unit, s prahy pokrytí) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`. Kromě příkladových testů i **property-based** (`fast-check`, `tests/unit/properties.test.ts`) a **mutation testing** (Stryker, týdně v CI). Testovací orákula jsou zmapovaná v [docs/ORACLES.md](docs/ORACLES.md), zdraví suity v [docs/SUITE-HEALTH.md](docs/SUITE-HEALTH.md), exploratory charty v [docs/EXPLORATORY-CHARTERS.md](docs/EXPLORATORY-CHARTERS.md)
 
 ## Build a úpravy kódu
 
