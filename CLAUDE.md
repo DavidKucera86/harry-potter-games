@@ -207,9 +207,11 @@ commit at the end.
   with a clear message. Prefer several small, reviewable commits that each leave the tree
   in a sensible state over one sprawling commit. Keep unrelated changes in separate
   commits.
-- The pre-commit hook (`verify:build`, `lint`, `typecheck`, catalog regen) runs on every
-  commit, so each increment stays green; the full-suite / PR rules below still gate the
-  branch before it is opened as a pull request.
+- The pre-commit hook (`verify:build`, `lint`, `typecheck`) runs on every commit, so each
+  increment stays green; the full-suite / PR rules below still gate the branch before it
+  is opened as a pull request. The hook is deliberately kept under ~20 s — it used to
+  regenerate the E2E catalog, which meant a full Playwright run per commit and made
+  `--no-verify` the path of least resistance. Catalog regeneration now lives in CI.
 
 ## Before opening a pull request — always run the full E2E suite
 
@@ -293,12 +295,12 @@ npm run build        # regenerate JS + HTML (run after editing src/, then commit
 npm run lint         # eslint src/ tests/
 npm run typecheck    # tsc for src + tests
 npm run test:unit    # vitest
+npm run test:coverage # vitest + coverage thresholds (same gate as CI)
 npm run audit        # npm audit --audit-level=high (same gate as CI)
 npm test             # vitest + playwright (E2E against `npx serve`, incl. @visual)
 npm run test:docker  # full E2E against the built Docker image (nginx); @visual skipped
 npm run verify:build # fail if generated files are out of sync with src/
 ```
 
-The pre-commit hook runs `verify:build`, `lint`, `typecheck`, and regenerates the E2E
-test catalog. Always `npm run build` and commit the generated artifacts alongside
-`src/` changes.
+The pre-commit hook runs `verify:build`, `lint` and `typecheck`. Always `npm run build`
+and commit the generated artifacts alongside `src/` changes.
