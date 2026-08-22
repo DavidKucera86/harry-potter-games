@@ -57,11 +57,11 @@
 - **Given** hra na adrese /who-is-on-photo/ je načtená s mockovanými daty
 - **Then** hra je hratelná se skrytým loading overlay a deseti životy
 
-### S04.01 — shared scripts load without critical console errors
+### S04.01 — shared scripts load without unexpected console errors
 **Soubor:** `tests/smoke/games-load.spec.ts`
 
 - **Given** uživatel postupně navštíví všechny hry
-- **Then** v konzoli se neobjeví kritické chyby
+- **Then** v konzoli se neobjeví žádná neočekávaná chyba
 
 ### S05.01 — back link returns to menu
 **Soubor:** `tests/smoke/games-load.spec.ts`

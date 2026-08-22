@@ -1,0 +1,33 @@
+{
+  "_comment": "Purpose oracle (HICCUPPS - see docs/ORACLES.md). CLAUDE.md puts SEO, responsiveness and accessibility on the same footing as tests, but until this existed only axe measured any of it. Mobile preset, because that is who plays this.",
+  "ci": {
+    "collect": {
+      "url": [
+        "http://127.0.0.1:4173/",
+        "http://127.0.0.1:4173/guess-house/",
+        "http://127.0.0.1:4173/chat-with-character/"
+      ],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop",
+        "emulatedFormFactor": "mobile",
+        "throttlingMethod": "simulate",
+        "skipAudits": ["errors-in-console"]
+      }
+    },
+    "_assert_comment": "Set from 9 measured runs across 3 URLs on 2026-08-22 (perf 100, a11y 100, seo 100), not from ambition. accessibility and seo are deterministic on a static site, so they sit at the measured value. performance stays a warning until there are more than one commit's worth of runner data - it is the one score that moves with CI load. Ratchet up, never down.",
+    "assert": {
+      "assertions": {
+        "categories:accessibility": ["error", { "minScore": 1 }],
+        "categories:seo": ["error", { "minScore": 1 }],
+        "categories:best-practices": ["error", { "minScore": 1 }],
+        "categories:performance": ["warn", { "minScore": 0.95 }]
+      }
+    },
+    "_skip_audits_comment": "errors-in-console is skipped at collection time, not merely unasserted - the category score is computed by Lighthouse from its own audits, so leaving it in would cap best-practices at 96 no matter what we assert. The signal is owned by tests/smoke/games-load.spec.ts S04.01 instead, which fails on any console error except a named, justified allowlist. Lighthouse can only say that an error occurred; that test says which one is expected and why. The single message this repo emits is the 'frame-ancestors is ignored in a <meta> CSP' warning - benign, because the directive binds as an HTTP header and netlify.toml and docker/nginx.conf both send it. Left on, this one log line would cap best-practices at 96 forever and the score would stop meaning anything.",
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci"
+    }
+  }
+}

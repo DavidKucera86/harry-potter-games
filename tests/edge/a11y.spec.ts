@@ -6,6 +6,14 @@ import { waitForRpsReady } from '../helpers/duel';
 import { sendMessage, startChat, suggestions, waitForChatReady } from '../helpers/chat';
 import { given, when, then } from '../helpers/gwt';
 
+/**
+ * Standards oracle (HICCUPPS — see docs/ORACLES.md). Without an explicit tag set axe
+ * runs its default rules, which is a moving target tied to the axe-core version rather
+ * than to a standard we chose. Naming WCAG 2.2 AA makes the oracle the standard itself,
+ * so a dependency bump can add rules but cannot quietly drop the bar.
+ */
+const WCAG_22_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+
 const gamePages = [
   { id: 'E39.01', path: '/guess-character-name/', ready: waitForHangmanReady },
   { id: 'E40.01', path: '/guess-spell/', ready: waitForHangmanReady },
@@ -22,7 +30,7 @@ test.describe('Accessibility @edge', () => {
 
     let serious: Awaited<ReturnType<AxeBuilder['analyze']>>['violations'] = [];
     await when('proběhne axe accessibility scan', async () => {
-      const results = await new AxeBuilder({ page }).analyze();
+      const results = await new AxeBuilder({ page }).withTags(WCAG_22_AA).analyze();
       serious = results.violations.filter(
         violation => violation.impact === 'serious' || violation.impact === 'critical'
       );
@@ -61,7 +69,7 @@ test.describe('Accessibility @edge', () => {
 
     let serious: Awaited<ReturnType<AxeBuilder['analyze']>>['violations'] = [];
     await when('proběhne axe accessibility scan', async () => {
-      const results = await new AxeBuilder({ page }).analyze();
+      const results = await new AxeBuilder({ page }).withTags(WCAG_22_AA).analyze();
       serious = results.violations.filter(
         violation => violation.impact === 'serious' || violation.impact === 'critical'
       );
@@ -82,7 +90,7 @@ test.describe('Accessibility @edge', () => {
 
       let serious: Awaited<ReturnType<AxeBuilder['analyze']>>['violations'] = [];
       await when('proběhne axe accessibility scan', async () => {
-        const results = await new AxeBuilder({ page }).analyze();
+        const results = await new AxeBuilder({ page }).withTags(WCAG_22_AA).analyze();
         serious = results.violations.filter(
           violation => violation.impact === 'serious' || violation.impact === 'critical'
         );

@@ -46,6 +46,8 @@ const PRECACHE_URLS = [
   '/guess-house/script.js',
   '/who-is-on-photo/index.html',
   '/who-is-on-photo/script.js',
+  '/rock-paper-scissors/index.html',
+  '/rock-paper-scissors/script.js',
   '/chat-with-character/index.html',
   '/chat-with-character/script.js',
 ];

@@ -1,0 +1,48 @@
+name: Quality (scheduled)
+
+# Everything here is too slow, too noisy, or too dependent on a third party to sit in
+# the PR gate. It runs on its own schedule and never blocks a deploy — a failure here
+# is a work item, not a broken build.
+on:
+  schedule:
+    - cron: '0 5 * * 1' # Mondays, 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    name: Mutation testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      # Fails below the `break` threshold in stryker.config.json. Coverage says the code
+      # ran; this says the tests would have noticed had it been wrong.
+      - run: npm run test:mutation
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          retention-days: 30
+
+  fixture-drift:
+    name: HP API drift
+    # Comparable-products oracle: shared/fixtures/*.json is a frozen copy of upstream,
+    # and a frozen copy is exactly what the code learns to pass. Reports only — a third
+    # party must never be able to turn our build red.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+      - run: node scripts/check-api-drift.mjs

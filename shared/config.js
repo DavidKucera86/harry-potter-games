@@ -1,4 +1,4 @@
-const APP_VERSION = "8";
+const APP_VERSION = "9";
 const GAME_CONFIG = {
   MAX_LIVES: 10,
   ROUND_DELAY_MS: 1200,

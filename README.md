@@ -74,7 +74,7 @@ adresu bez ohledu na to, zda běží kontejner nebo vestavěný server.
 - **HTML generátor** (`npm run build:html`) ze šablon v `shared/templates/`
 - **SEO:** každá stránka má unikátní popisek, canonical, Open Graph i Twitter card tagy (`shared/templates/partials/head.html` + `scripts/build-html.mjs`, absolutní URL z `SITE_URL`); `robots.txt` a `sitemap.xml` se generují buildem, náhledový obrázek je `shared/og-image.png`
 - **Bezpečnost:** přísné Content-Security-Policy a další security headers z jednoho zdroje pravdy ([scripts/security-headers.mjs](scripts/security-headers.mjs) → `netlify.toml`, `docker/nginx.conf`, `<meta>` v šabloně; drift hlídá unit test), zero-trust validace vstupů a odpovědí API, rate-limit guard proti záplavě požadavků, `npm run audit` v CI — viz [CLAUDE.md](CLAUDE.md)
-- **Testování:** Vitest (unit) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`
+- **Testování:** Vitest (unit, s prahy pokrytí) + Playwright (E2E), ESLint a TypeScript kontrola pro `src/` i `tests/`. Kromě příkladových testů i **property-based** (`fast-check`, `tests/unit/properties.test.ts`) a **mutation testing** (Stryker, týdně v CI). Testovací orákula jsou zmapovaná v [docs/ORACLES.md](docs/ORACLES.md), zdraví suity v [docs/SUITE-HEALTH.md](docs/SUITE-HEALTH.md), exploratory charty v [docs/EXPLORATORY-CHARTERS.md](docs/EXPLORATORY-CHARTERS.md)
 
 ## Build a úpravy kódu
 
@@ -107,7 +107,9 @@ Vygenerované soubory (`index.html`, `guess-*/index.html`, …) commituj do repo
 npm run verify:build
 ```
 
-Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) automaticky spouští `verify:build`, `lint`, `typecheck`, regeneraci [E2E test katalogu](docs/E2E-TEST-CATALOG.md).
+Ověří, že `npm run build` neprodukuje necommitnuté změny v generovaných souborech. Pre-commit hook (`simple-git-hooks`) automaticky spouští `verify:build`, `lint` a `typecheck` — rozpočet do 20 sekund, aby se hook nevyplácelo obcházet přes `--no-verify`.
+
+[E2E test katalog](docs/E2E-TEST-CATALOG.md) se **v hooku neregeneruje** (znamenalo by to celou Playwright suitu na každém commitu). Regeneruje ho CI přes `PLAYWRIGHT_CATALOG=1` a pak selže, pokud se soubor rozejde s realitou — katalog je *History orákulum* a hook, který ho tiše přepíše, jím být přestává. Ručně: `npm run docs:test-catalog`.
 
 ## Sdílená cache dat
 
@@ -158,10 +160,12 @@ Co se stane:
 | Příkaz | Účel |
 |---|---|
 | `npm run test:unit` | Jen Vitest unit testy |
+| `npm run test:coverage` | Vitest s měřením pokrytí a prahy (stejná vrata jako v CI) |
 | `npm run test:e2e` | Jen Playwright E2E testy |
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
 | `npm run docs:test-catalog` | Vygeneruje [E2E test katalog](docs/E2E-TEST-CATALOG.md) ve stylu Given-When-Then |
 | `npm run audit` | `npm audit --audit-level=high` — stejná kontrola závislostí jako v CI |
+| `npm run test:mutation` | Stryker mutation testing nad čistou logikou (běží týdně v CI, ne v PR gate) |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
 | `npx playwright test --grep @visual` | Visual regression screenshoty |
@@ -256,3 +260,10 @@ Průběh:
 Při selhání v CI se do GitHub Actions nahraje Playwright HTML report včetně trace (Artifacts → stáhnout → `npx playwright show-report playwright-report`).
 
 Pro plně automatický deploy je potřeba v Netlify vypnout paralelní auto-deploy z GitHub hooku, aby deploy probíhal jen z GHA po úspěšných pre-deploy testech.
+
+## Licence
+
+Kód je pod licencí [MIT](LICENSE). Licence pokrývá **jen kód tohoto repozitáře** — nevztahuje
+se na obsah a ochranné známky světa Harryho Pottera (ty patří příslušným držitelům práv) ani
+na data poskytovaná [HP API](https://hp-api.onrender.com/). Projekt je nekomerční fanouškovská
+hra.

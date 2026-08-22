@@ -6,3 +6,7 @@ test-results/
 blob-report/
 **/*.map
 .claude/settings.local.json
+coverage/
+reports/
+.stryker-tmp/
+.lighthouseci/

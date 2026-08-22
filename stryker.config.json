@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "Mutation testing answers the question coverage cannot: would the tests notice if the code were wrong? Scoped to pure logic — mutating DOM-bound game classes is slow and mostly yields equivalent mutants. Never runs in the pre-commit hook or the PR gate; see .github/workflows/quality.yml.",
+  "packageManager": "npm",
+  "testRunner": "vitest",
+  "vitest": {
+    "configFile": "vitest.config.js"
+  },
+  "reporters": ["html", "clear-text", "progress"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/index.html"
+  },
+  "coverageAnalysis": "perTest",
+  "tempDirName": ".stryker-tmp",
+  "mutate": [
+    "src/shared/deckUtils.ts",
+    "src/shared/wordUtils.ts",
+    "src/shared/hangmanUtils.ts",
+    "src/shared/rpsUtils.ts",
+    "src/shared/urlUtils.ts",
+    "src/shared/chatEngine.ts"
+  ],
+  "_thresholds_comment": "break is set below the measured baseline (84.97% on 2026-08-22) so the scheduled job fails on a real regression, not on the noise of a mutant or two. Ratchet up as survivors get killed; never down.",
+  "thresholds": {
+    "high": 90,
+    "low": 70,
+    "break": 80
+  }
+}
