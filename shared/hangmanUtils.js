@@ -1,23 +1,6 @@
-const DIACRITIC_MAP = {
-  "\xE1": "a",
-  "\u010D": "c",
-  "\u010F": "d",
-  "\xE9": "e",
-  "\u011B": "e",
-  "\xED": "i",
-  "\u0148": "n",
-  "\xF3": "o",
-  "\u0159": "r",
-  "\u0161": "s",
-  "\u0165": "t",
-  "\xFA": "u",
-  "\u016F": "u",
-  "\xFD": "y",
-  "\u017E": "z"
-};
+const COMBINING_MARKS = /\p{Mn}/gu;
 function normalizeLetter(char) {
-  const lower = char.toLowerCase();
-  return DIACRITIC_MAP[lower] || lower;
+  return char.toLowerCase().normalize("NFD").replace(COMBINING_MARKS, "");
 }
 function getWordLetters(word) {
   return word.split("").filter((ch) => ch !== " ");
