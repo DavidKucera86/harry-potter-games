@@ -148,7 +148,12 @@ The baseline below already exists in the codebase; keep it intact and extend it.
   entries and throw when nothing is left, which hands over to the fixture fallback. Keep
   the timeout / retry / fixture-fallback path intact. URLs from API data are checked with
   `isSafeImageUrl` ([src/shared/urlUtils.ts](src/shared/urlUtils.ts)) before they reach an
-  `img.src`; any new URL sink (`href`, `srcset`) needs the same. Build DOM with
+  `img.src`; any new URL sink (`href`, `srcset`) needs the same. **Judge a URL only in the
+  form the URL parser will see it in** — it removes ASCII tab/LF/CR from anywhere in the
+  string before parsing, so a check on the raw text inspects a different URL than the one
+  the browser fetches (`/<TAB>/host/x` does not start with `//`, yet resolves to
+  `//host/x`). Never compare an untrusted URL character by character without normalising
+  first. Build DOM with
   `textContent` / `createElement` — never `innerHTML` from untrusted strings. This is
   covered by tests (e.g. [tests/edge/xss-safe-dom.spec.ts](tests/edge/xss-safe-dom.spec.ts),
   [tests/unit/urlUtils.test.ts](tests/unit/urlUtils.test.ts)).
