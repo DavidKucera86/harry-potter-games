@@ -6,6 +6,17 @@ on:
   pull_request:
     branches: [main]
 
+# Least privilege: no job here needs to write to the repo. Without this block the
+# default GITHUB_TOKEN permissions apply, which are broader than anything we use.
+permissions:
+  contents: read
+
+# A second push to a PR should cancel the first run; pushes to main must not cancel
+# each other (a half-finished deploy is worse than a queued one).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   pre_deploy_tests:
     runs-on: ubuntu-latest
@@ -14,13 +25,15 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: npm
       - uses: actions/cache@v6
         with:
           path: |
             ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
       - run: npm ci
       # Make apt resilient to flaky Ubuntu mirrors: bounded timeouts + retries +
       # IPv4 so a bad mirror fails fast instead of hanging the job. (PR #13 stalled
@@ -38,7 +51,28 @@ jobs:
       - run: npm run verify:build
       - run: npm run typecheck
       - run: npm run audit
-      - run: npm test
+      # Split out of `npm test` so the suite runs once, with coverage thresholds on the
+      # unit half and the catalog reporter attached to the E2E half.
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run test:coverage
+      - run: PLAYWRIGHT_CATALOG=1 npx playwright test
+      # History oracle: the catalog describes how the app behaves. If a change alters
+      # behaviour without the catalog being regenerated and reviewed, that change is
+      # slipping past its own documentation.
+      - name: E2E catalog is up to date
+        run: |
+          git diff --exit-code -- docs/E2E-TEST-CATALOG.md || {
+            echo "::error::Chování se změnilo, ale docs/E2E-TEST-CATALOG.md ne."
+            echo "Spusť 'npm run docs:test-catalog' a commitni výsledek, nebo oprav test."
+            exit 1
+          }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
@@ -57,7 +91,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
       - run: npm ci
       - run: npm run build
       - run: npx --yes netlify-cli@20.0.0 deploy --prod --dir=. --message="Deploy ${{ github.sha }}"
@@ -74,13 +108,15 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
           cache: npm
       - uses: actions/cache@v6
         with:
           path: |
             ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
       - run: npm ci
       # Same apt hardening as pre_deploy_tests (see the comment there).
       - name: Harden apt against flaky mirrors
