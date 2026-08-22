@@ -186,6 +186,25 @@ describe('isSafeImageUrl (property)', () => {
       }),
     );
   });
+
+  // The URL parser drops ASCII tab/LF/CR from anywhere in the string before parsing,
+  // so `/<TAB>/host/x` reaches the network as the protocol-relative `//host/x`. No
+  // character the parser ignores may turn a rejected URL into an accepted one.
+  it('cannot be talked into a cross-origin URL by characters the URL parser ignores', () => {
+    fc.assert(
+      fc.property(
+        fc.webUrl(),
+        fc.stringMatching(/^[\t\n\r]{1,4}$/),
+        fc.stringMatching(/^[\t\n\r]{0,4}$/),
+        (url, inserted, trailing) => {
+          const { host } = new URL(url);
+          expect(isSafeImageUrl(`/${inserted}/${host}/photo.png`)).toBe(false);
+          expect(isSafeImageUrl(`${inserted}//${host}/photo.png${trailing}`)).toBe(false);
+          expect(isSafeImageUrl(`http${inserted}://${host}/photo.png`)).toBe(false);
+        },
+      ),
+    );
+  });
 });
 
 describe('normalizeText (property)', () => {
