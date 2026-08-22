@@ -48,3 +48,15 @@ Typ mezery (technika, ne symptom): **chybějící unicode ekvivalenční třída
 jen ASCII, přestože hra běží v češtině a jména tahá z cizího API. Zabito dvěma testy;
 zároveň odstraněn duplicitní `it()`, který měl byte-identický assert s tím vedle sebe —
 dvě jména pro jeden test case, tedy nulová dodatečná ochrana.
+
+### 2026-08-22 — orákulový test našel chybu, kterou E2E míjelo
+
+`brand-consistency.test.ts` odhalil, že `rock-paper-scissors` chybí v precache listu
+service workeru — hra se offline nenačte, přestože PWA to slibuje a Dockerfile ji kopíruje.
+
+Typ mezery (technika, ne symptom): **E2E testuje jednu instanci místo třídy.**
+`pwa-offline.spec.ts` ověřuje offline vždy jen `/guess-character-name/` — jednu hru
+ze šesti, vybranou jednou a nikdy nepřehodnocenou. Kterákoli později přidaná hra tím
+propadne. Opraveno na úrovni třídy: unit test porovnává všechny čtyři kopie seznamu rout
+(Dockerfile `COPY`, `sw.ts`, `sitemap.xml`, README), takže příště chybějící routa
+spadne bez ohledu na to, které hry se týká.
