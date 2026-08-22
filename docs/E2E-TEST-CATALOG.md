@@ -390,6 +390,13 @@
 - **When** uživatel prohraje hru
 - **Then** payload je v modalu zobrazen jako text a nespustí se alert
 
+### E25.02 — image URL smuggling a protocol-relative host past the guard never reaches the network
+**Soubor:** `tests/edge/xss-safe-dom.spec.ts`
+
+- **Given** API vrátí postavu s fotkou schovávající cizí origin za tabulátor
+- **When** hráč projde celý balíček
+- **Then** otrávená postava je zahozena a na evil.example nejde žádný request
+
 ### E26.01 — retries after server errors and eventually loads
 **Soubor:** `tests/edge/api-retry.spec.ts`
 
