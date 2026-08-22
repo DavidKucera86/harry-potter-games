@@ -82,6 +82,42 @@ jobs:
             test-results/
           retention-days: 14
 
+  lighthouse:
+    name: Lighthouse budgets
+    # Purpose oracle: CLAUDE.md puts SEO / responsiveness / a11y on the same footing as
+    # tests, but only axe measured any of it. PR-only — this reports on a change, it is
+    # not part of the deploy path.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      # The app is only ever run in Docker (CLAUDE.md), so budgets are measured against
+      # the real nginx artifact — including its security headers — not a dev server.
+      - run: docker compose up --build -d
+      - name: Wait for the container
+        run: |
+          for _ in $(seq 1 60); do
+            curl -sfo /dev/null http://127.0.0.1:4173/ && exit 0
+            sleep 2
+          done
+          echo "::error::Container did not come up on :4173"
+          exit 1
+      - run: npx --yes @lhci/cli@0.14.x autorun --config=lighthouserc.json
+      - if: always()
+        run: docker compose down
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: lighthouse
+          path: .lighthouseci/
+          retention-days: 14
+
   deploy:
     needs: pre_deploy_tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

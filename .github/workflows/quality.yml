@@ -32,3 +32,17 @@ jobs:
           name: mutation-report
           path: reports/mutation/
           retention-days: 30
+
+  fixture-drift:
+    name: HP API drift
+    # Comparable-products oracle: shared/fixtures/*.json is a frozen copy of upstream,
+    # and a frozen copy is exactly what the code learns to pass. Reports only — a third
+    # party must never be able to turn our build red.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+      - run: node scripts/check-api-drift.mjs
