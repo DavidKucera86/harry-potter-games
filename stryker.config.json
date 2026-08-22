@@ -20,7 +20,7 @@
     "src/shared/urlUtils.ts",
     "src/shared/chatEngine.ts"
   ],
-  "_thresholds_comment": "break is set below the measured baseline (84.97% on 2026-08-22) so the scheduled job fails on a real regression, not on the noise of a mutant or two. Ratchet up as survivors get killed; never down.",
+  "_thresholds_comment": "break is set below the measured baseline (85.86% on 2026-08-22, up from 84.97% once urlUtils.ts reached 100%) so the scheduled job fails on a real regression, not on the noise of a mutant or two. A single mutant is worth ~0.34 points here, so the ~5-point gap is deliberate; killing 3 mutants does not earn a ratchet. Ratchet up as survivors get killed; never down.",
   "thresholds": {
     "high": 90,
     "low": 70,
