@@ -63,6 +63,12 @@ describe('getWordLetters', () => {
 });
 
 describe('isGuessableLetter', () => {
+  // The anchors in the rule are what make this a *letter* check rather than a
+  // contains-a-letter check. Without them a pasted word counts as a guess.
+  it.each(['ab', 'ea', 'a ', ' a', 'abc'])('rejects %o — more than one letter is not a letter', (input) => {
+    expect(isGuessableLetter(input)).toBe(false);
+  });
+
   it('returns true for letters and false for punctuation', () => {
     expect(isGuessableLetter('a')).toBe(true);
     expect(isGuessableLetter('é')).toBe(true);
