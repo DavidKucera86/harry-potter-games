@@ -28,7 +28,7 @@ test.describe('Hangman diacritics @edge', () => {
   // E06.01 covers 'é', which the old Czech table happened to know. The API also serves
   // names carrying accents that table never had, and those were not merely un-guessable
   // — they were auto-revealed, handing the player a letter before the game started.
-  test('E06.02: an accent outside the Czech alphabet is guessed, not given away', { tag: '@edge' }, async ({ page }) => {
+  test('E06.03: an accent outside the Czech alphabet is guessed, not given away', { tag: '@edge' }, async ({ page }) => {
     await given('hra je načtená s postavou „Zoë“', async () => {
       await setupGameMocks(page, {
         characters: [

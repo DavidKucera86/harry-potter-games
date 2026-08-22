@@ -13,6 +13,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 |---|---|---|---|---|---|---|---|
 | 2026-08-22 | 1049 | 97 | 87,74 / 78,67 | 84,97 % | — | 7 týdnů | 0 |
 | 2026-08-22 | 1075 | 98 | 87,74 / 78,63 | 85,86 % | — | 7 týdnů | 0 |
+| 2026-08-22 | 1125 | 99 | 87,73 / 78,58 | 90,28 % | — | 7 týdnů | 0 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 
@@ -27,9 +28,9 @@ podle hodnoty modulu.
 | `wordUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže |
 | `rpsUtils.ts` | 95,00 % | 1 | Malá doména, vyčerpávající tabulka; zbytek je nejspíš ekvivalentní mutant |
 | `urlUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; jeden ze tří mutantů byl reálná díra |
-| `chatEngine.ts` | 87,27 % | 18 | Největší modul; 3 mutanti bez pokrytí vůbec |
-| `deckUtils.ts` | 81,25 % | 6 | `shuffle` bere globální `Math.random`; injektovatelný RNG by část z nich zabil |
-| `hangmanUtils.ts` | 62,50 % | 15 | **Nejhorší poměr** — 15 přeživších na 40 řádků kódu. Nejvyšší hodnota za nejmíň práce — **další na řadě** |
+| `chatEngine.ts` | 87,27 % | 18 | Největší modul; **3 mutanti bez pokrytí vůbec** — kód, kterého se nedotkne žádný test. Na řadě po `deckUtils` |
+| `deckUtils.ts` | 81,25 % | 6 | `shuffle` bere globální `Math.random`; injektovatelný RNG by část z nich zabil — **další na řadě**, příčina je pojmenovaná |
+| `hangmanUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; tabulka nahrazena Unicode dekompozicí |
 
 ## Log nálezů
 
@@ -49,6 +50,38 @@ Typ mezery (technika, ne symptom): **chybějící unicode ekvivalenční třída
 jen ASCII, přestože hra běží v češtině a jména tahá z cizího API. Zabito dvěma testy;
 zároveň odstraněn duplicitní `it()`, který měl byte-identický assert s tím vedle sebe —
 dvě jména pro jeden test case, tedy nulová dodatečná ochrana.
+
+### 2026-08-22 — patnáct mutantů, jedna příčina: ručně psaná tabulka místo dat, která už existují
+
+`DIACRITIC_MAP` měla patnáct řádků a testy ověřovaly dva (`É`, `ř`). Zbylých třináct se
+dalo vyprázdnit a suita zůstala zelená. Navíc: `é` je **jediný** ne-ASCII znak v celém
+`shared/fixtures/` — těch třináct řádků tedy nebylo jen netestovaných, ony nebyly ani
+procvičené žádnými reálnými daty v repu.
+
+Co rozbitá položka dělá, není zřejmé z prvního pohledu: písmeno se nestane
+neuhodnutelným, ale **automaticky odhaleným**. `'ů': ''` znamená, že se `ů` prozradí
+zadarmo na startu a psaní `u` už ho netrefí. Tichá změna obtížnosti — přesně to, co
+žádný test nehlídal.
+
+Unicode kanonická dekompozice reprodukuje všech patnáct řádků do posledního znaku, takže
+tabulka opisovala data, která standard už dodává. Odvození základního písmene místo tabulky
+mutanty odstraní konstrukcí — není co mutovat — a zavře reálnou mezeru: slova chodí
+z anglicko-francouzské HP API a `ë`, `ï`, `â`, `ü` v české tabulce nebyly, takže `Zoë` se
+odhalilo zadarmo. Ověřeno v prohlížeči, `E06.03` na staré implementaci padá.
+
+Orákulum: **P — Purpose** (z české klávesnice musí jít dosáhnout na každé písmeno slova,
+které hra ukáže), referencí je **S — Standards** (Unicode canonical decomposition).
+
+Typ mezery (technika, ne symptom): **příklad zastupující třídu.** Dva příklady na
+patnáctiprvkovou tabulku vypadají v diffu jako pokrytí, ale chrání dva řádky z patnácti.
+Kdykoli test bere jeden prvek z vyjmenované množiny, patří tam `it.each` nad celou
+množinou — a expected hodnoty psané ručně, ne dopočítané tou samou funkcí, jinak assert
+neověřuje nic.
+
+Poslední dva mutanti byli jiný případ: ukotvení `^`/`$` v `/^[a-z]$/`, viditelné jen
+u víceznakového vstupu. Při jejich zabíjení se ukázalo, že `HangmanGame.guessLetter` má
+tentýž regex **opsaný podruhé** místo volání `isGuessableLetter` — pravidlo ve dvou
+kopiích, kde rozejití nic neshodí (**P — Product**). Sjednoceno.
 
 ### 2026-08-22 — mutant na `trim()` ukázal na obcházitelnou bezpečnostní stráž
 
