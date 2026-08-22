@@ -165,6 +165,7 @@ Co se stane:
 | `npm run test:ui` | Playwright UI mode — debug jednotlivých testů |
 | `npm run docs:test-catalog` | Vygeneruje [E2E test katalog](docs/E2E-TEST-CATALOG.md) ve stylu Given-When-Then |
 | `npm run audit` | `npm audit --audit-level=high` — stejná kontrola závislostí jako v CI |
+| `npm run test:mutation` | Stryker mutation testing nad čistou logikou (běží týdně v CI, ne v PR gate) |
 | `npx playwright test --grep @smoke` | Jen smoke testy (rychlejší kontrola) |
 | `npx playwright test --grep @critical` | Jen happy-path scénáře |
 | `npx playwright test --grep @visual` | Visual regression screenshoty |

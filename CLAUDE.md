@@ -297,6 +297,7 @@ npm run typecheck    # tsc for src + tests
 npm run test:unit    # vitest
 npm run test:coverage # vitest + coverage thresholds (same gate as CI)
 npm run audit        # npm audit --audit-level=high (same gate as CI)
+npm run test:mutation # stryker over the pure modules (weekly job, never the PR gate)
 npm test             # vitest + playwright (E2E against `npx serve`, incl. @visual)
 npm run test:docker  # full E2E against the built Docker image (nginx); @visual skipped
 npm run verify:build # fail if generated files are out of sync with src/
