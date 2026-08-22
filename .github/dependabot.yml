@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Runtime dependencies are deliberately zero (see CLAUDE.md § Security), so every
+  # npm update here is a devDependency. Grouped into one PR a week to keep the noise
+  # proportional to a hobby repo; `npm run audit` in CI is the gate that actually blocks.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
