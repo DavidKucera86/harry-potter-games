@@ -36,12 +36,12 @@ function pickFrom(candidates, excluded, random) {
 }
 function detectTopics(text, registry, locale) {
   const haystack = normalizeText(text);
-  return Object.entries(registry).filter(([, def]) => bestMatchLength(haystack, def.keywords[locale] ?? []) > 0).map(([id]) => id);
+  return Object.entries(registry).filter(([, def]) => bestMatchLength(haystack, def.keywords[locale]) > 0).map(([id]) => id);
 }
 function matchTopic(haystack, registry, locale, random) {
   const scored = Object.entries(registry).map(([id, def]) => ({
     id,
-    length: bestMatchLength(haystack, def.keywords[locale] ?? []),
+    length: bestMatchLength(haystack, def.keywords[locale]),
     priority: def.priority ?? TOPIC_PRIORITY.NORMAL
   })).filter((entry) => entry.length > 0);
   if (scored.length === 0) {

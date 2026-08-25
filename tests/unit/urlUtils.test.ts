@@ -7,6 +7,7 @@ describe('isSafeImageUrl', () => {
     'https://hp-api.local/albus.png',
     '/shared/fixtures/characters.json',
     '/shared/icons/icon.svg',
+    '  /shared/fixtures/characters.json  ',
   ])('accepts %s', (url) => {
     expect(isSafeImageUrl(url)).toBe(true);
   });
@@ -18,6 +19,10 @@ describe('isSafeImageUrl', () => {
     ['data: URL', 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4='],
     ['plain http URL', 'http://example.com/harry.png'],
     ['protocol-relative URL', '//evil.example/harry.png'],
+    ['protocol-relative URL smuggled past the guard with a tab', '/\t/evil.example/pwn.png'],
+    ['protocol-relative URL smuggled past the guard with a newline', '/\n/evil.example/pwn.png'],
+    ['protocol-relative URL smuggled past the guard with CR LF', '/\r\n/evil.example/pwn.png'],
+    ['javascript: URL split by a newline', 'java\nscript:alert(1)'],
     ['relative path', 'shared/fixtures/harry.png'],
     ['empty string', ''],
     ['whitespace only', '   '],

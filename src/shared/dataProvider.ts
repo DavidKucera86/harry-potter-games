@@ -65,11 +65,21 @@ export class FetchTimeoutError extends Error {
   }
 }
 
+// A truthiness check here would read an explicit 0 as "not set" and quietly use the
+// default, which is the opposite of what a test asking for 0 wants.
 function getFetchTimeoutMs(): number {
-  if (typeof window !== 'undefined' && window.__HP_FETCH_TIMEOUT_MS) {
-    return window.__HP_FETCH_TIMEOUT_MS;
-  }
-  return GAME_CONFIG.FETCH_TIMEOUT_MS;
+  if (typeof window === 'undefined') return GAME_CONFIG.FETCH_TIMEOUT_MS;
+  return window.__HP_FETCH_TIMEOUT_MS ?? GAME_CONFIG.FETCH_TIMEOUT_MS;
+}
+
+function getApiBudgetMs(): number {
+  if (typeof window === 'undefined') return GAME_CONFIG.API_TOTAL_BUDGET_MS;
+  return window.__HP_API_BUDGET_MS ?? GAME_CONFIG.API_TOTAL_BUDGET_MS;
+}
+
+function getFixtureTimeoutMs(): number {
+  if (typeof window === 'undefined') return GAME_CONFIG.FIXTURE_TIMEOUT_MS;
+  return window.__HP_FIXTURE_TIMEOUT_MS ?? GAME_CONFIG.FIXTURE_TIMEOUT_MS;
 }
 
 function cacheStorageKey(storageKey: string): string {
@@ -79,9 +89,19 @@ function cacheStorageKey(storageKey: string): string {
 async function fetchWithRetry(url: string): Promise<Response> {
   let lastError: Error | undefined;
 
+  // performance.now() is monotonic. Date.now() is not: a backgrounded tab that comes
+  // back, or an NTP step, would charge time the request never spent to its budget and
+  // skip the retries a flaky connection needs.
+  const startedAt = performance.now();
+  const budgetMs = getApiBudgetMs();
+  const remainingBudget = () => budgetMs - (performance.now() - startedAt);
+
   for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), getFetchTimeoutMs());
+    // Never let one attempt outlive the budget: a hang would otherwise spend a full
+    // timeout here and leave the player waiting past the point of giving up.
+    const attemptTimeout = Math.min(getFetchTimeoutMs(), Math.max(remainingBudget(), 1));
+    const timeoutId = setTimeout(() => controller.abort(), attemptTimeout);
 
     try {
       const response = await fetch(url, { signal: controller.signal });
@@ -107,7 +127,13 @@ async function fetchWithRetry(url: string): Promise<Response> {
     }
 
     if (attempt < GAME_CONFIG.API_RETRIES - 1) {
-      await delay(GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1));
+      // Sleeping the full delay only to give up on waking would spend the player's
+      // patience on nothing. Give up before the sleep if the retry cannot fit after it.
+      const sleepMs = GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1);
+      if (remainingBudget() <= sleepMs) {
+        break;
+      }
+      await delay(sleepMs);
     }
   }
 
@@ -115,7 +141,16 @@ async function fetchWithRetry(url: string): Promise<Response> {
 }
 
 async function loadFallback(url: string): Promise<unknown> {
-  const response = await fetch(url);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), getFixtureTimeoutMs());
+
+  let response: Response;
+  try {
+    response = await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
   if (!response.ok) {
     throw new Error(`Fallback HTTP ${response.status}`);
   }

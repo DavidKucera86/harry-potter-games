@@ -150,4 +150,48 @@ test.describe('Visual regression @visual', () => {
       await expect(page.locator('#overlay')).toHaveScreenshot('hangman-lose-modal.png');
     });
   });
+
+  // Every baseline so far captures a screen at rest: freshly loaded, or finished. The
+  // states a player actually spends the game in — some letters up, some lives gone, a
+  // wrong-guess message on screen — had no baseline at all, so a layout that only breaks
+  // mid-round broke silently.
+  test('V08.01: hangman mid-round with hits, misses and lost lives', { tag: '@visual' }, async ({ page }) => {
+    await given('uživatel je uprostřed rozehrané hry — něco trefil, něco ne', async () => {
+      await setupGameMocks(page, {
+        characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
+        random: 0,
+      });
+      await page.goto('/guess-character-name/');
+      await waitForHangmanReady(page);
+      // Two hits and three misses: revealed slots, a wrong-letter row, three of the ten
+      // hearts gone.
+      await guessLetters(page, ['a', 'q', 'l', 'w', 'e']);
+      await stabilizeVisualRendering(page);
+    });
+
+    await then('screenshot rozehrané hry odpovídá baseline', async () => {
+      await expect(page.locator('.game-container')).toHaveScreenshot('hangman-mid-round.png');
+    });
+  });
+
+  test('V09.01: win modal on a mobile viewport', { tag: '@visual' }, async ({ page }) => {
+    await given('viewport je přenastaven na mobilních 375×667 a uživatel vyhraje', async () => {
+      // The modal is the one thing that has to fit on top of everything else, and the
+      // narrow viewport is where it has the least room to do it.
+      await page.setViewportSize({ width: 375, height: 667 });
+      await setupGameMocks(page, {
+        characters: [{ id: '1', name: 'Albus', house: 'Gryffindor', image: 'https://hp-api.local/albus.png' }],
+        random: 0,
+      });
+      await page.goto('/guess-character-name/');
+      await waitForHangmanReady(page);
+      await guessLetters(page, ['a', 'l', 'b', 'u', 's']);
+      await expectModalOpen(page, 'Gratulujeme!');
+      await stabilizeVisualRendering(page);
+    });
+
+    await then('screenshot modalu na mobilu odpovídá baseline', async () => {
+      await expect(page.locator('#overlay')).toHaveScreenshot('hangman-win-modal-mobile.png');
+    });
+  });
 });

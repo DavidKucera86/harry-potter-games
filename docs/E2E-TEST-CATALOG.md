@@ -256,6 +256,14 @@
 - **When** uživatel uhádne poslední písmeno s klávesou Enter
 - **Then** zobrazí se výherní modal
 
+### E06.03 — an accent outside the Czech alphabet is guessed, not given away
+**Soubor:** `tests/edge/hangman-diacritics.spec.ts`
+
+- **Given** hra je načtená s postavou „Zoë“
+- **Then** žádné písmeno není odhalené předem
+- **When** uživatel uhádne písmeno e bez diakritiky
+- **Then** odhalí se písmeno Ë
+
 ### E07.01 — guess-house shows defeat modal after 10 wrong answers
 **Soubor:** `tests/edge/quiz-lose.spec.ts`
 
@@ -377,11 +385,17 @@
 - **When** timeout se prodlouží, API se obnoví a uživatel spustí novou hru
 - **Then** hra se načte a je hratelná
 
-### E24.01 — retries hung requests and loads on later attempt
+### E24.01 — retries a fast-failing request and loads on a later attempt
 **Soubor:** `tests/edge/fetch-timeout.spec.ts`
 
-- **Given** první dva API requesty visí a třetí uspěje
+- **Given** první dva API requesty spadnou hned a třetí uspěje
 - **Then** hra se načte po třetím pokusu
+
+### E24.02 — does not retry a hung request, it falls back instead
+**Soubor:** `tests/edge/fetch-timeout.spec.ts`
+
+- **Given** API visí a rozpočet je stejný jako timeout, jako v produkci
+- **Then** proběhl jediný pokus a hra běží z fixtures
 
 ### E25.01 — malicious character name is rendered as text in modal
 **Soubor:** `tests/edge/xss-safe-dom.spec.ts`
@@ -389,6 +403,13 @@
 - **Given** hra je načtená s postavou obsahující XSS payload v názvu
 - **When** uživatel prohraje hru
 - **Then** payload je v modalu zobrazen jako text a nespustí se alert
+
+### E25.02 — image URL smuggling a protocol-relative host past the guard never reaches the network
+**Soubor:** `tests/edge/xss-safe-dom.spec.ts`
+
+- **Given** API vrátí postavu s fotkou schovávající cizí origin za tabulátor
+- **When** hráč projde celý balíček
+- **Then** otrávená postava je zahozena a na evil.example nejde žádný request
 
 ### E26.01 — retries after server errors and eventually loads
 **Soubor:** `tests/edge/api-retry.spec.ts`
@@ -852,6 +873,17 @@
 - **When** se do stránky pokusí vložit inline skript
 - **Then** skript se nespustí
 
+### E61.01 — a whole round is playable from the menu with the keyboard alone
+**Soubor:** `tests/edge/keyboard-only.spec.ts`
+
+- **Given** menu je načtené a myš se nepoužije
+- **When** hráč dojde tabem na kartu hry a otevře ji Enterem
+- **Then** hra sama položí fokus na pole pro písmeno
+- **When** hráč uhádne celé jméno bez sáhnutí na myš
+- **Then** otevře se výherní modal s fokusem na svém tlačítku
+- **When** hráč potvrdí modal Enterem a vrátí se tabem na odkaz zpět
+- **Then** hráč je zpátky v menu, aniž by se jednou dotkl myši
+
 ## Visual (@visual)
 
 ### V01.01 — menu page layout
@@ -902,3 +934,17 @@
 - **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
 - **Given** hráč je v chatu s Brumbálem a vidí návrhy otázek
 - **Then** screenshot chatu odpovídá baseline
+
+### V08.01 — hangman mid-round with hits, misses and lost lives
+**Soubor:** `tests/visual/screenshots.spec.ts`
+
+- **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
+- **Given** uživatel je uprostřed rozehrané hry — něco trefil, něco ne
+- **Then** screenshot rozehrané hry odpovídá baseline
+
+### V09.01 — win modal on a mobile viewport
+**Soubor:** `tests/visual/screenshots.spec.ts`
+
+- **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
+- **Given** viewport je přenastaven na mobilních 375×667 a uživatel vyhraje
+- **Then** screenshot modalu na mobilu odpovídá baseline

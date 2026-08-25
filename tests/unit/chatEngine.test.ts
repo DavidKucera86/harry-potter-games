@@ -65,7 +65,47 @@ const pupil: ChatCharacter = {
   fallback: { cs: ['Netuším.'], en: ['No idea.'] },
 };
 
+/**
+ * Knows nothing about `smrt`, and stands *before* the character who does. Without it
+ * every deferral test asks a roster whose first candidate is already the right answer,
+ * which is a search that never has to search.
+ */
+const novice: ChatCharacter = {
+  id: 'novice',
+  name: { cs: 'Nováček', en: 'Novice' },
+  title: { cs: 'Zkušební nováček', en: 'Test Novice' },
+  deferral: {
+    cs: (source, quote) => `Ptej se jinde. ${source}: „${quote}"`,
+    en: (source, quote) => `Ask elsewhere. ${source}: “${quote}”`,
+  },
+  quotes: {
+    general: { cs: ['Nevím.'], en: ['Dunno.'] },
+  },
+  fallback: { cs: ['Nevím.'], en: ['Dunno.'] },
+};
+
+/**
+ * Two shapes the fixtures never had: a topic bucket that exists but is empty, and no
+ * `general` pool at all. Both are reachable — a character may be written with a bucket
+ * later emptied, and `general` is optional — and both change which pool answers.
+ */
+const hermit: ChatCharacter = {
+  id: 'hermit',
+  name: { cs: 'Poustevník', en: 'Hermit' },
+  title: { cs: 'Zkušební poustevník', en: 'Test Hermit' },
+  deferral: {
+    cs: (source, quote) => `Slyšel jsem od ${source}: „${quote}"`,
+    en: (source, quote) => `I heard from ${source}: “${quote}”`,
+  },
+  quotes: {
+    // Empty on purpose: present, but with nothing to say.
+    laska: { cs: [], en: [] },
+  },
+  fallback: { cs: ['Mlčím.'], en: ['I stay silent.'] },
+};
+
 const roster = [sage, pupil];
+const rosterWithNovice = [novice, sage, pupil];
 
 describe('normalizeText', () => {
   it('lowercases and strips Czech diacritics', () => {
@@ -118,6 +158,93 @@ describe('resolveReply — own quotes', () => {
     // pool answers, so suggestions must not promise depth on that topic.
     const reply = resolveReply('Máš rodinu?', pupil, roster, topics, 'cs', { random: () => 0 });
     expect(reply.topic).toBeNull();
+  });
+
+  it('skips a character who has nothing on the topic and keeps looking', () => {
+    // Novice comes first and knows no `smrt`. Reaching for him — or trusting the roster
+    // order — hands the deferral template a quote that does not exist.
+    const reply = resolveReply('Řekni mi o smrti', pupil, rosterWithNovice, topics, 'cs', {
+      random: () => 0,
+    });
+    expect(reply).toEqual({
+      text: 'To nevím, ale Mudrc říká: „Smrt je dobrodružství."',
+      topic: 'smrt',
+    });
+  });
+
+  it('answers from its own fallback when nobody in the roster knows the topic', () => {
+    const reply = resolveReply('Řekni mi o smrti', novice, [novice], topics, 'cs', {
+      random: () => 0,
+    });
+    expect([...novice.quotes.general.cs, ...novice.fallback.cs]).toContain(reply.text);
+    expect(reply.topic).toBeNull();
+  });
+
+  // `bestMatchLength` promises the *longest* matching stem, and matchTopic's whole
+  // specificity rule rests on it — "temný pán" must beat the broader "temn". Drop the
+  // `> best` comparison and it returns the *last* matching stem instead, which is the
+  // same number often enough to look fine and wrong exactly when specificity matters.
+  it('scores a topic by its longest matching stem, not by its last', () => {
+    const registry: TopicRegistry = {
+      famfrpal: { deferrable: false, keywords: { cs: ['famfrpál', 'hra'], en: ['quidditch', 'game'] } },
+      koleje: { deferrable: false, keywords: { cs: ['koleje'], en: ['houses'] } },
+    };
+    const commentator: ChatCharacter = {
+      id: 'commentator',
+      name: { cs: 'Komentátor', en: 'Commentator' },
+      title: { cs: 'Zkušební komentátor', en: 'Test Commentator' },
+      deferral: { cs: (a, b) => `${a}: ${b}`, en: (a, b) => `${a}: ${b}` },
+      quotes: {
+        famfrpal: { cs: ['O famfrpálu vím vše.'], en: ['I know all about quidditch.'] },
+        koleje: { cs: ['O kolejích vím vše.'], en: ['I know all about the houses.'] },
+      },
+      fallback: { cs: ['Netuším.'], en: ['No idea.'] },
+    };
+
+    // "famfrpál" (8) beats "koleje" (6); "hra" (3) matches too and is last in the list.
+    const reply = resolveReply(
+      'Je famfrpál hra pro koleje?',
+      commentator,
+      [commentator],
+      registry,
+      'cs',
+      { random: () => 0 },
+    );
+
+    expect(reply.topic).toBe('famfrpal');
+  });
+
+  it('reaches the last quote in a bucket, not only the first', () => {
+    // `random() * pool.length` is what spreads the pick. Mutate the `*` and every
+    // player hears the same first line for a topic, forever.
+    const first = resolveReply('Co je láska?', sage, roster, topics, 'cs', { random: () => 0 });
+    const last = resolveReply('Co je láska?', sage, roster, topics, 'cs', { random: () => 0.999 });
+    expect(first.text).toBe(sage.quotes.laska.cs[0]);
+    expect(last.text).toBe(sage.quotes.laska.cs[sage.quotes.laska.cs.length - 1]);
+    expect(first.text).not.toBe(last.text);
+  });
+
+  it('treats an empty topic bucket as nothing to say, not as an answer', () => {
+    // `own` is truthy here — an empty array is — so only the length check stands
+    // between the player and a pick from an empty pool.
+    const reply = resolveReply('Co je láska?', hermit, [hermit, sage], topics, 'cs', {
+      random: () => 0,
+    });
+    // The topic matched and the bucket is empty, so the answer comes from the roster —
+    // relayed, not picked out of nothing.
+    expect(reply).toEqual({
+      text: 'Slyšel jsem od Mudrc: „Láska je mocná."',
+      topic: 'laska',
+    });
+  });
+
+  it('answers from the fallback alone when the speaker has no general pool', () => {
+    // `quotes.general` is optional. Without the guard this spreads `undefined` into the
+    // pool and the pick lands on nothing.
+    const reply = resolveReply('Něco úplně jiného', hermit, [hermit], topics, 'cs', {
+      random: () => 0,
+    });
+    expect(reply).toEqual({ text: 'Mlčím.', topic: null });
   });
 
   it('avoids repeating the excluded (previous) reply when alternatives exist', () => {
@@ -279,6 +406,17 @@ describe('suggestFollowUps', () => {
     expect(questions).toHaveLength(FOLLOW_UP_COUNT);
   });
 
+  it('accepts a single exclusion as a plain string, not only as an array', () => {
+    // The signature is `string | string[]`, and every test so far passed an array —
+    // so the string branch could return anything at all and nobody would notice.
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: 'Je láska oběť?',
+    });
+    expect(questions).not.toContain('Je láska oběť?');
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+  });
+
   it('compares exclusions without case or diacritics', () => {
     const questions = suggestFollowUps('laska', followUps, 'cs', {
       random: () => 0,
@@ -294,6 +432,40 @@ describe('suggestFollowUps', () => {
     });
     expect(questions).toHaveLength(FOLLOW_UP_COUNT);
     expect(new Set(questions).size).toBe(FOLLOW_UP_COUNT);
+  });
+
+  // Relaxing the exclusion must not also relax the ordering. Both of the unfiltered
+  // top-ups are load-bearing, and asserting only the row's length cannot tell them
+  // apart: drop either one and the player still gets three questions.
+  it('keeps the topic its own questions even once every one was already asked', () => {
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: [...followUps.byTopic.laska.cs, ...followUps.default.cs],
+    });
+    // Without the bespoke top-up the row silently turns generic — the dead end the
+    // per-topic sets exist to prevent (see the content invariants in CLAUDE.md).
+    expect([...questions].sort()).toEqual([...followUps.byTopic.laska.cs].sort());
+  });
+
+  it('tops a short bespoke set up from the default pool even once every one was asked', () => {
+    const questions = suggestFollowUps('smrt', followUps, 'cs', {
+      random: () => 0,
+      exclude: [...followUps.byTopic.smrt.cs, ...followUps.default.cs],
+    });
+    // 'smrt' owns a single question, so without the generic top-up the row goes short —
+    // and a short row is exactly what the doc comment promises never to hand the player.
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+    expect(questions[0]).toBe('Bojíš se smrti?');
+    expect(questions.slice(1).every(q => followUps.default.cs.includes(q))).toBe(true);
+  });
+
+  it('draws follow-ups from across the pool, not always the first one left', () => {
+    // `random() * remaining.length` is what spreads the draw. Mutate the `*` and every
+    // round offers the same three questions in the same order, for every player.
+    const first = suggestFollowUps(null, followUps, 'cs', { count: 1, random: () => 0 });
+    const last = suggestFollowUps(null, followUps, 'cs', { count: 1, random: () => 0.999 });
+    expect(first).toEqual([followUps.default.cs[0]]);
+    expect(last).toEqual([followUps.default.cs[followUps.default.cs.length - 1]]);
   });
 
   it('honours an explicit count', () => {

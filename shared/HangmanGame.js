@@ -1,6 +1,11 @@
 import { GAME_CONFIG } from "./config.js";
 import { BaseGame } from "./BaseGame.js";
-import { getAutoRevealedLetters, getWordLetters, normalizeLetter } from "./hangmanUtils.js";
+import {
+  getAutoRevealedLetters,
+  getWordLetters,
+  isGuessableLetter,
+  normalizeLetter
+} from "./hangmanUtils.js";
 import { prefersReducedMotion } from "./motion.js";
 class HangmanGame extends BaseGame {
   config;
@@ -245,7 +250,7 @@ class HangmanGame extends BaseGame {
   guessLetter(rawLetter) {
     if (this.gameOver || !this.isReady) return;
     const letter = normalizeLetter(rawLetter);
-    if (!letter || !/^[a-z]$/.test(letter)) {
+    if (!isGuessableLetter(letter)) {
       this._lastFeedback = { letter: rawLetter, kind: "invalid" };
       this.setMessage(this.strings.invalidLetter, "error");
       return;

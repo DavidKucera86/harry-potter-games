@@ -152,7 +152,7 @@ export function detectTopics(
   const haystack = normalizeText(text);
 
   return Object.entries(registry)
-    .filter(([, def]) => bestMatchLength(haystack, def.keywords[locale] ?? []) > 0)
+    .filter(([, def]) => bestMatchLength(haystack, def.keywords[locale]) > 0)
     .map(([id]) => id);
 }
 
@@ -172,7 +172,7 @@ function matchTopic(
   const scored = Object.entries(registry)
     .map(([id, def]) => ({
       id,
-      length: bestMatchLength(haystack, def.keywords[locale] ?? []),
+      length: bestMatchLength(haystack, def.keywords[locale]),
       priority: def.priority ?? TOPIC_PRIORITY.NORMAL,
     }))
     .filter(entry => entry.length > 0);

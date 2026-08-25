@@ -148,7 +148,12 @@ The baseline below already exists in the codebase; keep it intact and extend it.
   entries and throw when nothing is left, which hands over to the fixture fallback. Keep
   the timeout / retry / fixture-fallback path intact. URLs from API data are checked with
   `isSafeImageUrl` ([src/shared/urlUtils.ts](src/shared/urlUtils.ts)) before they reach an
-  `img.src`; any new URL sink (`href`, `srcset`) needs the same. Build DOM with
+  `img.src`; any new URL sink (`href`, `srcset`) needs the same. **Judge a URL only in the
+  form the URL parser will see it in** — it removes ASCII tab/LF/CR from anywhere in the
+  string before parsing, so a check on the raw text inspects a different URL than the one
+  the browser fetches (`/<TAB>/host/x` does not start with `//`, yet resolves to
+  `//host/x`). Never compare an untrusted URL character by character without normalising
+  first. Build DOM with
   `textContent` / `createElement` — never `innerHTML` from untrusted strings. This is
   covered by tests (e.g. [tests/edge/xss-safe-dom.spec.ts](tests/edge/xss-safe-dom.spec.ts),
   [tests/unit/urlUtils.test.ts](tests/unit/urlUtils.test.ts)).
@@ -283,15 +288,22 @@ npm run test:docker   # docker compose up --build -d -> wait -> test:production 
 ```
 
 This is the authoritative "does the real artifact work" gate. It catches
-packaging/serving bugs `serve` can't — e.g. a game dir missing from the Dockerfile
-`COPY` list (a real bug the chat game hit: the page 404'd in the container while every
-serve-based test passed), or nginx routing/header differences.
+packaging/serving bugs `serve` can't — nginx routing and header differences, and
+anything that only shows up once the image is assembled. A game dir missing from the
+Dockerfile `COPY` list used to be the classic case (a real bug the chat game hit: the
+page 404'd in the container while every serve-based test passed); that one now fails in
+the unit suite instead, because
+[tests/unit/brand-consistency.test.ts](tests/unit/brand-consistency.test.ts) compares the
+`COPY` list against the route list in both directions. A copy policed only by a container
+build is policed too late to be a brake.
 
 > `test:docker` builds the image from the **committed** working tree, so `npm run build`
 > and commit generated artifacts first. It tears the container down at the end.
 > **Caveat:** `@visual` snapshots are skipped in production mode — keep covering those
-> with the serve-based `npm test`. When adding a new game/page, remember both the
-> Dockerfile `COPY` list and the `sw.ts` precache list enumerate routes and must be updated.
+> with the serve-based `npm test`. When adding a new game/page, both the Dockerfile
+> `COPY` list and the `sw.ts` precache list enumerate routes and must be updated —
+> `brand-consistency.test.ts` fails on either if you forget, and on a `COPY` entry that
+> no other list knows about.
 
 ## After a successful deploy — always clean up
 

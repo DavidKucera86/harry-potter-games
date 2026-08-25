@@ -22,12 +22,14 @@ Chyba = **porušení konzistence** s jedním z osmi orákul.
 | Artefakt (zdroj pravdy) | Vynuceno kde |
 |---|---|
 | Commitnuté generované artefakty (`shared/*.js`, `*/index.html`, `sitemap.xml`, `robots.txt`) | [scripts/verify-build.mjs](../scripts/verify-build.mjs) — `git diff` proti buildu; pre-commit hook i CI |
-| 7 baseline PNG v `tests/visual/screenshots.spec.ts-snapshots/` | `tests/visual/screenshots.spec.ts`, `maxDiffPixelRatio: 0.01` |
+| 9 baseline PNG v `tests/visual/screenshots.spec.ts-snapshots/` — 7 klidových a 2 rozehrané | `tests/visual/screenshots.spec.ts`, `maxDiffPixelRatio: 0.01` |
 | [E2E-TEST-CATALOG.md](E2E-TEST-CATALOG.md) — popis chování ve stylu Given-When-Then | CI: `PLAYWRIGHT_CATALOG=1` regeneruje, `git diff --exit-code` selže při driftu |
 | `APP_VERSION` v [src/shared/config.ts](../src/shared/config.ts) | ručně — bump invaliduje sessionStorage i SW cache |
 
-**Mezera:** vizuální baseline pokrývají 7 obrazovek; stavy uprostřed hry (rozehraný hangman,
-otevřený modal na mobilu) baseline nemají.
+**Mezera:** *(zavřeno 2026-08-26)* vizuální baseline pokrývaly 7 obrazovek, všechny v klidu —
+čerstvě načtené, nebo dohrané. `V08.01` (rozehraný hangman: odhalená i chybná písmena,
+ubrané životy, chybová hláška) a `V09.01` (výherní modal na 375×667) doplňují stavy, ve
+kterých hráč hru skutečně tráví.
 
 ## I — Image (jak produkt vypadá a jak si říká)
 
@@ -35,10 +37,13 @@ otevřený modal na mobilu) baseline nemají.
 |---|---|
 | Název produktu napříč `manifest.webmanifest`, `<title>` všech stránek, `pages.menuTitle` | [tests/unit/brand-consistency.test.ts](../tests/unit/brand-consistency.test.ts) |
 | Install deskriptor PWA (`short_name` ≤ 12 znaků, `description`, `start_url`, ikony) | tamtéž |
-| `shared/og-image.png`, favicony, `store-assets/` | vizuální snapshoty jen částečně |
+| `shared/og-image.png` | [tests/unit/brand-consistency.test.ts](../tests/unit/brand-consistency.test.ts) — existence, PNG signatura, rozměry proti požadavkům Open Graph, a shoda s `og:image`/`twitter:image` na všech stránkách |
+| Favicony, `store-assets/` | vizuální snapshoty jen částečně |
 
-**Mezera:** náhledový obrázek pro sdílení (`og-image.png`) nemá žádný test; kdyby
-zmizel, pozná se to až podle rozbitého náhledu na sociální síti.
+**Mezera:** *(zavřeno 2026-08-26)* náhledový obrázek pro sdílení neměl žádný test.
+`brand-consistency.test.ts` teď ověřuje, že soubor existuje, je to PNG, má rozměry, které
+`summary_large_image` vyžaduje, a že na něj **absolutní** URL míří `og:image` i
+`twitter:image` na každé generované stránce.
 
 ## C — Comparable products (srovnatelný produkt)
 
@@ -70,14 +75,16 @@ Skuteční uživatelé nejsou k dispozici, takže se používají zástupné sig
 | Artefakt | Vynuceno kde |
 |---|---|
 | Uživatel asistivní technologie | `tests/edge/a11y.spec.ts` (axe, WCAG 2.2 AA), `modal-accessibility.spec.ts` |
+| Uživatel bez myši | [tests/edge/keyboard-only.spec.ts](../tests/edge/keyboard-only.spec.ts) — axe na tohle neodpoví, čte DOM, neovládá stránku |
 | Uživatel na mobilu | `quiz-mobile.spec.ts`, `hangman-mobile.spec.ts`, `chat-mobile.spec.ts` |
 | Uživatel s pomalou/žádnou sítí | `fetch-timeout.spec.ts`, `api-retry.spec.ts`, `offline-fallback.spec.ts`, `pwa-offline.spec.ts` |
 | Uživatel citlivý na pohyb | `src/shared/motion.ts` + `tests/unit/motion.test.ts` |
 | Uživatel, který mluví anglicky | `i18n.spec.ts`, `tests/unit/i18n-parity.test.ts` |
 | Nescriptované chování | [EXPLORATORY-CHARTERS.md](EXPLORATORY-CHARTERS.md) |
 
-**Mezera:** hangman se ovládá klávesnicí a **nemá keyboard-only E2E scénář** — hraje se
-myší i v testech.
+**Mezera:** *(zavřeno 2026-08-25)* hangman se ovládá klávesnicí, ale suita ho hrála myší.
+Zavřeno `E61.01`, které projde menu → hru → modal → zpět bez jediného kliknutí a u každé
+zastávky ověří, že je fokus vidět.
 
 ## P — Product (vnitřní konzistence)
 
@@ -88,10 +95,10 @@ hodnota je v pořádku jen tehdy, když něco selže, jakmile se rozejde.
 |---|---|
 | CSP ve třech kopiích (`netlify.toml`, `docker/nginx.conf`, `<meta>`) vs. `scripts/security-headers.mjs` | [tests/unit/security-headers.test.ts](../tests/unit/security-headers.test.ts) — **vzorové P-orákulum**, podle něj modeluj další |
 | `cs.ts` a `en.ts` jako dvě kopie jedné struktury | [tests/unit/i18n-parity.test.ts](../tests/unit/i18n-parity.test.ts) — stejné klíče, stejné typy, žádný prázdný string, žádný zapomenutý překlad |
-| Seznam rout ve třech kopiích: Dockerfile `COPY`, `sw.ts` precache, `sitemap.xml` | `brand-consistency.test.ts` |
+| Seznam rout ve čtyřech kopiích: `sitemap.xml`, README, `sw.ts` precache, Dockerfile `COPY` | `brand-consistency.test.ts` — porovnává obousměrně, takže spadne i na routě navíc |
 | Chování životů, modalu, balíčku napříč hrami | `BaseGame.test.ts` + per-game testy |
 
-**Mezera:** Dockerfile `COPY` list není pokrytý testem — kontroluje ho až `npm run test:docker`.
+**Mezera:** *(zavřeno 2026-08-25)* Dockerfile `COPY` list dlouho kontroloval až `npm run test:docker`, tedy build kontejneru daleko za PR gate. Teď je čtvrtou hlídanou kopií v `brand-consistency.test.ts`, porovnávanou obousměrně.
 
 ## P — Purpose (k čemu to je)
 
@@ -111,6 +118,8 @@ responsivitu a a11y na roveň testům.
 | OWASP Top 10 / API Top 10 / ASVS L1 | **skill [`owasp-security-testing`](../.claude/skills/owasp-security-testing/SKILL.md)** — už implementované orákulum včetně odůvodněných N/A. Neopisovat, odkazovat |
 | WCAG 2.2 AA | `tests/edge/a11y.spec.ts` — axe s explicitními tagy `wcag2a`…`wcag22aa` |
 | CSP Level 3 | `tests/unit/security-headers.test.ts` |
+| Unicode canonical decomposition (NFD) — jaké je základní písmeno pod diakritikou | [src/shared/hangmanUtils.ts](../src/shared/hangmanUtils.ts), [tests/unit/hangmanUtils.test.ts](../tests/unit/hangmanUtils.test.ts), [tests/edge/hangman-diacritics.spec.ts](../tests/edge/hangman-diacritics.spec.ts) |
+| WHATWG URL Standard — co parser zahazuje, než URL vůbec začne parsovat | [tests/unit/urlUtils.test.ts](../tests/unit/urlUtils.test.ts), [tests/unit/properties.test.ts](../tests/unit/properties.test.ts), [tests/edge/xss-safe-dom.spec.ts](../tests/edge/xss-safe-dom.spec.ts) (E25.02) |
 | Web App Manifest | `tests/unit/brand-consistency.test.ts` |
 | Sitemap / robots protokol | `tests/edge/seo.spec.ts` |
 
@@ -125,3 +134,15 @@ responsivitu a a11y na roveň testům.
 | 2026-08-22 | **P — Purpose** | První měření Lighthouse: performance / accessibility / seo 100, best-practices 96. Prahy zpřísněny z odhadu na naměřené hodnoty. |
 | 2026-08-22 | **S — Standards** | Best-practices drželo na 96 jediné: `frame-ancestors` se v `<meta>` CSP podle specifikace ignoruje a váže se jen jako HTTP hlavička. **Není to díra** — hlavičku posílá `netlify.toml` i `docker/nginx.conf`. Zvažovalo se rozdělit CSP na dvě varianty (meta bez direktivy), ale to by z jednoho zdroje pravdy o bezpečnostní politice udělalo dva — horší obchod než jedna neškodná hláška v konzoli. **Rozhodnutí: CSP zůstává jedna.** Audit `errors-in-console` se přeskakuje v `lighthouserc.json` (přes `skipAudits`, ne přes aserci — skóre kategorie počítá Lighthouse sám) a ten signál převzal posílený `S04.01`. Ověřeno lokálně proti Docker image: všechny čtyři kategorie 100. |
 | 2026-08-22 | **U — Users** | `S04.01` hlídal konzoli obráceně: chytal jen texty obsahující `ReferenceError`, `Failed to load` nebo `is not defined`, takže běžný `TypeError: Cannot read properties of undefined` prošel. Přepsáno na deny-by-default s pojmenovaným allowlistem. Sonda napříč všemi šesti hrami našla jedinou distinktní chybu (tu CSP hlášku), takže obrácení filtru nic nerozbilo — a ověřeno, že test umí zčervenat. |
+| 2026-08-22 | **S — Standards** | `isSafeImageUrl` rozhodovalo nad surovým řetězcem, zatímco WHATWG URL parser zahazuje ASCII tab/LF/CR kdekoli v URL, ještě než ji začne parsovat. `/<TAB>/evil.example/pwn.png` tedy nezačínalo na `//`, prošlo stráží proti protocol-relative URL a v prohlížeči se z něj stalo `https://evil.example/pwn.png` v `img.src`. CSP to nechytí — `img-src` musí povolovat `https:` kvůli obrázkovým hostům HP API. Odhalil to přeživší mutant `value.trim()` → `value` z backlogu v [SUITE-HEALTH.md](SUITE-HEALTH.md); ve sporu s **C — Claims** (doc komentář modulu i sekce Security v CLAUDE.md tvrdily, že protocol-relative se zahazuje). Opraveno normalizací vstupu do podoby, kterou vidí parser. |
+| 2026-08-22 | **P — Purpose** | `DIACRITIC_MAP` v šibenici znala jen českou diakritiku, ale slova chodí z anglicko-francouzské HP API. `ë`, `ï`, `â`, `ü` v tabulce nebyly, takže se nestaly neuhodnutelnými — staly se **automaticky odhalenými**: `Zoë` dostal hráč zčásti prozrazené na startu a psaní `e` na to písmeno netrefilo. Odhalilo to 15 přeživších mutantů v [SUITE-HEALTH.md](SUITE-HEALTH.md), všech patnáct na hodnotách té tabulky. Tabulka nahrazena Unicode kanonickou dekompozicí (**S — Standards**), která reprodukuje všech 15 řádků přesně a cizí diakritiku zvládne taky. Ověřeno v prohlížeči: `E06.03` na staré implementaci padá. |
+| 2026-08-25 | **P — Product** | Dockerfile `COPY` list byl jedinou kopií seznamu rout, kterou nehlídal žádný unit test — chybějící routa se poznala až po buildu kontejneru, což je přesně to, jak kdysi propadla chat hra. Doplněno do `brand-consistency.test.ts` jako čtvrtá hlídaná kopie, a to **obousměrně**: spadne i na routě, kterou Dockerfile kopíruje a nic jiného o ní neví. Ověřeno oběma směry na upraveném Dockerfilu. Při té příležitosti se ukázalo, že [SUITE-HEALTH.md](SUITE-HEALTH.md) tvrdila, že tenhle test už `COPY` porovnává — nikdy to nebyla pravda. Tvrzení opraveno; nález nehlásí test, ale čtení vlastní dokumentace. |
+| 2026-08-25 | **P — Purpose** | `shuffle` v balíčku měl šest přeživších mutantů a všechny ve stejné skrýši: žádná aserce netvrdila, že funkce něco **změní**. Smazané tělo cyklu i `Math.random() * (i + 1)` → `/` vrátí nezměněný vstup, což pořád splňuje *stejné prvky, stejná délka, vstup nezmutovaný* — jediné, co property testy ověřovaly. Zelená property nad funkcí, která nedělá nic. Nahrazeno dosažitelností všech permutací (Fisher-Yates je uniformní) a počtem tahů z generátoru (přesně `n − 1`), zdroj náhody injektovaný jako v `rpsUtils.ts`. |
+| 2026-08-25 | **C — Claims** | Doc komentář `suggestFollowUps` slibuje, že se vyloučení už položených otázek uvolní, aby hráč nedostal prázdnou nebo krátkou řadu. Ten slib plní dva řádky a oba šlo smazat se zelenou suitou — test na ten scénář existoval, ale tvrdil jen *„vrátily se tři různé otázky"*, což platí i pod oběma mutanty. Bez `take(bespoke)` se řada dolije z generického fondu a téma přijde o vlastní otázky; bez `take(generic)` jde krátké téma zkrátka. Nové testy se ptají na **původ** otázek, ne na jejich počet. |
+| 2026-08-25 | **P — Product** | Předávání repliky od jiné postavy testoval vždy roster `[sage, pupil]`, kde byla správná odpověď prvním kandidátem — `find`, který uspěje napoprvé, neodliší funkční hledání od rozbitého. Pět mutantů (predikát na `true`, `> 0` na `>= 0`, `&&` na `||`, dvakrát zahozený optional chaining) tím prošlo. Přidána postava, která stojí **před** znalcem tématu a sama o něm neví nic. Zobecněně: fixture pro test vyhledávání musí obsahovat záznam, který se má přeskočit, a ten musí být vpředu. |
+| 2026-08-25 | **S — Standards** | WCAG 2.1.1 (Keyboard) nemělo v repu **žádné** orákulum. axe ho nezachytí — je to statická analýza DOM, ne ovládání stránky — a suita sahala v každé hře po myši. Mezeru měly zapsanou nezávisle dvě místa: `U — Users` v tomhle souboru a charta #2. `E61.01` projde celou cestu z charty bez kliknutí. Cestou vyšlo najevo, že hangman fokusuje vstupní pole sám, ale jen za `(hover: hover) and (pointer: fine)` — první verze testu k poli tabovala, a tím od něj odcházela. Test to teď tvrdí, místo aby s tím závodil. |
+| 2026-08-25 | **P — Purpose** | Exploratory charta #1: při API requestu, který nikdy neodpoví, sedí hráč **48 s na spinneru** bez vysvětlení — 3 pokusy × 15 s timeout + 2 × 1 s prodleva, naměřeno proti Docker buildu. Pak se hra korektně zotaví z lokálních fixtures, které byly instantně k dispozici celou tu dobu. Účel produktu je *rychlá hra pro děti na mobilu*; `fetch-timeout.spec.ts` ověřuje, že se hra nakonec vzpamatuje, a je zelený — kolik toho hráč mezitím vydrží, se neptá nikdo. Opraveno stropem `API_TOTAL_BUDGET_MS` na celé načtení — přeměřeno proti Docker buildu na **15,1 s** a jeden pokus. Per-attempt `FETCH_TIMEOUT_MS` zůstává 15 s: je nastavený z měření a snižovat ho naslepo by odřízlo pomalá, ale funkční připojení. Nespolehlivé připojení selže rychle a dostane všechny retry dál; zkrátí se jen to visící. |
+| 2026-08-25 | **P — Product** | Uzavření mutačního backlogu na **97,54 %**. Poslední kolo zabilo sedm mutantů ve třech datových tvarech, které fixtures nikdy neměly: prázdný quote bucket, mluvčí bez `general` poolu a losování, které nesáhlo dál než na první prvek. Zbylých sedm je **ekvivalentních** a je v [SUITE-HEALTH.md](SUITE-HEALTH.md) vypsaných jmenovitě, aby je nikdo nehonil. Vzorec napříč celým backlogem: **testy popisovaly tvar odpovědi, ne její původ** — „vrátila se permutace", „vrátily se tři otázky", „našel se zdroj" jsou pravdy, které splní i rozbitá implementace. |
+| 2026-08-25 | **C — Claims** | Code review odhalilo, že jeden z „ekvivalentních" mutantů ekvivalentní nebyl. Tabulka ho popsala jako `normalized` → `true`; skutečný přeživší na témže řádku byl **`normalized.length > best` → `true`**, po kterém `bestMatchLength` vrací délku *posledního* odpovídajícího stemu místo *nejdelšího* — opak toho, co slibuje vlastní JSDoc, a základ pravidla specificity v `matchTopic`. Zabito, skóre 97,54 → **97,89 %**. Do tabulky ekvivalentů se od teď povinně píše rozsah sloupců: na jednom řádku bývá mutací víc a bez rozsahu se verdikt přiřadí té špatné. Odbýt mutanta jako ekvivalentního je rozhodnutí, které nikdo nepřezkoumá — proto k němu patří tvrdší důkaz než k testu. |
+| 2026-08-26 | **I — Image** | Náhledový obrázek pro sdílení byl jediný artefakt, kterého si nevšimne nic: v aplikaci se nevykresluje, žádná stránka bez něj nespadne a vizuální snapshoty ho nepokrývají — první známkou by byla prázdná karta na cizí timeline za pár dní. Ověřeno, že existuje, je to PNG s rozměry, které `summary_large_image` vyžaduje, a že na něj absolutní URL míří `og:image` i `twitter:image` na každé stránce. Ověřeno oběma směry: smazání souboru i odstranění `twitter:image` ze šablony test shodí. |
+| 2026-08-26 | **H — History** | Všech 7 vizuálních baseline zachycovalo obrazovku **v klidu** — čerstvě načtenou, nebo dohranou. Stavy, ve kterých hráč hru skutečně tráví, baseline neměly, takže rozpad layoutu jen uprostřed kola by prošel. `V08.01` a `V09.01` doplňují rozehraný hangman a výherní modal na mobilu. Ověřeno, že změna `.modal-icon` v CSS je shodí. |
