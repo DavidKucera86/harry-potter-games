@@ -15,6 +15,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-22 | 1075 | 98 | 87,74 / 78,63 | 85,86 % | — | 7 týdnů | 0 |
 | 2026-08-22 | 1125 | 99 | 87,73 / 78,58 | 90,28 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1134 | 99 | 87,73 / 78,58 | 92,36 % | — | 7 týdnů | 0 |
+| 2026-08-25 | 1136 | 99 | 87,73 / 78,58 | 93,06 % | — | 7 týdnů | 0 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 
@@ -29,7 +30,7 @@ podle hodnoty modulu.
 | `wordUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže |
 | `rpsUtils.ts` | 95,00 % | 1 | Malá doména, vyčerpávající tabulka; zbytek je nejspíš ekvivalentní mutant |
 | `urlUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; jeden ze tří mutantů byl reálná díra |
-| `chatEngine.ts` | 87,27 % | 18 | Největší modul; **3 mutanti bez pokrytí vůbec** — kód, kterého se nedotkne žádný test. **Další na řadě**, a poslední velká položka |
+| `chatEngine.ts` | 88,48 % | 16 | Poslední velká položka, bere se po skupinách. Hotovo: relaxovaná cesta follow-upů. Zbývá: nedosažitelné `?? []` fallbacky (3 bez pokrytí), hranice porovnání, náhodný výběr — **další na řadě** |
 | `deckUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-25 — viz níže; injektovatelný RNG zabil všech šest |
 | `hangmanUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; tabulka nahrazena Unicode dekompozicí |
 
@@ -140,6 +141,33 @@ záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou
 a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
+
+### 2026-08-25 — test na ten scénář existoval a byl zelený, jen se ptal na špatnou věc
+
+`suggestFollowUps` slibuje ve vlastním doc komentáři, že se vyloučení už položených otázek
+**uvolní**, místo aby hráči podstrčilo prázdnou nebo krátkou řadu. Ten slib plní dva řádky
+na konci funkce — a oba šly smazat se zelenou suitou.
+
+Test na ten scénář přitom existoval: *„still offers a full set when every question was
+already asked"*. Vylučuje úplně všechno a tvrdí, že řada má tři různé otázky. Jenže to
+platí i pod oběma mutanty:
+
+- bez `take(bespoke)` se řada dolije z generického fondu — pořád tři, ale téma přišlo
+  o vlastní otázky a konverzace se zasekne přesně tam, kde tomu mají per-topic sady
+  bránit;
+- bez `take(generic)` jde zkrátka téma, které vlastní míň než tři otázky.
+
+Typ mezery (technika, ne symptom): **assert na počet místo na původ.** „Vrátily se tři"
+je vlastnost, kterou splní i špatná odpověď. Nové testy se ptají, ze *kterého* fondu ty
+otázky přišly. Ověřeno proti oběma mutantům zvlášť.
+
+Orákulum: **C — Claims** — proti doc komentáři té funkce a obsahovým invariantům
+v CLAUDE.md.
+
+Poznámka k dalšímu postupu: `chatEngine` se nebere najednou. Zbylých 16 mutantů se dělí na
+nedosažitelné `?? []` fallbacky (tvarem totéž co mrtvá stráž `if (!url)` v `urlUtils`),
+hranice porovnání a náhodný výběr `random() * length` — tedy přesně to, co už bylo řešeno
+v `deckUtils`.
 
 ### 2026-08-25 — šest mutantů v jedné skrýši: testy říkaly, co `shuffle` zachovává, ne co dělá
 
