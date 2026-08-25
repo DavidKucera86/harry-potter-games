@@ -20,9 +20,9 @@
     "src/shared/urlUtils.ts",
     "src/shared/chatEngine.ts"
   ],
-  "_thresholds_comment": "break is set below the measured baseline (97.54% on 2026-08-25) so the scheduled job fails on a real regression, not on the noise of a mutant or two. A single mutant is worth ~0.36 points here, so the ~5.5-point cushion is about 15 mutants. Ratcheted 80 -> 87 -> 92 as the baseline moved; each step measured and rounded down, never above a baseline. The backlog is closed: all seven remaining survivors are equivalent mutants, listed by name in docs/SUITE-HEALTH.md, so the score is at its ceiling. A drop is a regression, not an opportunity.",
+  "_thresholds_comment": "high must stay at or above break: Stryker only validates high >= low, so a high below break prints a green table for a run that exits 1. break is set below the measured baseline (97.89% on 2026-08-25) so the scheduled job fails on a real regression, not on the noise of a mutant or two. A single mutant is worth ~0.36 points here, so the ~5.5-point cushion is about 15 mutants. Ratcheted 80 -> 87 -> 92 as the baseline moved; each step measured and rounded down, never above a baseline. The backlog is closed: all six remaining survivors are equivalent mutants, listed by name in docs/SUITE-HEALTH.md, so the score is at its ceiling. A drop is a regression, not an opportunity.",
   "thresholds": {
-    "high": 90,
+    "high": 95,
     "low": 70,
     "break": 92
   }
