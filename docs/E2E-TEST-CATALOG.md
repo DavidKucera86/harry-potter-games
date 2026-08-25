@@ -867,6 +867,17 @@
 - **When** se do stránky pokusí vložit inline skript
 - **Then** skript se nespustí
 
+### E61.01 — a whole round is playable from the menu with the keyboard alone
+**Soubor:** `tests/edge/keyboard-only.spec.ts`
+
+- **Given** menu je načtené a myš se nepoužije
+- **When** hráč dojde tabem na kartu hry a otevře ji Enterem
+- **Then** hra sama položí fokus na pole pro písmeno
+- **When** hráč uhádne celé jméno bez sáhnutí na myš
+- **Then** otevře se výherní modal s fokusem na svém tlačítku
+- **When** hráč potvrdí modal Enterem a vrátí se tabem na odkaz zpět
+- **Then** hráč je zpátky v menu, aniž by se jednou dotkl myši
+
 ## Visual (@visual)
 
 ### V01.01 — menu page layout

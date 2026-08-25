@@ -17,6 +17,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-25 | 1134 | 99 | 87,73 / 78,58 | 92,36 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1136 | 99 | 87,73 / 78,58 | 93,06 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1138 | 99 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 0 |
+| 2026-08-25 | 1138 | 100 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 0 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 

@@ -70,14 +70,16 @@ Skuteční uživatelé nejsou k dispozici, takže se používají zástupné sig
 | Artefakt | Vynuceno kde |
 |---|---|
 | Uživatel asistivní technologie | `tests/edge/a11y.spec.ts` (axe, WCAG 2.2 AA), `modal-accessibility.spec.ts` |
+| Uživatel bez myši | [tests/edge/keyboard-only.spec.ts](../tests/edge/keyboard-only.spec.ts) — axe na tohle neodpoví, čte DOM, neovládá stránku |
 | Uživatel na mobilu | `quiz-mobile.spec.ts`, `hangman-mobile.spec.ts`, `chat-mobile.spec.ts` |
 | Uživatel s pomalou/žádnou sítí | `fetch-timeout.spec.ts`, `api-retry.spec.ts`, `offline-fallback.spec.ts`, `pwa-offline.spec.ts` |
 | Uživatel citlivý na pohyb | `src/shared/motion.ts` + `tests/unit/motion.test.ts` |
 | Uživatel, který mluví anglicky | `i18n.spec.ts`, `tests/unit/i18n-parity.test.ts` |
 | Nescriptované chování | [EXPLORATORY-CHARTERS.md](EXPLORATORY-CHARTERS.md) |
 
-**Mezera:** hangman se ovládá klávesnicí a **nemá keyboard-only E2E scénář** — hraje se
-myší i v testech.
+**Mezera:** *(zavřeno 2026-08-25)* hangman se ovládá klávesnicí, ale suita ho hrála myší.
+Zavřeno `E61.01`, které projde menu → hru → modal → zpět bez jediného kliknutí a u každé
+zastávky ověří, že je fokus vidět.
 
 ## P — Product (vnitřní konzistence)
 
@@ -133,3 +135,4 @@ responsivitu a a11y na roveň testům.
 | 2026-08-25 | **P — Purpose** | `shuffle` v balíčku měl šest přeživších mutantů a všechny ve stejné skrýši: žádná aserce netvrdila, že funkce něco **změní**. Smazané tělo cyklu i `Math.random() * (i + 1)` → `/` vrátí nezměněný vstup, což pořád splňuje *stejné prvky, stejná délka, vstup nezmutovaný* — jediné, co property testy ověřovaly. Zelená property nad funkcí, která nedělá nic. Nahrazeno dosažitelností všech permutací (Fisher-Yates je uniformní) a počtem tahů z generátoru (přesně `n − 1`), zdroj náhody injektovaný jako v `rpsUtils.ts`. |
 | 2026-08-25 | **C — Claims** | Doc komentář `suggestFollowUps` slibuje, že se vyloučení už položených otázek uvolní, aby hráč nedostal prázdnou nebo krátkou řadu. Ten slib plní dva řádky a oba šlo smazat se zelenou suitou — test na ten scénář existoval, ale tvrdil jen *„vrátily se tři různé otázky"*, což platí i pod oběma mutanty. Bez `take(bespoke)` se řada dolije z generického fondu a téma přijde o vlastní otázky; bez `take(generic)` jde krátké téma zkrátka. Nové testy se ptají na **původ** otázek, ne na jejich počet. |
 | 2026-08-25 | **P — Product** | Předávání repliky od jiné postavy testoval vždy roster `[sage, pupil]`, kde byla správná odpověď prvním kandidátem — `find`, který uspěje napoprvé, neodliší funkční hledání od rozbitého. Pět mutantů (predikát na `true`, `> 0` na `>= 0`, `&&` na `||`, dvakrát zahozený optional chaining) tím prošlo. Přidána postava, která stojí **před** znalcem tématu a sama o něm neví nic. Zobecněně: fixture pro test vyhledávání musí obsahovat záznam, který se má přeskočit, a ten musí být vpředu. |
+| 2026-08-25 | **S — Standards** | WCAG 2.1.1 (Keyboard) nemělo v repu **žádné** orákulum. axe ho nezachytí — je to statická analýza DOM, ne ovládání stránky — a suita sahala v každé hře po myši. Mezeru měly zapsanou nezávisle dvě místa: `U — Users` v tomhle souboru a charta #2. `E61.01` projde celou cestu z charty bez kliknutí. Cestou vyšlo najevo, že hangman fokusuje vstupní pole sám, ale jen za `(hover: hover) and (pointer: fine)` — první verze testu k poli tabovala, a tím od něj odcházela. Test to teď tvrdí, místo aby s tím závodil. |
