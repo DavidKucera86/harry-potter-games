@@ -256,6 +256,14 @@
 - **When** uživatel uhádne poslední písmeno s klávesou Enter
 - **Then** zobrazí se výherní modal
 
+### E06.03 — an accent outside the Czech alphabet is guessed, not given away
+**Soubor:** `tests/edge/hangman-diacritics.spec.ts`
+
+- **Given** hra je načtená s postavou „Zoë“
+- **Then** žádné písmeno není odhalené předem
+- **When** uživatel uhádne písmeno e bez diakritiky
+- **Then** odhalí se písmeno Ë
+
 ### E07.01 — guess-house shows defeat modal after 10 wrong answers
 **Soubor:** `tests/edge/quiz-lose.spec.ts`
 
