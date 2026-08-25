@@ -53,6 +53,47 @@ describe('fetchWithRetry timeout handling', () => {
     expect(data).toEqual([{ id: '1', name: 'Albus' }]);
   });
 
+  // A connection that hangs rather than fails costs a full timeout per attempt, so
+  // retrying it three times spends three timeouts before the player sees anything —
+  // measured at 48 s against the Docker build (exploratory charter #1). Retries are
+  // there for a flaky connection, which fails fast and still gets all of them.
+  it('stops retrying once the total budget is spent, instead of paying a timeout per attempt', async () => {
+    vi.stubGlobal('window', { __HP_FETCH_TIMEOUT_MS: 10, __HP_API_BUDGET_MS: 1500 });
+
+    let attempts = 0;
+    vi.stubGlobal('fetch', vi.fn(async (url: string | URL | Request) => {
+      if (String(url).includes('/api/characters')) {
+        attempts++;
+        throw createAbortError();
+      }
+      return { ok: true, json: async () => [{ id: '9', name: 'Fixture Albus' }] };
+    }));
+
+    const promise = getCharacters();
+    await vi.runAllTimersAsync();
+    await promise;
+
+    expect(attempts).toBeLessThan(GAME_CONFIG.API_RETRIES);
+    expect(attempts).toBeGreaterThan(0);
+  });
+
+  it('still spends every attempt on a connection that fails fast', async () => {
+    let attempts = 0;
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      attempts++;
+      if (attempts < GAME_CONFIG.API_RETRIES) {
+        throw createAbortError();
+      }
+      return { ok: true, json: async () => [{ id: '1', name: 'Albus' }] };
+    }));
+
+    const promise = getCharacters();
+    await vi.runAllTimersAsync();
+    await promise;
+
+    expect(attempts).toBe(GAME_CONFIG.API_RETRIES);
+  });
+
   it('falls back to fixtures after all timeout attempts fail', async () => {
     vi.stubGlobal('fetch', vi.fn(async (url: string | URL | Request) => {
       if (String(url).includes('/api/characters')) {

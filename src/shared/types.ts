@@ -74,6 +74,7 @@ export type LoadGameDataOptions<T, R> = {
 declare global {
   interface Window {
     __HP_FETCH_TIMEOUT_MS?: number;
+    __HP_API_BUDGET_MS?: number;
   }
 }
 

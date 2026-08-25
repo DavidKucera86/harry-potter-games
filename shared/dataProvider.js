@@ -43,14 +43,24 @@ function getFetchTimeoutMs() {
   }
   return GAME_CONFIG.FETCH_TIMEOUT_MS;
 }
+function getApiBudgetMs() {
+  if (typeof window !== "undefined" && window.__HP_API_BUDGET_MS) {
+    return window.__HP_API_BUDGET_MS;
+  }
+  return GAME_CONFIG.API_TOTAL_BUDGET_MS;
+}
 function cacheStorageKey(storageKey) {
   return `${storageKey}-v${GAME_CONFIG.CACHE_VERSION}`;
 }
 async function fetchWithRetry(url) {
   let lastError;
+  const startedAt = Date.now();
+  const budgetMs = getApiBudgetMs();
+  const remainingBudget = () => budgetMs - (Date.now() - startedAt);
   for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), getFetchTimeoutMs());
+    const attemptTimeout = Math.min(getFetchTimeoutMs(), Math.max(remainingBudget(), 1));
+    const timeoutId = setTimeout(() => controller.abort(), attemptTimeout);
     try {
       const response = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
@@ -70,7 +80,13 @@ async function fetchWithRetry(url) {
       }
     }
     if (attempt < GAME_CONFIG.API_RETRIES - 1) {
+      if (remainingBudget() <= 0) {
+        break;
+      }
       await delay(GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1));
+      if (remainingBudget() <= 0) {
+        break;
+      }
     }
   }
   throw lastError ?? new Error("Fetch failed");

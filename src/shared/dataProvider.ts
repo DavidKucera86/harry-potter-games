@@ -72,6 +72,13 @@ function getFetchTimeoutMs(): number {
   return GAME_CONFIG.FETCH_TIMEOUT_MS;
 }
 
+function getApiBudgetMs(): number {
+  if (typeof window !== 'undefined' && window.__HP_API_BUDGET_MS) {
+    return window.__HP_API_BUDGET_MS;
+  }
+  return GAME_CONFIG.API_TOTAL_BUDGET_MS;
+}
+
 function cacheStorageKey(storageKey: string): string {
   return `${storageKey}-v${GAME_CONFIG.CACHE_VERSION}`;
 }
@@ -79,9 +86,16 @@ function cacheStorageKey(storageKey: string): string {
 async function fetchWithRetry(url: string): Promise<Response> {
   let lastError: Error | undefined;
 
+  const startedAt = Date.now();
+  const budgetMs = getApiBudgetMs();
+  const remainingBudget = () => budgetMs - (Date.now() - startedAt);
+
   for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), getFetchTimeoutMs());
+    // Never let one attempt outlive the budget: a hang would otherwise spend a full
+    // timeout here and leave the player waiting past the point of giving up.
+    const attemptTimeout = Math.min(getFetchTimeoutMs(), Math.max(remainingBudget(), 1));
+    const timeoutId = setTimeout(() => controller.abort(), attemptTimeout);
 
     try {
       const response = await fetch(url, { signal: controller.signal });
@@ -107,7 +121,13 @@ async function fetchWithRetry(url: string): Promise<Response> {
     }
 
     if (attempt < GAME_CONFIG.API_RETRIES - 1) {
+      if (remainingBudget() <= 0) {
+        break;
+      }
       await delay(GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1));
+      if (remainingBudget() <= 0) {
+        break;
+      }
     }
   }
 
