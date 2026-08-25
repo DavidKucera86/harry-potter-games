@@ -22,12 +22,14 @@ Chyba = **porušení konzistence** s jedním z osmi orákul.
 | Artefakt (zdroj pravdy) | Vynuceno kde |
 |---|---|
 | Commitnuté generované artefakty (`shared/*.js`, `*/index.html`, `sitemap.xml`, `robots.txt`) | [scripts/verify-build.mjs](../scripts/verify-build.mjs) — `git diff` proti buildu; pre-commit hook i CI |
-| 7 baseline PNG v `tests/visual/screenshots.spec.ts-snapshots/` | `tests/visual/screenshots.spec.ts`, `maxDiffPixelRatio: 0.01` |
+| 9 baseline PNG v `tests/visual/screenshots.spec.ts-snapshots/` — 7 klidových a 2 rozehrané | `tests/visual/screenshots.spec.ts`, `maxDiffPixelRatio: 0.01` |
 | [E2E-TEST-CATALOG.md](E2E-TEST-CATALOG.md) — popis chování ve stylu Given-When-Then | CI: `PLAYWRIGHT_CATALOG=1` regeneruje, `git diff --exit-code` selže při driftu |
 | `APP_VERSION` v [src/shared/config.ts](../src/shared/config.ts) | ručně — bump invaliduje sessionStorage i SW cache |
 
-**Mezera:** vizuální baseline pokrývají 7 obrazovek; stavy uprostřed hry (rozehraný hangman,
-otevřený modal na mobilu) baseline nemají.
+**Mezera:** *(zavřeno 2026-08-26)* vizuální baseline pokrývaly 7 obrazovek, všechny v klidu —
+čerstvě načtené, nebo dohrané. `V08.01` (rozehraný hangman: odhalená i chybná písmena,
+ubrané životy, chybová hláška) a `V09.01` (výherní modal na 375×667) doplňují stavy, ve
+kterých hráč hru skutečně tráví.
 
 ## I — Image (jak produkt vypadá a jak si říká)
 
@@ -35,10 +37,13 @@ otevřený modal na mobilu) baseline nemají.
 |---|---|
 | Název produktu napříč `manifest.webmanifest`, `<title>` všech stránek, `pages.menuTitle` | [tests/unit/brand-consistency.test.ts](../tests/unit/brand-consistency.test.ts) |
 | Install deskriptor PWA (`short_name` ≤ 12 znaků, `description`, `start_url`, ikony) | tamtéž |
-| `shared/og-image.png`, favicony, `store-assets/` | vizuální snapshoty jen částečně |
+| `shared/og-image.png` | [tests/unit/brand-consistency.test.ts](../tests/unit/brand-consistency.test.ts) — existence, PNG signatura, rozměry proti požadavkům Open Graph, a shoda s `og:image`/`twitter:image` na všech stránkách |
+| Favicony, `store-assets/` | vizuální snapshoty jen částečně |
 
-**Mezera:** náhledový obrázek pro sdílení (`og-image.png`) nemá žádný test; kdyby
-zmizel, pozná se to až podle rozbitého náhledu na sociální síti.
+**Mezera:** *(zavřeno 2026-08-26)* náhledový obrázek pro sdílení neměl žádný test.
+`brand-consistency.test.ts` teď ověřuje, že soubor existuje, je to PNG, má rozměry, které
+`summary_large_image` vyžaduje, a že na něj **absolutní** URL míří `og:image` i
+`twitter:image` na každé generované stránce.
 
 ## C — Comparable products (srovnatelný produkt)
 
@@ -139,3 +144,5 @@ responsivitu a a11y na roveň testům.
 | 2026-08-25 | **P — Purpose** | Exploratory charta #1: při API requestu, který nikdy neodpoví, sedí hráč **48 s na spinneru** bez vysvětlení — 3 pokusy × 15 s timeout + 2 × 1 s prodleva, naměřeno proti Docker buildu. Pak se hra korektně zotaví z lokálních fixtures, které byly instantně k dispozici celou tu dobu. Účel produktu je *rychlá hra pro děti na mobilu*; `fetch-timeout.spec.ts` ověřuje, že se hra nakonec vzpamatuje, a je zelený — kolik toho hráč mezitím vydrží, se neptá nikdo. Opraveno stropem `API_TOTAL_BUDGET_MS` na celé načtení — přeměřeno proti Docker buildu na **15,1 s** a jeden pokus. Per-attempt `FETCH_TIMEOUT_MS` zůstává 15 s: je nastavený z měření a snižovat ho naslepo by odřízlo pomalá, ale funkční připojení. Nespolehlivé připojení selže rychle a dostane všechny retry dál; zkrátí se jen to visící. |
 | 2026-08-25 | **P — Product** | Uzavření mutačního backlogu na **97,54 %**. Poslední kolo zabilo sedm mutantů ve třech datových tvarech, které fixtures nikdy neměly: prázdný quote bucket, mluvčí bez `general` poolu a losování, které nesáhlo dál než na první prvek. Zbylých sedm je **ekvivalentních** a je v [SUITE-HEALTH.md](SUITE-HEALTH.md) vypsaných jmenovitě, aby je nikdo nehonil. Vzorec napříč celým backlogem: **testy popisovaly tvar odpovědi, ne její původ** — „vrátila se permutace", „vrátily se tři otázky", „našel se zdroj" jsou pravdy, které splní i rozbitá implementace. |
 | 2026-08-25 | **C — Claims** | Code review odhalilo, že jeden z „ekvivalentních" mutantů ekvivalentní nebyl. Tabulka ho popsala jako `normalized` → `true`; skutečný přeživší na témže řádku byl **`normalized.length > best` → `true`**, po kterém `bestMatchLength` vrací délku *posledního* odpovídajícího stemu místo *nejdelšího* — opak toho, co slibuje vlastní JSDoc, a základ pravidla specificity v `matchTopic`. Zabito, skóre 97,54 → **97,89 %**. Do tabulky ekvivalentů se od teď povinně píše rozsah sloupců: na jednom řádku bývá mutací víc a bez rozsahu se verdikt přiřadí té špatné. Odbýt mutanta jako ekvivalentního je rozhodnutí, které nikdo nepřezkoumá — proto k němu patří tvrdší důkaz než k testu. |
+| 2026-08-26 | **I — Image** | Náhledový obrázek pro sdílení byl jediný artefakt, kterého si nevšimne nic: v aplikaci se nevykresluje, žádná stránka bez něj nespadne a vizuální snapshoty ho nepokrývají — první známkou by byla prázdná karta na cizí timeline za pár dní. Ověřeno, že existuje, je to PNG s rozměry, které `summary_large_image` vyžaduje, a že na něj absolutní URL míří `og:image` i `twitter:image` na každé stránce. Ověřeno oběma směry: smazání souboru i odstranění `twitter:image` ze šablony test shodí. |
+| 2026-08-26 | **H — History** | Všech 7 vizuálních baseline zachycovalo obrazovku **v klidu** — čerstvě načtenou, nebo dohranou. Stavy, ve kterých hráč hru skutečně tráví, baseline neměly, takže rozpad layoutu jen uprostřed kola by prošel. `V08.01` a `V09.01` doplňují rozehraný hangman a výherní modal na mobilu. Ověřeno, že změna `.modal-icon` v CSS je shodí. |

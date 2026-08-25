@@ -20,6 +20,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-25 | 1138 | 100 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 1 |
 | 2026-08-25 | 1147 | 101 | 87,81 / 79,41 | 97,54 % | — | 7 týdnů | 1 |
 | 2026-08-25 | 1148 | 101 | 87,81 / 79,41 | 97,89 % | — | 7 týdnů | 1 |
+| 2026-08-26 | 1150 | 103 | 87,81 / 79,41 | 97,89 % | — | 7 týdnů | 1 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 Počet E2E: `grep -rho '^\s*test(' tests/ --include='*.spec.ts' | wc -l` — **čísla se opisují z výstupu, ne odhadují.**

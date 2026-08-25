@@ -934,3 +934,17 @@
 - **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
 - **Given** hráč je v chatu s Brumbálem a vidí návrhy otázek
 - **Then** screenshot chatu odpovídá baseline
+
+### V08.01 — hangman mid-round with hits, misses and lost lives
+**Soubor:** `tests/visual/screenshots.spec.ts`
+
+- **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
+- **Given** uživatel je uprostřed rozehrané hry — něco trefil, něco ne
+- **Then** screenshot rozehrané hry odpovídá baseline
+
+### V09.01 — win modal on a mobile viewport
+**Soubor:** `tests/visual/screenshots.spec.ts`
+
+- **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
+- **Given** uživatel vyhraje na mobilním viewportu
+- **Then** screenshot modalu na mobilu odpovídá baseline
