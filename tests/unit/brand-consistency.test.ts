@@ -131,10 +131,12 @@ describe('the share preview is really there', () => {
     const bytes = readFileSync(join(root, OG_IMAGE_PATH));
     const { width, height } = pngSize(bytes);
 
-    // Open Graph rejects anything under 200x200 outright, and Twitter's
+    // Open Graph rejects anything under 200x200 outright; Twitter's
     // summary_large_image — which every page here declares — wants at least 300x157.
+    // The floor is the stricter of the two on each axis, or a regenerated image could
+    // pass here and still render the blank card this test exists to prevent.
     expect(width).toBeGreaterThanOrEqual(300);
-    expect(height).toBeGreaterThanOrEqual(157);
+    expect(height).toBeGreaterThanOrEqual(200);
     // Under 5 MB, or the crawlers skip it.
     expect(bytes.byteLength).toBeLessThan(5 * 1024 * 1024);
   });
@@ -147,8 +149,9 @@ describe('the share preview is really there', () => {
 
       expect(og, `${route}index.html has no og:image`).toBeTruthy();
       expect(og!.endsWith(`/${OG_IMAGE_PATH}`), `og:image points at ${og}`).toBe(true);
-      // A card declared summary_large_image with no twitter:image renders blank.
-      expect(twitter, `${route}index.html has no twitter:image`).toBe(og);
+      // A card declared summary_large_image with no twitter:image renders blank, and one
+      // pointing somewhere else renders the wrong thing. The message has to say which.
+      expect(twitter, `${route}index.html: twitter:image is ${twitter ?? 'missing'}, expected ${og}`).toBe(og);
       // Crawlers do not resolve relative URLs; the tag has to be absolute.
       expect(og!.startsWith('https://')).toBe(true);
     }

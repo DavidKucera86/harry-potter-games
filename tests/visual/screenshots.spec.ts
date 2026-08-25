@@ -163,7 +163,8 @@ test.describe('Visual regression @visual', () => {
       });
       await page.goto('/guess-character-name/');
       await waitForHangmanReady(page);
-      // Two hits and three misses: revealed slots, a wrong-letter row, four hearts gone.
+      // Two hits and three misses: revealed slots, a wrong-letter row, three of the ten
+      // hearts gone.
       await guessLetters(page, ['a', 'q', 'l', 'w', 'e']);
       await stabilizeVisualRendering(page);
     });
@@ -174,7 +175,7 @@ test.describe('Visual regression @visual', () => {
   });
 
   test('V09.01: win modal on a mobile viewport', { tag: '@visual' }, async ({ page }) => {
-    await given('uživatel vyhraje na mobilním viewportu', async () => {
+    await given('viewport je přenastaven na mobilních 375×667 a uživatel vyhraje', async () => {
       // The modal is the one thing that has to fit on top of everything else, and the
       // narrow viewport is where it has the least room to do it.
       await page.setViewportSize({ width: 375, height: 667 });
