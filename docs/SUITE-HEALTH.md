@@ -132,3 +132,31 @@ ze šesti, vybranou jednou a nikdy nepřehodnocenou. Kterákoli později přidan
 propadne. Opraveno na úrovni třídy: unit test porovnává všechny čtyři kopie seznamu rout
 (Dockerfile `COPY`, `sw.ts`, `sitemap.xml`, README), takže příště chybějící routa
 spadne bez ohledu na to, které hry se týká.
+
+**Oprava zápisu 2026-08-22:** ta věta byla nepřesná. Test tehdy porovnával tři kopie —
+`sw.ts`, `sitemap.xml` a README — Dockerfile `COPY` v něm nebyl, přestože ho tenhle
+záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou mezeru
+a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
+které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
+a tenhle záznam do ní spadl sám.
+
+### 2026-08-22 — kopie seznamu rout, kterou hlídal až build kontejneru
+
+Dockerfile `COPY` byl jediný ze čtyř zdrojů pravdy o seznamu rout bez unit testu.
+Chybějící routa se tak poznala až po `npm run test:docker` — o build kontejneru dál než
+PR gate, a přesně tou cestou kdysi propadla chat hra: 404 v kontejneru, zatímco všechny
+serve-based testy zelené.
+
+Doplněno do `brand-consistency.test.ts` **obousměrně**. Jednosměrná kontrola („každá hra
+je v `COPY`") by chytila chybějící routu, ale ne routu navíc — adresář, který se kopíruje
+do image a nikdo jiný o něm neví. Ověřeno oběma směry na upraveném Dockerfilu.
+
+Orákulum: **P — Product**. Nález ale nepřišel z testu, nýbrž ze čtení vlastní
+dokumentace: záznam výše tvrdil, že se `COPY` porovnává, `ORACLES.md` to vedl jako
+otevřenou mezeru, a kód držel s ORACLES.
+
+Typ mezery (technika, ne symptom): **duplikát mimo dosah rychlé brány.** Duplikovaná
+hodnota je v pořádku jen tehdy, když něco selže, jakmile se rozejde — ale *kdy* selže,
+rozhoduje o tom, jestli je to brzda, nebo jen zpráva o už rozbitém buildu. Kopie hlídaná
+až kontejnerem je prakticky nehlídaná: `test:docker` se pouští ručně před PR, ne při
+každém commitu.

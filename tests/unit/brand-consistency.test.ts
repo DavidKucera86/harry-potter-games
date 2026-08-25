@@ -6,11 +6,12 @@ import { cs } from '../../src/shared/i18n/locales/cs.ts';
 /**
  * Image oracle (HICCUPPS — see docs/ORACLES.md).
  *
- * The product's name, its route list and its install metadata are written down in four
- * places: the manifest, the generated page titles, the sitemap and the README table.
- * None of them is derived from the others, so any of them can go stale on its own —
- * and a stale one is invisible until someone installs the PWA, shares a link, or reads
- * the README expecting it to be true.
+ * The product writes the same facts down in several independent places. Its name lives
+ * in the manifest and in every generated page title; its route list lives in the sitemap,
+ * the README table, the service worker precache list and the Dockerfile COPY list. None
+ * of them is derived from the others, so any one can go stale on its own — and a stale
+ * one stays invisible until someone installs the PWA, shares a link, reads the README
+ * expecting it to be true, or opens a game in the container and gets a 404.
  *
  * The same pattern as tests/unit/security-headers.test.ts, which does this for the CSP:
  * duplicated values are fine as long as something fails when they diverge.
@@ -96,5 +97,16 @@ describe('the route list agrees with itself', () => {
     for (const route of GAME_ROUTES) {
       expect(sw, `sw.ts does not precache /${route}/`).toContain(`/${route}/`);
     }
+  });
+
+  it('ships every game route in the runtime image, and nothing else', () => {
+    // A route missing here 404s in the container while every serve-based test passes —
+    // the chat game shipped that way once. Until now only `npm run test:docker` caught
+    // it, which is a container build away from the PR gate.
+    const copied = [...read('Dockerfile').matchAll(/^COPY --from=build \/app\/(\S+) \.\/\1$/gm)]
+      .map(([, route]) => route)
+      .filter((route) => route !== 'shared');
+
+    expect([...copied].sort()).toEqual([...GAME_ROUTES].sort());
   });
 });
