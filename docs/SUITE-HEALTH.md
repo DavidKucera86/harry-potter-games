@@ -14,6 +14,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-22 | 1049 | 97 | 87,74 / 78,67 | 84,97 % | — | 7 týdnů | 0 |
 | 2026-08-22 | 1075 | 98 | 87,74 / 78,63 | 85,86 % | — | 7 týdnů | 0 |
 | 2026-08-22 | 1125 | 99 | 87,73 / 78,58 | 90,28 % | — | 7 týdnů | 0 |
+| 2026-08-25 | 1134 | 99 | 87,73 / 78,58 | 92,36 % | — | 7 týdnů | 0 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 
@@ -28,8 +29,8 @@ podle hodnoty modulu.
 | `wordUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže |
 | `rpsUtils.ts` | 95,00 % | 1 | Malá doména, vyčerpávající tabulka; zbytek je nejspíš ekvivalentní mutant |
 | `urlUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; jeden ze tří mutantů byl reálná díra |
-| `chatEngine.ts` | 87,27 % | 18 | Největší modul; **3 mutanti bez pokrytí vůbec** — kód, kterého se nedotkne žádný test. Na řadě po `deckUtils` |
-| `deckUtils.ts` | 81,25 % | 6 | `shuffle` bere globální `Math.random`; injektovatelný RNG by část z nich zabil — **další na řadě**, příčina je pojmenovaná |
+| `chatEngine.ts` | 87,27 % | 18 | Největší modul; **3 mutanti bez pokrytí vůbec** — kód, kterého se nedotkne žádný test. **Další na řadě**, a poslední velká položka |
+| `deckUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-25 — viz níže; injektovatelný RNG zabil všech šest |
 | `hangmanUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; tabulka nahrazena Unicode dekompozicí |
 
 ## Log nálezů
@@ -139,6 +140,37 @@ záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou
 a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
+
+### 2026-08-25 — šest mutantů v jedné skrýši: testy říkaly, co `shuffle` zachovává, ne co dělá
+
+Všech šest přeživších v `deckUtils.ts` se schovávalo za totéž. Smazání těla cyklu,
+`Math.random() * (i + 1)` → `/`, i cyklus, který se nespustí — všechny vrátí nezměněný
+vstup. A to pořád splňuje *stejné prvky, stejná délka, vstup nezmutovaný*, což bylo
+úplně všechno, co tabulkové testy i property ověřovaly.
+
+To je zrádnější než chybějící test. Property-based testy tam byly, běžely, byly zelené —
+jenže všechny aserce mluvily o tom, co funkce **zachovává**, a ani jedna o tom, co
+**dělá**. Invariant „výsledek je permutace vstupu" je pravdivý i pro funkci, která
+nedělá vůbec nic.
+
+Nahrazeno dvěma orákuly, z nichž ani jedno neopisuje cyklus:
+
+1. **Fisher-Yates je uniformní** — každá permutace musí být dosažitelná. Shuffle sesypaný
+   na identitu dosáhne jedné ze šesti.
+2. **Táhne přesně jedno náhodné číslo na prvek nad první** — to z něj dělá lineární
+   algoritmus a je to jediné, co odliší off-by-one v mezích cyklu od swapu, který je
+   náhodou no-op (`i > 0` → `i >= 0` swapuje prvek sám se sebou, na výstupu neznatelné,
+   na počtu tahů ano).
+
+Zdroj náhody je teď parametr s defaultem `Math.random`, stejný tvar jako `randomMove`
+v `rpsUtils.ts`. Volání v aplikaci se nemění a E2E helper `seedRandom` funguje dál.
+
+Orákulum: **P — Purpose** — balíček, který rozdává pořád stejné pořadí, není balíček.
+
+Typ mezery (technika, ne symptom): **jednostranný invariant.** Property test, který
+tvrdí jen zachování, projde i nad funkcí, která nedělá nic. Ke každému „co zůstává
+stejné" patří „co se musí změnit" — jinak je zelená property jen dražší způsob, jak
+netestovat.
 
 ### 2026-08-25 — kopie seznamu rout, kterou hlídal až build kontejneru
 
