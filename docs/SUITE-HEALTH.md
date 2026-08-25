@@ -133,14 +133,14 @@ propadne. Opraveno na úrovni třídy: unit test porovnává všechny čtyři ko
 (Dockerfile `COPY`, `sw.ts`, `sitemap.xml`, README), takže příště chybějící routa
 spadne bez ohledu na to, které hry se týká.
 
-**Oprava zápisu 2026-08-22:** ta věta byla nepřesná. Test tehdy porovnával tři kopie —
+**Oprava zápisu 2026-08-25:** ta věta byla nepřesná. Test tehdy porovnával tři kopie —
 `sw.ts`, `sitemap.xml` a README — Dockerfile `COPY` v něm nebyl, přestože ho tenhle
 záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou mezeru
 a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
 
-### 2026-08-22 — kopie seznamu rout, kterou hlídal až build kontejneru
+### 2026-08-25 — kopie seznamu rout, kterou hlídal až build kontejneru
 
 Dockerfile `COPY` byl jediný ze čtyř zdrojů pravdy o seznamu rout bez unit testu.
 Chybějící routa se tak poznala až po `npm run test:docker` — o build kontejneru dál než
