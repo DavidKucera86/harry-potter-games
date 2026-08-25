@@ -296,6 +296,31 @@ describe('suggestFollowUps', () => {
     expect(new Set(questions).size).toBe(FOLLOW_UP_COUNT);
   });
 
+  // Relaxing the exclusion must not also relax the ordering. Both of the unfiltered
+  // top-ups are load-bearing, and asserting only the row's length cannot tell them
+  // apart: drop either one and the player still gets three questions.
+  it('keeps the topic its own questions even once every one was already asked', () => {
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: [...followUps.byTopic.laska.cs, ...followUps.default.cs],
+    });
+    // Without the bespoke top-up the row silently turns generic — the dead end the
+    // per-topic sets exist to prevent (see the content invariants in CLAUDE.md).
+    expect([...questions].sort()).toEqual([...followUps.byTopic.laska.cs].sort());
+  });
+
+  it('tops a short bespoke set up from the default pool even once every one was asked', () => {
+    const questions = suggestFollowUps('smrt', followUps, 'cs', {
+      random: () => 0,
+      exclude: [...followUps.byTopic.smrt.cs, ...followUps.default.cs],
+    });
+    // 'smrt' owns a single question, so without the generic top-up the row goes short —
+    // and a short row is exactly what the doc comment promises never to hand the player.
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+    expect(questions[0]).toBe('Bojíš se smrti?');
+    expect(questions.slice(1).every(q => followUps.default.cs.includes(q))).toBe(true);
+  });
+
   it('honours an explicit count', () => {
     expect(suggestFollowUps(null, followUps, 'cs', { count: 2, random: () => 0 })).toHaveLength(2);
   });
