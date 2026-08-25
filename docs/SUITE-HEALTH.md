@@ -18,9 +18,13 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-25 | 1136 | 99 | 87,73 / 78,58 | 93,06 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1138 | 99 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1138 | 100 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 1 |
-| 2026-08-25 | 1146 | 101 | 87,81 / 79,41 | 97,54 % | — | 7 týdnů | 1 |
+| 2026-08-25 | 1147 | 101 | 87,81 / 79,41 | 97,54 % | — | 7 týdnů | 1 |
+| 2026-08-25 | 1148 | 101 | 87,81 / 79,41 | 97,89 % | — | 7 týdnů | 1 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
+Počet E2E: `grep -rho '^\s*test(' tests/ --include='*.spec.ts' | wc -l` — **čísla se opisují z výstupu, ne odhadují.**
+Řádek 1146/97,54 % byl původně zapsán z měření pořízeného před posledním přidaným testem;
+opraveno na 1147 po přepočtu.
 
 ## Přeživší mutanti — to-do list
 
@@ -28,8 +32,9 @@ Přeživší mutant je místo, kde by se kód dal změnit a **žádný test by s
 Není to chyba sama o sobě; je to díra, kterou by chyba prošla. Neřeš je hromadně — ber je
 podle hodnoty modulu.
 
-> **Backlog uzavřen 2026-08-25 na 97,54 %.** Všech 7 zbylých přeživších je **ekvivalentních** —
-> mění zápis, ne chování, takže je žádný test zabít nemůže. Jsou vypsané níže jmenovitě.
+> **Backlog uzavřen 2026-08-25 na 97,89 %.** Všech 6 zbylých přeživších je **ekvivalentních** —
+> mění zápis, ne chování, takže je žádný test zabít nemůže. Jsou vypsané níže jmenovitě
+> i s přesným rozsahem, protože jeden řádek téhle tabulky už jednou lhal (viz níže).
 > Skóre je tím na stropě: co půjde nahoru, je jen odstranění toho kódu, ne přidání testu.
 > **Když skóre klesne, je to regrese, ne prostor ke zlepšení.**
 
@@ -38,7 +43,7 @@ podle hodnoty modulu.
 | `wordUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže |
 | `rpsUtils.ts` | 95,00 % | 1 | **Ekvivalentní, ověřeno** — `RPS_MOVES.length - 1` → `+ 1` v `Math.min` clampu. `random()` je z intervalu `[0,1)`, takže `index ≤ 2` a clamp nikdy nezasáhne |
 | `urlUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; jeden ze tří mutantů byl reálná díra |
-| `chatEngine.ts` | 96,27 % | 6 | **Hotovo 2026-08-25.** Všech 6 zbylých je ekvivalentních — vypsané níže, nechytat se jich |
+| `chatEngine.ts` | 96,89 % | 5 | **Hotovo 2026-08-25.** Všech 5 zbylých je ekvivalentních — vypsané níže s rozsahem, nechytat se jich |
 | `deckUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-25 — viz níže; injektovatelný RNG zabil všech šest |
 | `hangmanUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; tabulka nahrazena Unicode dekompozicí |
 
@@ -150,24 +155,44 @@ a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v 
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
 
-### 2026-08-25 — konec backlogu: zbylo sedm ekvivalentů, vypsaných jmenovitě
+### 2026-08-25 — oprava: jeden „ekvivalent" ekvivalentní nebyl
 
-Poslední kolo zavřelo `chatEngine` na 96,27 % a celek na **97,54 %**. Zabito bylo sedm
+Tabulka výše tvrdila, že mutant na `chatEngine.ts:120` je `normalized` → `true`, a odbyla
+ho tím, že prázdný stem má délku 0. Skutečný přeživší je ale jiná mutace na témže řádku:
+**`normalized.length > best` → `true`** (rozsah 120:56-80). Ta není neškodná —
+`bestMatchLength` pak vrací délku **posledního** odpovídajícího stemu místo **nejdelšího**,
+což je přesně opak toho, co slibuje vlastní JSDoc, a na čem stojí pravidlo specificity
+v `matchTopic`: „temný pán" má vyhrát nad širším „temn".
+
+Zabito testem, který dá tématu dva stemy různé délky a druhé téma s délkou mezi nimi;
+`famfrpál` (8) musí porazit `koleje` (6) i když poslední odpovídající stem je `hra` (3).
+Skóre 97,54 → **97,89 %**, tedy skutečný strop.
+
+Typ mezery (technika, ne symptom): **verdikt zapsaný k mutantovi, který se jen podobá.**
+Na jednom řádku bývá mutací víc a bez rozsahu sloupců se od sebe nepoznají. Odbýt
+mutanta jako ekvivalentního je rozhodnutí, které nikdo nepřezkoumá — proto k němu patří
+tvrdší důkaz než k testu, ne měkčí. Do tabulky se proto povinně píše rozsah.
+
+### 2026-08-25 — konec backlogu: zbylé ekvivalenty, vypsané jmenovitě
+
+Poslední kolo zavřelo `chatEngine` na 96,27 % a celek na 97,54 % (po opravě výše na 96,89 % a **97,89 %**). Zabito bylo sedm
 mutantů ve třech datových tvarech, které fixtures nikdy neměly: prázdný quote bucket,
 mluvčí bez `general` poolu, a losování, které nikdy nesáhlo dál než na první prvek
 (`random() * length` — potřetí v tomhle repu, po `deckUtils` a `pickFromRemaining`).
 
 **Zbylých sedm je ekvivalentních.** Vypsané, aby je příště nikdo nehonil:
 
-| Místo | Mutace | Proč nemůže selhat |
+| Místo (rozsah) | Mutace | Proč nemůže selhat |
 |---|---|---|
-| `chatEngine.ts:120` | `normalized` → `true` | prázdný stem má délku 0, `0 > best` je nepravda tak jako tak |
-| `chatEngine.ts:120` | `>` → `>=` | přiřadí se stejná délka, `best` skončí stejně |
-| `chatEngine.ts:133` | `[]` → `["Stryker was here"]` | vyloučí řetězec, který se v obsahu nevyskytuje |
-| `chatEngine.ts:222` | celý predikát → `true` | do větve se dojde jen když mluvčí repliku nemá, což ho vyřadí i tak |
-| `chatEngine.ts:222` | vnitřní `?.` pryč | `LocalizedList` má obě lokalizace povinně |
-| `chatEngine.ts:255` | ternář → `true` | `byTopic[null]` je `undefined`, `?? []` dá totéž |
-| `rpsUtils.ts:22` | `length - 1` → `+ 1` | `random()` je z `[0,1)`, takže `index ≤ 2` a clamp nikdy nezasáhne |
+| `chatEngine.ts:120:56-80` | `>` → `>=` | přiřadí se stejná délka, `best` skončí stejně |
+| `chatEngine.ts:133:54-56` | `[]` → `["Stryker was here"]` | vyloučí řetězec, který se v obsahu nevyskytuje |
+| `chatEngine.ts:222:11-38` | `character.id !== speaker.id` → `true` | do větve se dojde jen když mluvčí repliku nemá, což ho vyřadí i podmínkou na délku |
+| `chatEngine.ts:222:43-84` | vnitřní `?.` pryč | `LocalizedList` má obě lokalizace povinně |
+| `chatEngine.ts:255:20-34` | `topic !== null` → `true` | `byTopic[null]` je `undefined`, `?? []` dá totéž |
+| `rpsUtils.ts:22:49` | `length - 1` → `+ 1` | `random()` je z `[0,1)`, takže `index ≤ 2` a clamp nikdy nezasáhne |
+
+**Rozsahy sloupců jsou v téhle tabulce povinné.** Bez nich se dvě různé mutace na jednom
+řádku popíšou stejně a verdikt se přiřadí té špatné — přesně to se tu jednou stalo.
 
 Typ mezery napříč celým backlogem, pokud si z něj má člověk odnést jednu věc:
 **testy popisovaly tvar odpovědi, ne její původ.** „Vrátila se permutace", „vrátily se tři

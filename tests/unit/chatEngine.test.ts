@@ -180,6 +180,40 @@ describe('resolveReply — own quotes', () => {
     expect(reply.topic).toBeNull();
   });
 
+  // `bestMatchLength` promises the *longest* matching stem, and matchTopic's whole
+  // specificity rule rests on it — "temný pán" must beat the broader "temn". Drop the
+  // `> best` comparison and it returns the *last* matching stem instead, which is the
+  // same number often enough to look fine and wrong exactly when specificity matters.
+  it('scores a topic by its longest matching stem, not by its last', () => {
+    const registry: TopicRegistry = {
+      famfrpal: { deferrable: false, keywords: { cs: ['famfrpál', 'hra'], en: ['quidditch', 'game'] } },
+      koleje: { deferrable: false, keywords: { cs: ['koleje'], en: ['houses'] } },
+    };
+    const commentator: ChatCharacter = {
+      id: 'commentator',
+      name: { cs: 'Komentátor', en: 'Commentator' },
+      title: { cs: 'Zkušební komentátor', en: 'Test Commentator' },
+      deferral: { cs: (a, b) => `${a}: ${b}`, en: (a, b) => `${a}: ${b}` },
+      quotes: {
+        famfrpal: { cs: ['O famfrpálu vím vše.'], en: ['I know all about quidditch.'] },
+        koleje: { cs: ['O kolejích vím vše.'], en: ['I know all about the houses.'] },
+      },
+      fallback: { cs: ['Netuším.'], en: ['No idea.'] },
+    };
+
+    // "famfrpál" (8) beats "koleje" (6); "hra" (3) matches too and is last in the list.
+    const reply = resolveReply(
+      'Je famfrpál hra pro koleje?',
+      commentator,
+      [commentator],
+      registry,
+      'cs',
+      { random: () => 0 },
+    );
+
+    expect(reply.topic).toBe('famfrpal');
+  });
+
   it('reaches the last quote in a bucket, not only the first', () => {
     // `random() * pool.length` is what spreads the pick. Mutate the `*` and every
     // player hears the same first line for a topic, forever.
