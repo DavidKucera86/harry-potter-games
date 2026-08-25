@@ -16,6 +16,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-22 | 1125 | 99 | 87,73 / 78,58 | 90,28 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1134 | 99 | 87,73 / 78,58 | 92,36 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1136 | 99 | 87,73 / 78,58 | 93,06 % | — | 7 týdnů | 0 |
+| 2026-08-25 | 1138 | 99 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 0 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 
@@ -30,7 +31,7 @@ podle hodnoty modulu.
 | `wordUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže |
 | `rpsUtils.ts` | 95,00 % | 1 | Malá doména, vyčerpávající tabulka; zbytek je nejspíš ekvivalentní mutant |
 | `urlUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; jeden ze tří mutantů byl reálná díra |
-| `chatEngine.ts` | 88,48 % | 16 | Poslední velká položka, bere se po skupinách. Hotovo: relaxovaná cesta follow-upů. Zbývá: nedosažitelné `?? []` fallbacky (3 bez pokrytí), hranice porovnání, náhodný výběr — **další na řadě** |
+| `chatEngine.ts` | 91,93 % | 13 | Bere se po skupinách. Hotovo: relaxovaná cesta follow-upů, hledání v rosteru, mrtvé `?? []` u `keywords`. Zbývá 13, z toho **nejméně 4 ekvivalentní** (viz log) — **další na řadě** je prázdný quote bucket, chybějící `general` a `random() * length` |
 | `deckUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-25 — viz níže; injektovatelný RNG zabil všech šest |
 | `hangmanUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; tabulka nahrazena Unicode dekompozicí |
 
@@ -141,6 +142,38 @@ záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou
 a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
+
+### 2026-08-25 — hledání, které nikdy nemuselo hledat
+
+Pět mutantů v předávání repliky od jiné postavy sedělo za jednou vlastností testů:
+roster byl vždycky `[sage, pupil]` a předával vždycky pupil sageovi. **Správná odpověď
+byla pokaždé první kandidát v pořadí.** `find`, který uspěje hned napoprvé, neodliší
+funkční hledání od rozbitého — predikát se dá přepsat na `true`, `> 0` povolit na `>= 0`,
+`&&` prohodit za `||` nebo zahodit optional chaining, a první záznam pořád odpoví.
+
+Přidána třetí postava, která stojí **před** tím, kdo téma zná, a sama o něm neví nic.
+Ověřeno proti všem pěti mutantům: každý po ní buď sáhne a předá šabloně repliku, která
+neexistuje, nebo spadne na chybějícím bucketu.
+
+Typ mezery (technika, ne symptom): **fixture, kde je správná odpověď první.** Test
+vyhledávání nad seznamem, jehož první prvek je hledaný, netestuje vyhledávání. Platí to
+i mimo tenhle modul — kdekoli se dělá `find`, `filter().0` nebo `sort().0`, musí fixture
+obsahovat záznam, který se má přeskočit, a ten musí být vpředu.
+
+Dva `?? []` u `def.keywords[locale]` naopak **smazány, ne otestovány**. `TopicDef.keywords`
+je povinné `Record<Locale, string[]>`, takže undefined nemůže nastat — typový systém tu
+větev vylučuje a typecheck bez ní projde. Tvarem totéž co mrtvá stráž `if (!url)`, kterou
+odložil `urlUtils`.
+
+**Oprava dřívějšího čtení tohohle modulu:** `character.id !== speaker.id` není to, co brání
+postavě předat repliku sama sobě. Do té větve se dojde jen tehdy, když mluvčí pro téma
+použitelnou repliku nemá — a tím pádem neprojde už podmínkou na délku. Ta klauzule je
+redundantní, ne nosná, a její mutant je **ekvivalentní**. Zapsáno, ne honěno.
+
+Ze zbylých 13 jsou nejméně čtyři ekvivalentní (obě zbylé varianty na řádku 222, ternář
+`topic !== null` a vnitřní optional chaining). Skutečně zabitelné zbývají: prázdný quote
+bucket u mluvčího, postava bez `general` bucketu a `random() * remaining.length` — poslední
+jmenovaný je přesně to, čím prošel `deckUtils`.
 
 ### 2026-08-25 — test na ten scénář existoval a byl zelený, jen se ptal na špatnou věc
 

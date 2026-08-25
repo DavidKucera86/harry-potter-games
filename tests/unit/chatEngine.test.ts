@@ -65,7 +65,27 @@ const pupil: ChatCharacter = {
   fallback: { cs: ['Netuším.'], en: ['No idea.'] },
 };
 
+/**
+ * Knows nothing about `smrt`, and stands *before* the character who does. Without it
+ * every deferral test asks a roster whose first candidate is already the right answer,
+ * which is a search that never has to search.
+ */
+const novice: ChatCharacter = {
+  id: 'novice',
+  name: { cs: 'Nováček', en: 'Novice' },
+  title: { cs: 'Zkušební nováček', en: 'Test Novice' },
+  deferral: {
+    cs: (source, quote) => `Ptej se jinde. ${source}: „${quote}"`,
+    en: (source, quote) => `Ask elsewhere. ${source}: “${quote}”`,
+  },
+  quotes: {
+    general: { cs: ['Nevím.'], en: ['Dunno.'] },
+  },
+  fallback: { cs: ['Nevím.'], en: ['Dunno.'] },
+};
+
 const roster = [sage, pupil];
+const rosterWithNovice = [novice, sage, pupil];
 
 describe('normalizeText', () => {
   it('lowercases and strips Czech diacritics', () => {
@@ -117,6 +137,26 @@ describe('resolveReply — own quotes', () => {
     // Pupil knows no `rodina` quote and rodina is not deferrable — the fallback
     // pool answers, so suggestions must not promise depth on that topic.
     const reply = resolveReply('Máš rodinu?', pupil, roster, topics, 'cs', { random: () => 0 });
+    expect(reply.topic).toBeNull();
+  });
+
+  it('skips a character who has nothing on the topic and keeps looking', () => {
+    // Novice comes first and knows no `smrt`. Reaching for him — or trusting the roster
+    // order — hands the deferral template a quote that does not exist.
+    const reply = resolveReply('Řekni mi o smrti', pupil, rosterWithNovice, topics, 'cs', {
+      random: () => 0,
+    });
+    expect(reply).toEqual({
+      text: 'To nevím, ale Mudrc říká: „Smrt je dobrodružství."',
+      topic: 'smrt',
+    });
+  });
+
+  it('answers from its own fallback when nobody in the roster knows the topic', () => {
+    const reply = resolveReply('Řekni mi o smrti', novice, [novice], topics, 'cs', {
+      random: () => 0,
+    });
+    expect([...novice.quotes.general.cs, ...novice.fallback.cs]).toContain(reply.text);
     expect(reply.topic).toBeNull();
   });
 
