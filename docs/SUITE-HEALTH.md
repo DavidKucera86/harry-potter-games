@@ -18,6 +18,7 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-25 | 1136 | 99 | 87,73 / 78,58 | 93,06 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1138 | 99 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 0 |
 | 2026-08-25 | 1138 | 100 | 87,73 / 79,18 | 95,07 % | — | 7 týdnů | 1 |
+| 2026-08-25 | 1146 | 101 | 87,81 / 79,41 | 97,54 % | — | 7 týdnů | 1 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 
@@ -27,12 +28,17 @@ Přeživší mutant je místo, kde by se kód dal změnit a **žádný test by s
 Není to chyba sama o sobě; je to díra, kterou by chyba prošla. Neřeš je hromadně — ber je
 podle hodnoty modulu.
 
+> **Backlog uzavřen 2026-08-25 na 97,54 %.** Všech 7 zbylých přeživších je **ekvivalentních** —
+> mění zápis, ne chování, takže je žádný test zabít nemůže. Jsou vypsané níže jmenovitě.
+> Skóre je tím na stropě: co půjde nahoru, je jen odstranění toho kódu, ne přidání testu.
+> **Když skóre klesne, je to regrese, ne prostor ke zlepšení.**
+
 | Modul | Score | Přeživších | Poznámka |
 |---|---|---|---|
 | `wordUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže |
-| `rpsUtils.ts` | 95,00 % | 1 | Malá doména, vyčerpávající tabulka; zbytek je nejspíš ekvivalentní mutant |
+| `rpsUtils.ts` | 95,00 % | 1 | **Ekvivalentní, ověřeno** — `RPS_MOVES.length - 1` → `+ 1` v `Math.min` clampu. `random()` je z intervalu `[0,1)`, takže `index ≤ 2` a clamp nikdy nezasáhne |
 | `urlUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; jeden ze tří mutantů byl reálná díra |
-| `chatEngine.ts` | 91,93 % | 13 | Bere se po skupinách. Hotovo: relaxovaná cesta follow-upů, hledání v rosteru, mrtvé `?? []` u `keywords`. Zbývá 13, z toho **nejméně 4 ekvivalentní** (viz log) — **další na řadě** je prázdný quote bucket, chybějící `general` a `random() * length` |
+| `chatEngine.ts` | 96,27 % | 6 | **Hotovo 2026-08-25.** Všech 6 zbylých je ekvivalentních — vypsané níže, nechytat se jich |
 | `deckUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-25 — viz níže; injektovatelný RNG zabil všech šest |
 | `hangmanUtils.ts` | 100,00 % | 0 | Vyřešeno 2026-08-22 — viz níže; tabulka nahrazena Unicode dekompozicí |
 
@@ -143,6 +149,33 @@ záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou
 a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
+
+### 2026-08-25 — konec backlogu: zbylo sedm ekvivalentů, vypsaných jmenovitě
+
+Poslední kolo zavřelo `chatEngine` na 96,27 % a celek na **97,54 %**. Zabito bylo sedm
+mutantů ve třech datových tvarech, které fixtures nikdy neměly: prázdný quote bucket,
+mluvčí bez `general` poolu, a losování, které nikdy nesáhlo dál než na první prvek
+(`random() * length` — potřetí v tomhle repu, po `deckUtils` a `pickFromRemaining`).
+
+**Zbylých sedm je ekvivalentních.** Vypsané, aby je příště nikdo nehonil:
+
+| Místo | Mutace | Proč nemůže selhat |
+|---|---|---|
+| `chatEngine.ts:120` | `normalized` → `true` | prázdný stem má délku 0, `0 > best` je nepravda tak jako tak |
+| `chatEngine.ts:120` | `>` → `>=` | přiřadí se stejná délka, `best` skončí stejně |
+| `chatEngine.ts:133` | `[]` → `["Stryker was here"]` | vyloučí řetězec, který se v obsahu nevyskytuje |
+| `chatEngine.ts:222` | celý predikát → `true` | do větve se dojde jen když mluvčí repliku nemá, což ho vyřadí i tak |
+| `chatEngine.ts:222` | vnitřní `?.` pryč | `LocalizedList` má obě lokalizace povinně |
+| `chatEngine.ts:255` | ternář → `true` | `byTopic[null]` je `undefined`, `?? []` dá totéž |
+| `rpsUtils.ts:22` | `length - 1` → `+ 1` | `random()` je z `[0,1)`, takže `index ≤ 2` a clamp nikdy nezasáhne |
+
+Typ mezery napříč celým backlogem, pokud si z něj má člověk odnést jednu věc:
+**testy popisovaly tvar odpovědi, ne její původ.** „Vrátila se permutace", „vrátily se tři
+otázky", „našel se zdroj" — všechno pravdy, které splní i rozbitá implementace. Mutanti
+padali teprve u asercí, které se ptaly *odkud* výsledek přišel.
+
+Práh `break` utažen 87 → 92. Baseline 97,54 %, jeden mutant tu váží ~0,36 bodu, takže
+5,5 bodu polštáře je zhruba 15 mutantů šumu. Nastaveno z měření, zaokrouhleno dolů.
 
 ### 2026-08-25 — hledání, které nikdy nemuselo hledat
 

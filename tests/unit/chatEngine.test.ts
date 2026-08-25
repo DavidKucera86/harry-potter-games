@@ -84,6 +84,26 @@ const novice: ChatCharacter = {
   fallback: { cs: ['Nevím.'], en: ['Dunno.'] },
 };
 
+/**
+ * Two shapes the fixtures never had: a topic bucket that exists but is empty, and no
+ * `general` pool at all. Both are reachable — a character may be written with a bucket
+ * later emptied, and `general` is optional — and both change which pool answers.
+ */
+const hermit: ChatCharacter = {
+  id: 'hermit',
+  name: { cs: 'Poustevník', en: 'Hermit' },
+  title: { cs: 'Zkušební poustevník', en: 'Test Hermit' },
+  deferral: {
+    cs: (source, quote) => `Slyšel jsem od ${source}: „${quote}"`,
+    en: (source, quote) => `I heard from ${source}: “${quote}”`,
+  },
+  quotes: {
+    // Empty on purpose: present, but with nothing to say.
+    laska: { cs: [], en: [] },
+  },
+  fallback: { cs: ['Mlčím.'], en: ['I stay silent.'] },
+};
+
 const roster = [sage, pupil];
 const rosterWithNovice = [novice, sage, pupil];
 
@@ -158,6 +178,39 @@ describe('resolveReply — own quotes', () => {
     });
     expect([...novice.quotes.general.cs, ...novice.fallback.cs]).toContain(reply.text);
     expect(reply.topic).toBeNull();
+  });
+
+  it('reaches the last quote in a bucket, not only the first', () => {
+    // `random() * pool.length` is what spreads the pick. Mutate the `*` and every
+    // player hears the same first line for a topic, forever.
+    const first = resolveReply('Co je láska?', sage, roster, topics, 'cs', { random: () => 0 });
+    const last = resolveReply('Co je láska?', sage, roster, topics, 'cs', { random: () => 0.999 });
+    expect(first.text).toBe(sage.quotes.laska.cs[0]);
+    expect(last.text).toBe(sage.quotes.laska.cs[sage.quotes.laska.cs.length - 1]);
+    expect(first.text).not.toBe(last.text);
+  });
+
+  it('treats an empty topic bucket as nothing to say, not as an answer', () => {
+    // `own` is truthy here — an empty array is — so only the length check stands
+    // between the player and a pick from an empty pool.
+    const reply = resolveReply('Co je láska?', hermit, [hermit, sage], topics, 'cs', {
+      random: () => 0,
+    });
+    // The topic matched and the bucket is empty, so the answer comes from the roster —
+    // relayed, not picked out of nothing.
+    expect(reply).toEqual({
+      text: 'Slyšel jsem od Mudrc: „Láska je mocná."',
+      topic: 'laska',
+    });
+  });
+
+  it('answers from the fallback alone when the speaker has no general pool', () => {
+    // `quotes.general` is optional. Without the guard this spreads `undefined` into the
+    // pool and the pick lands on nothing.
+    const reply = resolveReply('Něco úplně jiného', hermit, [hermit], topics, 'cs', {
+      random: () => 0,
+    });
+    expect(reply).toEqual({ text: 'Mlčím.', topic: null });
   });
 
   it('avoids repeating the excluded (previous) reply when alternatives exist', () => {
@@ -319,6 +372,17 @@ describe('suggestFollowUps', () => {
     expect(questions).toHaveLength(FOLLOW_UP_COUNT);
   });
 
+  it('accepts a single exclusion as a plain string, not only as an array', () => {
+    // The signature is `string | string[]`, and every test so far passed an array —
+    // so the string branch could return anything at all and nobody would notice.
+    const questions = suggestFollowUps('laska', followUps, 'cs', {
+      random: () => 0,
+      exclude: 'Je láska oběť?',
+    });
+    expect(questions).not.toContain('Je láska oběť?');
+    expect(questions).toHaveLength(FOLLOW_UP_COUNT);
+  });
+
   it('compares exclusions without case or diacritics', () => {
     const questions = suggestFollowUps('laska', followUps, 'cs', {
       random: () => 0,
@@ -359,6 +423,15 @@ describe('suggestFollowUps', () => {
     expect(questions).toHaveLength(FOLLOW_UP_COUNT);
     expect(questions[0]).toBe('Bojíš se smrti?');
     expect(questions.slice(1).every(q => followUps.default.cs.includes(q))).toBe(true);
+  });
+
+  it('draws follow-ups from across the pool, not always the first one left', () => {
+    // `random() * remaining.length` is what spreads the draw. Mutate the `*` and every
+    // round offers the same three questions in the same order, for every player.
+    const first = suggestFollowUps(null, followUps, 'cs', { count: 1, random: () => 0 });
+    const last = suggestFollowUps(null, followUps, 'cs', { count: 1, random: () => 0.999 });
+    expect(first).toEqual([followUps.default.cs[0]]);
+    expect(last).toEqual([followUps.default.cs[followUps.default.cs.length - 1]]);
   });
 
   it('honours an explicit count', () => {
