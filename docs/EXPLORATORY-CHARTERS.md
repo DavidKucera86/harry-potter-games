@@ -17,7 +17,7 @@ Orákula: [ORACLES.md](ORACLES.md).
 | # | Charta | Na co se dívat |
 |---|---|---|
 | 1 | **Chybové stavy** | Vypni síť uprostřed načítání. Nech API vrátit nesmysl. Rozbij obrázek. Vidí hráč něco srozumitelného, nebo prázdno? |
-| 2 | **Jen klávesnice** | Odlož myš. Projdi menu → hru → modal → zpět. Je fokus vždy vidět? Dá se z modalu odejít? *(Známá mezera: hangman nemá keyboard-only E2E.)* |
+| 2 | **Jen klávesnice** | Odlož myš. Projdi menu → hru → modal → zpět. Je fokus vždy vidět? Dá se z modalu odejít? *(Dřívější mezera „hangman nemá keyboard-only E2E" zavřena 2026-08-25 testem `E61.01` — charta teď hledá to, co skript nepokrývá: ostatní hry, přepnutí jazyka fokusem, návrat z modalu jinam než tlačítkem.)* |
 | 3 | **Pomalá síť a offline** | DevTools throttling na 3G, pak letadlový režim. Funguje offline **každá** z šesti her, ne jen ta první? |
 | 4 | **Přepnutí jazyka uprostřed hry** | Rozehraj, přepni cs↔en, pokračuj. Přeloží se i to, co už je na obrazovce? Modal? Hlášky? |
 | 5 | **Spam a dvojkliky** | Mačkej „Nová hra" a odpovědi tak rychle, jak to jde. Poteče záplava requestů? Započítá se odpověď dvakrát? |
