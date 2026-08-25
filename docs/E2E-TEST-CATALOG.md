@@ -946,5 +946,5 @@
 **Soubor:** `tests/visual/screenshots.spec.ts`
 
 - **Given** viewport je nastaven na 1280×720 a fonty jsou stabilizované
-- **Given** uživatel vyhraje na mobilním viewportu
+- **Given** viewport je přenastaven na mobilních 375×667 a uživatel vyhraje
 - **Then** screenshot modalu na mobilu odpovídá baseline
