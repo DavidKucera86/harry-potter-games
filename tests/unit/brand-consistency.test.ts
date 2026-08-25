@@ -110,3 +110,47 @@ describe('the route list agrees with itself', () => {
     expect([...copied].sort()).toEqual([...GAME_ROUTES].sort());
   });
 });
+
+/**
+ * The share preview is the one asset nothing else notices. It never renders in the app,
+ * no page breaks without it, and the visual snapshots do not cover it — the first sign it
+ * went missing is a blank card on someone else's timeline, days later.
+ */
+describe('the share preview is really there', () => {
+  const OG_IMAGE_PATH = 'shared/og-image.png';
+
+  /** Width and height straight out of the PNG's IHDR chunk — no decoder needed. */
+  function pngSize(bytes: Buffer): { width: number; height: number } {
+    const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    expect(bytes.subarray(0, 8).equals(signature), `${OG_IMAGE_PATH} is not a PNG`).toBe(true);
+    expect(bytes.subarray(12, 16).toString('ascii')).toBe('IHDR');
+    return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+  }
+
+  it('exists, is a PNG, and is big enough for a large summary card', () => {
+    const bytes = readFileSync(join(root, OG_IMAGE_PATH));
+    const { width, height } = pngSize(bytes);
+
+    // Open Graph rejects anything under 200x200 outright, and Twitter's
+    // summary_large_image — which every page here declares — wants at least 300x157.
+    expect(width).toBeGreaterThanOrEqual(300);
+    expect(height).toBeGreaterThanOrEqual(157);
+    // Under 5 MB, or the crawlers skip it.
+    expect(bytes.byteLength).toBeLessThan(5 * 1024 * 1024);
+  });
+
+  it('is what every generated page points at, in both card formats', () => {
+    for (const route of ['', ...GAME_ROUTES.map((r) => `${r}/`)]) {
+      const html = read(`${route}index.html`);
+      const og = html.match(/<meta property="og:image" content="([^"]+)">/)?.[1];
+      const twitter = html.match(/<meta name="twitter:image" content="([^"]+)">/)?.[1];
+
+      expect(og, `${route}index.html has no og:image`).toBeTruthy();
+      expect(og!.endsWith(`/${OG_IMAGE_PATH}`), `og:image points at ${og}`).toBe(true);
+      // A card declared summary_large_image with no twitter:image renders blank.
+      expect(twitter, `${route}index.html has no twitter:image`).toBe(og);
+      // Crawlers do not resolve relative URLs; the tag has to be absolute.
+      expect(og!.startsWith('https://')).toBe(true);
+    }
+  });
+});
