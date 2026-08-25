@@ -38,25 +38,25 @@ class FetchTimeoutError extends Error {
   }
 }
 function getFetchTimeoutMs() {
-  if (typeof window !== "undefined" && window.__HP_FETCH_TIMEOUT_MS) {
-    return window.__HP_FETCH_TIMEOUT_MS;
-  }
-  return GAME_CONFIG.FETCH_TIMEOUT_MS;
+  if (typeof window === "undefined") return GAME_CONFIG.FETCH_TIMEOUT_MS;
+  return window.__HP_FETCH_TIMEOUT_MS ?? GAME_CONFIG.FETCH_TIMEOUT_MS;
 }
 function getApiBudgetMs() {
-  if (typeof window !== "undefined" && window.__HP_API_BUDGET_MS) {
-    return window.__HP_API_BUDGET_MS;
-  }
-  return GAME_CONFIG.API_TOTAL_BUDGET_MS;
+  if (typeof window === "undefined") return GAME_CONFIG.API_TOTAL_BUDGET_MS;
+  return window.__HP_API_BUDGET_MS ?? GAME_CONFIG.API_TOTAL_BUDGET_MS;
+}
+function getFixtureTimeoutMs() {
+  if (typeof window === "undefined") return GAME_CONFIG.FIXTURE_TIMEOUT_MS;
+  return window.__HP_FIXTURE_TIMEOUT_MS ?? GAME_CONFIG.FIXTURE_TIMEOUT_MS;
 }
 function cacheStorageKey(storageKey) {
   return `${storageKey}-v${GAME_CONFIG.CACHE_VERSION}`;
 }
 async function fetchWithRetry(url) {
   let lastError;
-  const startedAt = Date.now();
+  const startedAt = performance.now();
   const budgetMs = getApiBudgetMs();
-  const remainingBudget = () => budgetMs - (Date.now() - startedAt);
+  const remainingBudget = () => budgetMs - (performance.now() - startedAt);
   for (let attempt = 0; attempt < GAME_CONFIG.API_RETRIES; attempt++) {
     const controller = new AbortController();
     const attemptTimeout = Math.min(getFetchTimeoutMs(), Math.max(remainingBudget(), 1));
@@ -80,19 +80,24 @@ async function fetchWithRetry(url) {
       }
     }
     if (attempt < GAME_CONFIG.API_RETRIES - 1) {
-      if (remainingBudget() <= 0) {
+      const sleepMs = GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1);
+      if (remainingBudget() <= sleepMs) {
         break;
       }
-      await delay(GAME_CONFIG.API_RETRY_DELAY_MS * (attempt + 1));
-      if (remainingBudget() <= 0) {
-        break;
-      }
+      await delay(sleepMs);
     }
   }
   throw lastError ?? new Error("Fetch failed");
 }
 async function loadFallback(url) {
-  const response = await fetch(url);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), getFixtureTimeoutMs());
+  let response;
+  try {
+    response = await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
   if (!response.ok) {
     throw new Error(`Fallback HTTP ${response.status}`);
   }

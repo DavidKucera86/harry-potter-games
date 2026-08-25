@@ -385,11 +385,17 @@
 - **When** timeout se prodlouží, API se obnoví a uživatel spustí novou hru
 - **Then** hra se načte a je hratelná
 
-### E24.01 — retries hung requests and loads on later attempt
+### E24.01 — retries a fast-failing request and loads on a later attempt
 **Soubor:** `tests/edge/fetch-timeout.spec.ts`
 
-- **Given** první dva API requesty visí a třetí uspěje
+- **Given** první dva API requesty spadnou hned a třetí uspěje
 - **Then** hra se načte po třetím pokusu
+
+### E24.02 — does not retry a hung request, it falls back instead
+**Soubor:** `tests/edge/fetch-timeout.spec.ts`
+
+- **Given** API visí a rozpočet je stejný jako timeout, jako v produkci
+- **Then** proběhl jediný pokus a hra běží z fixtures
 
 ### E25.01 — malicious character name is rendered as text in modal
 **Soubor:** `tests/edge/xss-safe-dom.spec.ts`
