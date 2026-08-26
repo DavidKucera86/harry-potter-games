@@ -21,9 +21,20 @@ Doplňuj čtvrtletně, nebo po každém větším zásahu do testů. Metodika: s
 | 2026-08-25 | 1147 | 101 | 87,81 / 79,41 | 97,54 % | — | 7 týdnů | 1 |
 | 2026-08-25 | 1148 | 101 | 87,81 / 79,41 | 97,89 % | — | 7 týdnů | 1 |
 | 2026-08-26 | 1150 | 103 | 87,81 / 79,41 | 97,89 % | — | 7 týdnů | 1 |
+| 2026-08-26 | 1150 | 103 | **77,55 / 54,58** | 97,89 % | — | 7 týdnů | 1 |
 
 Příkazy: `npm run test:coverage` · `npm run test:mutation` · `git log -1 --format=%ci -- <soubor>`
 Počet E2E: `grep -rho '^\s*test(' tests/ --include='*.spec.ts' | wc -l` — **čísla se opisují z výstupu, ne odhadují.**
+
+> **Coverage přes 2026-08-26 není srovnatelná.** Poslední řádek je první měřený na
+> vitestu 4. Vitest 3 počítal pokrytí z v8 byte-ranges, takže každý řádek datového modulu
+> byl „pokrytý statement" jen proto, že se modul naimportoval — `topics.ts` a `followUps.ts`
+> samy přisypaly ~2300 statements na 100 %. Vitest 4 počítá podle AST a ty dva soubory se
+> smrsknou na jeden statement každý. Jmenovatel spadl 3692 → 1332.
+>
+> **Pokrytí neklesalo. Přestalo se ředit.** Čísla nad tím řádkem měřila logiku
+> naředěnou obsahem, čísla pod ním měří logiku. Prahy jsou překalibrované ze změřeného
+> baseline, ne slevené.
 Řádek 1146/97,54 % byl původně zapsán z měření pořízeného před posledním přidaným testem;
 opraveno na 1147 po přepočtu.
 
@@ -155,6 +166,35 @@ záznam jmenoval. `docs/ORACLES.md` to celou dobu vedl správně jako otevřenou
 a kód držel s ORACLES. Doplněno tentýž den, viz záznam níže. Tvrzení v dokumentaci,
 které nic nevynucuje, je přesně ta past, kvůli které orákulum **C — Claims** existuje —
 a tenhle záznam do ní spadl sám.
+
+### 2026-08-26 — coverage gate měřil něco jiného, než si myslel
+
+Dependabot bump na vitest 4 spadl na coverage gate, přestože **všech 1150 testů prošlo**.
+Nebyla to regrese, ale výměna měřidla.
+
+Vitest 3 odvozoval pokrytí z v8 byte-ranges: každý řádek datového literálu se počítal jako
+statement a byl triviálně pokrytý pouhým importem modulu. `topics.ts` a `followUps.ts`
+takhle přisypaly zhruba **2300 statements na 100 %**. Vitest 4 počítá podle AST a ty dva
+soubory se smrsknou na jeden statement — což je, čím doopravdy jsou.
+
+| | vitest 3 | vitest 4 |
+|---|---|---|
+| Statements | 87,81 % (3242/3692) | 77,55 % (1033/1332) |
+| Branches | 79,41 % | 54,58 % |
+
+Těch 87,81 % nebylo pokrytí logiky. Bylo to pokrytí logiky naředěné obsahem.
+
+Jakmile ředění zmizelo, vylezly tři soubory, které se v něm schovávaly: `registerSw.ts`
+(0/39), `prefetchGameData.ts` (0/6) a `initLocale.ts` (0/3). Jsou to bootstrapy bez
+vlastní logiky, procvičené E2E, protože jinde běžet nemůžou — stejná kategorie jako
+`sw.ts` a `script.ts`, které config vylučoval už dřív. Vyloučeny se jmenovitým odkazem na
+spec, který každý z nich pokrývá.
+
+Typ mezery (technika, ne symptom): **metrika, jejíž jednotku nikdo neověřil.** Coverage se
+tři roky reportovala v procentech, aniž by kdokoli zkontroloval, co je ten jmenovatel zač.
+Prahy se pak poctivě kalibrovaly z „naměřeného baseline" — jenže baseline měřil něco
+jiného, než se předpokládalo. **U každé metriky, která hlídá bránu, patří k číslu i to,
+co se počítá** — a to se ověřuje pohledem na jednotlivé soubory, ne na součet.
 
 ### 2026-08-25 — oprava: jeden „ekvivalent" ekvivalentní nebyl
 
