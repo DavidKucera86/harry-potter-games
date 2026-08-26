@@ -1,24 +1,39 @@
 version: 2
 updates:
   # Runtime dependencies are deliberately zero (see CLAUDE.md § Security), so every
-  # npm update here is a devDependency. Grouped into one PR a week to keep the noise
-  # proportional to a hobby repo; `npm run audit` in CI is the gate that actually blocks.
+  # npm update here is a devDependency, and `npm run audit` in CI is the gate that
+  # actually blocks.
+  #
+  # Minors and patches share one PR a week — that is the noise this repo wants batched.
+  # Majors are deliberately left out of the group, so each gets its own PR. Grouping
+  # everything cost us twice in one week: typescript@7 could not install at all and took
+  # twelve working bumps down with it, then vitest@4 changed how coverage is counted and
+  # did the same. Neither was reviewable inside a thirteen-package diff, and neither
+  # should have been able to hold the others hostage.
   - package-ecosystem: npm
     directory: "/"
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
+    # One grouped PR plus room for the majors that now arrive separately.
+    open-pull-requests-limit: 10
     ignore:
-      # typescript-eslint zatím nemá vydání, které by TypeScript 7 povolovalo — i to
-      # nejnovější (8.68.0) má peer `typescript: >=4.8.4 <6.1.0`. Bump na 7 tak shodí
-      # `npm ci` na ERESOLVE, a protože je celá dev sada v jedné skupině, vezme s sebou
-      # i všechny ostatní bumpy. Odebrat, jakmile plugin peer rozšíří.
+      # typescript-eslint has no release that allows TypeScript 7 — even the newest
+      # (8.68.0) peers `typescript: >=4.8.4 <6.1.0`, so a bump to 7 fails `npm ci` with
+      # ERESOLVE. Lift this when the plugin widens its peer range.
       - dependency-name: typescript
         versions: ["7.x"]
+      # @types/node tracks the runtime, it does not lead it: .nvmrc pins Node 22 and CI
+      # reads that file, so types from a later major would describe APIs the runtime does
+      # not have. Bump this line deliberately when .nvmrc moves, not before.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
-      dev-dependencies:
+      dev-minor-and-patch:
         dependency-type: development
+        update-types:
+          - minor
+          - patch
         patterns:
           - "*"
 
