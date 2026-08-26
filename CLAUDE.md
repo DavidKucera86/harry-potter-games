@@ -119,7 +119,13 @@ The baseline below already exists in the codebase; keep it intact and extend it.
   runtime dependency without a strong reason. Keep `package-lock.json` committed, install
   with `npm ci`, and run `npm run audit` (`npm audit --audit-level=high`) before adding or
   upgrading any package. The same command gates the `pre_deploy_tests` CI job, so a new
-  high/critical advisory fails the build.
+  high/critical advisory fails the build. **TypeScript stays on 6.x** — typescript-eslint
+  has no release that allows TypeScript 7 (8.68.0 still peers `typescript: <6.1.0`), so a
+  bump to 7 fails `npm ci` outright. Dependabot is told to skip it in
+  [.github/dependabot.yml](.github/dependabot.yml); lift both when the plugin widens its
+  peer range. TypeScript only typechecks here — `noEmit` is set and esbuild does the
+  transpiling — so a compiler upgrade cannot change the shipped artifact, and
+  `npm run verify:build` proves it did not.
 - **Security headers & CSP** — the headers (Content-Security-Policy, Permissions-Policy,
   X-Content-Type-Options, Referrer-Policy, Strict-Transport-Security,
   Cross-Origin-Opener-Policy) have **one source of truth**:

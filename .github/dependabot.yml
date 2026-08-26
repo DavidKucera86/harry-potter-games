@@ -9,6 +9,13 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint zatím nemá vydání, které by TypeScript 7 povolovalo — i to
+      # nejnovější (8.68.0) má peer `typescript: >=4.8.4 <6.1.0`. Bump na 7 tak shodí
+      # `npm ci` na ERESOLVE, a protože je celá dev sada v jedné skupině, vezme s sebou
+      # i všechny ostatní bumpy. Odebrat, jakmile plugin peer rozšíří.
+      - dependency-name: typescript
+        versions: ["7.x"]
     groups:
       dev-dependencies:
         dependency-type: development
