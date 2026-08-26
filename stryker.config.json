@@ -4,7 +4,7 @@
   "packageManager": "npm",
   "testRunner": "vitest",
   "vitest": {
-    "configFile": "vitest.config.js"
+    "configFile": "vitest.config.mjs"
   },
   "reporters": ["html", "clear-text", "progress"],
   "htmlReporter": {
