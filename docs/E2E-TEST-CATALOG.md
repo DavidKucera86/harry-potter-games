@@ -817,6 +817,16 @@
 - **Given** hráč je v chatu s Brumbálem na úzkém viewportu
 - **Then** stránka se nedá posouvat do stran
 
+### E58.03 — the message field stays unfocused while reading character replies
+**Soubor:** `tests/edge/chat-mobile.spec.ts`
+
+- **Given** hráč vstoupí do chatu na mobilu
+- **Then** úvodní zprávu může číst bez fokusu v poli
+- **When** hráč sám napíše a odešle otázku
+- **Then** odpověď postavy opět čte bez fokusu v poli
+- **When** hráč vybere navrženou otázku
+- **Then** i po navržené otázce zůstane pole bez fokusu
+
 ### E59.01 — the chat room with suggestion chips has no serious axe violations
 **Soubor:** `tests/edge/a11y.spec.ts`
 

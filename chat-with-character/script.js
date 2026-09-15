@@ -1712,14 +1712,14 @@ var ChatGame = class extends BaseGame {
     this.showChatScreen(true);
     this.appendMessage("character", character.name[getLocale()], strings.chat.greeting(this.nickname));
     this.renderSuggestions(null);
-    this.messageInput?.focus();
+    this.focusMessageInputOnDesktop();
   }
   sendMessage() {
     if (!this.messageInput) return;
     const text = this.messageInput.value;
     this.messageInput.value = "";
     this.askQuestion(text);
-    this.messageInput.focus();
+    this.focusMessageInputOnDesktop();
   }
   /** Single entry point for a player question — from the form or a suggestion. */
   askQuestion(question) {
@@ -1758,10 +1758,18 @@ var ChatGame = class extends BaseGame {
     this.suggestionsEl.hidden = questions.length === 0;
     this.lastTopic = topic;
   }
-  /** Asks a suggested question; the clicked chip is gone, so focus moves on. */
+  /** Asks a suggested question and restores focus only for desktop keyboard users. */
   askSuggested(question) {
     this.askQuestion(question);
-    this.messageInput?.focus();
+    this.focusMessageInputOnDesktop();
+  }
+  /** Keep the keyboard closed while a player reads a reply on a touch screen. */
+  focusMessageInputOnDesktop() {
+    if (window.matchMedia("(pointer: coarse), (max-width: 600px)").matches) {
+      this.messageInput?.blur();
+    } else {
+      this.messageInput?.focus();
+    }
   }
   backToSetup() {
     this.clearSuggestions();
