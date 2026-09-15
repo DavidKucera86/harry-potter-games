@@ -137,7 +137,7 @@ export class ChatGame extends BaseGame {
     this.appendMessage('character', character.name[getLocale()], strings.chat.greeting(this.nickname));
     // The opening suggestions double as an answer to "what can I even ask?".
     this.renderSuggestions(null);
-    this.messageInput?.focus();
+    this.focusMessageInputOnDesktop();
   }
 
   sendMessage(): void {
@@ -146,7 +146,7 @@ export class ChatGame extends BaseGame {
     const text = this.messageInput.value;
     this.messageInput.value = '';
     this.askQuestion(text);
-    this.messageInput.focus();
+    this.focusMessageInputOnDesktop();
   }
 
   /** Single entry point for a player question — from the form or a suggestion. */
@@ -194,10 +194,19 @@ export class ChatGame extends BaseGame {
     this.lastTopic = topic;
   }
 
-  /** Asks a suggested question; the clicked chip is gone, so focus moves on. */
+  /** Asks a suggested question and restores focus only for desktop keyboard users. */
   askSuggested(question: string): void {
     this.askQuestion(question);
-    this.messageInput?.focus();
+    this.focusMessageInputOnDesktop();
+  }
+
+  /** Keep the keyboard closed while a player reads a reply on a touch screen. */
+  focusMessageInputOnDesktop(): void {
+    if (window.matchMedia('(pointer: coarse), (max-width: 600px)').matches) {
+      this.messageInput?.blur();
+    } else {
+      this.messageInput?.focus();
+    }
   }
 
   backToSetup(): void {
